@@ -6,7 +6,7 @@ import config from './config/config';
 import helloRouter from './routes/hello';
 import noteRouter from './routes/notes';
 import userRouter from './routes/user';
-import mongoose from 'mongoose';
+
 
 
 const NAMESPACE = 'Server';
@@ -46,11 +46,9 @@ app.use((req, res, next) => {
 
 
 /** Routes */
-
 app.use('/users', userRouter.router);
 app.use('/hello', helloRouter.router);
 app.use('/notes', noteRouter.router);
-
 
 
 
