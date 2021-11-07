@@ -16,7 +16,13 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const register = (req: Request, res: Response, next: NextFunction) => {
-    let { username, password } = req.body;
+    let { username, password, permissions} = req.body;
+
+    /** check if token user is authorized to create a new user with permissions */
+    if (permissions) {
+        
+    }
+
 
     User.find({ username }, 'username createdAt')
     .exec()
@@ -38,7 +44,8 @@ const register = (req: Request, res: Response, next: NextFunction) => {
                 const _user = new User({
                     _id: new mongoose.Types.ObjectId(),
                     username,
-                    password: hash
+                    password: hash,
+                    permissions
                 });
 
                 return _user
@@ -56,7 +63,7 @@ const register = (req: Request, res: Response, next: NextFunction) => {
                     });
             });
         };
-    });        
+    });  
 }
 
 
@@ -106,7 +113,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
 
 const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
     User.find()
-        .select('username createdAt')
+        .select('username createdAt permissions')
         .exec()
         .then((users) => {
             return res.status(200).json({

@@ -1,12 +1,21 @@
 import express from 'express';
 import controller from '../controllers/notes';
-import extractJWT from '../middleware/extractJWT';
+import JWT from '../middleware/extractJWT';
 
 const router = express.Router();
 
-router.get('/get/allNotes', extractJWT ,controller.getAllNotes);
-router.get('/post/note', extractJWT, controller.createNote);
-router.get('/get/myNotes', extractJWT, controller.getMyNotes);
+/** create */
+router.get('/post/note', JWT.extractJWT, controller.createNote);
+/** read */
+router.get('/get/allNotes', JWT.extractJWT ,controller.getAllNotes);
+router.get('/get/myNotes', JWT.getJWT, JWT.validateAdminToken, controller.getMyNotes);
+/** update */
+router.get('/put/updateNote', JWT.extractJWT, controller.updateNote);
+
+
+/** delete */
+
+
 
 
 export default { router };
