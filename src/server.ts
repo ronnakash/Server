@@ -3,7 +3,6 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import logging  from './config/logging';
 import config from './config/config';
-import helloRouter from './routes/hello';
 import noteRouter from './routes/notes';
 import userRouter from './routes/user';
 
@@ -47,7 +46,6 @@ app.use((req, res, next) => {
 
 /** Routes */
 app.use('/users', userRouter.router);
-app.use('/hello', helloRouter.router);
 app.use('/notes', noteRouter.router);
 
 
