@@ -11,10 +11,8 @@ router.get('/get/allNotes', JWT.extractJWT ,controller.getAllNotes);
 router.get('/get/myNotes', JWT.getJWT, JWT.validateAdminToken, controller.getMyNotes);
 /** update */
 router.get('/put/updateNote', JWT.extractJWT, controller.updateNote);
-
-
 /** delete */
-
+router.get('/delete/deleteNote', JWT.extractJWT, controller.deleteNote);
 
 
 

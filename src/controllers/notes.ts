@@ -4,77 +4,10 @@ import mongoose from 'mongoose';
 import Note from '../models/notes';
 import User from '../models/user';
 
-
-
 const NAMESPACE = 'Notes Controller';
 
-/** create */
 
-/**  getAllNotes
- * 
- * saves new note to database
- * user must be author of the note and have a valid token connected to username
- * req.body must contain author, body and title
- * 
-*/
 
-const createNote = (req: Request, res: Response, next: NextFunction) => {
-    let { author, title, body} = req.body;
-    let tokenAuthor = res.locals.jwt.username;
-    
-    if (!tokenAuthor){
-        return res.status(404).json({
-            message: "Cannot retreive user from token"
-        });
-    } else if (author != tokenAuthor){
-        return res.status(201).json({
-            message: "Token does not match author"
-        });
-    }
-
-    if (body){
-        const note = new Note({
-            _id: new mongoose.Types.ObjectId(),
-            author,
-            title, 
-            body
-        });
-        return note
-        .save()
-        .then((result) => {
-            return res.status(201).json({
-                note: result
-            });
-        })
-        .catch((error) => {
-            return res.status(500).json({
-                message: error.message,
-                error
-            });
-        });
-    }
-    else {
-        const note = new Note({
-            _id: new mongoose.Types.ObjectId(),
-            author,
-            title
-        });
-        return note
-        .save()
-        .then((result) => {
-            return res.status(201).json({
-                note: result
-            });
-        })
-        .catch((error) => {
-            return res.status(500).json({
-                message: error.message,
-                error
-            });
-        });
-    }
-
-};
 
 
 /** read */
@@ -149,11 +82,13 @@ const updateNote = (req: Request, res: Response, next: NextFunction) => {
     //validate author matches token
 
 
+
     Note.findOneAndUpdate({id, author}, {body, title})
         .exec()
         .then((note) => {
             return res.status(200).json({
-                note: note
+                messege: "updated note",
+                originalNote: note
             });
         })
         .catch((error) => {
@@ -162,10 +97,116 @@ const updateNote = (req: Request, res: Response, next: NextFunction) => {
                 error
             });
         });
-    
+
+};
+
+/** delete */
+
+/**  deleteNote
+ * 
+ * delete note by id
+ * user must be author of the note or have administrator permissions
+ * req.body must contain note id and author for note to delete
+ * 
+*/
+
+const deleteNote = (req: Request, res: Response, next: NextFunction) => {
+let { id, author} = req.body;
+/** validate permissions */
+
+
+
+/** query */
+Note.findOneAndRemove({id, author})
+    .exec()
+    .then((note) => {
+        return res.status(200).json({
+            messege: "deleted note",
+            deletedNote: note
+        });
+    })
+    .catch((error) => {
+        return res.status(500).json({
+            message: error.message,
+            error
+        });
+    });
+
 
 };
 
 
+/** deleteAllNotes */
 
-export default { createNote, getAllNotes, updateNote, getMyNotes };
+/** deleteAllUsersNotes */
+
+
+/** create */
+
+/**  getAllNotes
+ * 
+ * saves new note to database
+ * user must be author of the note and have a valid token connected to username
+ * req.body must contain author, body and title
+ * 
+*/
+
+const createNote = (req: Request, res: Response, next: NextFunction) => {
+    let { author, title, body} = req.body;
+    let tokenAuthor = res.locals.jwt.username;
+    
+    if (!tokenAuthor){
+        return res.status(404).json({
+            message: "Cannot retreive user from token"
+        });
+    } else if (author != tokenAuthor){
+        return res.status(201).json({
+            message: "Token does not match author"
+        });
+    }
+
+    if (body){
+        const note = new Note({
+            _id: new mongoose.Types.ObjectId(),
+            author,
+            title, 
+            body
+        });
+        return note
+        .save()
+        .then((result) => {
+            return res.status(201).json({
+                note: result
+            });
+        })
+        .catch((error) => {
+            return res.status(500).json({
+                message: error.message,
+                error
+            });
+        });
+    }
+    else {
+        const note = new Note({
+            _id: new mongoose.Types.ObjectId(),
+            author,
+            title
+        });
+        return note
+        .save()
+        .then((result) => {
+            return res.status(201).json({
+                note: result
+            });
+        })
+        .catch((error) => {
+            return res.status(500).json({
+                message: error.message,
+                error
+            });
+        });
+    }
+
+};
+
+export default { createNote, getAllNotes, updateNote, getMyNotes, deleteNote };
