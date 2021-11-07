@@ -1,6 +1,6 @@
 import express from 'express';
 import controller from '../controllers/user';
-import JWT from '../middleware/extractJWT';
+import JWT from '../middleware/authJWT';
 
 const router = express.Router();
 

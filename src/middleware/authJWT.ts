@@ -4,8 +4,10 @@ import logging from '../config/logging';
 import User from '../models/user';
 import { Request, Response, NextFunction } from 'express';
 
+
 const NAMESPACE = 'Auth';
 
+//validates if a token exist and saves token at res.locals.jwt
 const extractJWT = (req: Request, res: Response, next: NextFunction) => {
     logging.info(NAMESPACE, 'Validating token' );
 
@@ -31,6 +33,7 @@ const extractJWT = (req: Request, res: Response, next: NextFunction) => {
 };
 
 
+//extracts token and saves token at res.locals.jwt
 const getJWT = (req: Request, res: Response, next: NextFunction) => {
     logging.info(NAMESPACE, 'Getting token');
     let token = req.headers.authorization?.split(' ')[1];
@@ -50,6 +53,7 @@ const getJWT = (req: Request, res: Response, next: NextFunction) => {
 };
 
 
+//validates if a token exist and it user has administrator permissions in DB and saves token at res.locals.jwt
 const validateAdminToken = (req: Request, res: Response, next: NextFunction) => {
     let token = res.locals.jwt;
     let {username, permissions} = token;
@@ -57,14 +61,31 @@ const validateAdminToken = (req: Request, res: Response, next: NextFunction) => 
         logging.info(NAMESPACE, `Validating Token for user ${username} with permissions ${permissions}`);
         if (permissions == "Admin"){
             /**check if user is infact authorized in DB */
-            
-
+            User.findOne({username})
+                .exec()
+                .then((user) => {
+                    if (user && user.permissions == "Admin"){
+                        logging.info(NAMESPACE,`validated admin token for user ${username} with permissions ${permissions}`);
+                    }
+                    else {
+                        return res.status(404).json({
+                            message: `No user named ${username} find  with permissions ${permissions}`
+                        });
+                    }
+                })
+                .catch((error) => {
+                    return res.status(404).json({
+                        message: error,
+                        error
+                    });
+                });
             
             logging.info(NAMESPACE, 'validated Admin Token', username);
             next();
-        } else {
+        } 
+        else {
             return res.status(401).json({
-                message: 'No token found for action requiring admin permissions'
+            message: 'No token found for action requiring admin permissions'
             });
         }
     }
@@ -79,4 +100,7 @@ const validateAdminToken = (req: Request, res: Response, next: NextFunction) => 
 
 
 
-export default { extractJWT, getJWT, validateAdminToken};
+
+
+
+export default { extractJWT, getJWT, validateAdminToken };

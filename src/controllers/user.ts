@@ -129,4 +129,7 @@ const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
         });
 };
 
+
+
+
 export default { validateToken, register, login, getAllUsers };
