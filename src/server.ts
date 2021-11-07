@@ -7,7 +7,6 @@ import noteRouter from './routes/notes';
 import userRouter from './routes/user';
 
 
-
 const NAMESPACE = 'Server';
 const app = express();
 
@@ -16,7 +15,6 @@ const app = express();
 app.use((req, res, next) => {
     /** Log the req */
     logging.info(NAMESPACE, `METHOD: [${req.method}] - URL: [${req.url}] - IP: [${req.socket.remoteAddress}]`);
-
     res.on('finish', () => {
         /** Log the res */
         logging.info(NAMESPACE, `METHOD: [${req.method}] - URL: [${req.url}] - STATUS: [${res.statusCode}] - IP: [${req.socket.remoteAddress}]`);
@@ -58,10 +56,10 @@ app.use((req, res, next) => {
     });
 })
 
-/** Server */
 
+/** Server */
 const httpServer = http.createServer(app);
 httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server running on ${config.server.hostname}:${config.server.port}`));
 
 
-export default { app, NAMESPACE };
+export default app ;

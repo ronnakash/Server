@@ -7,66 +7,89 @@ import User from '../models/user';
 
 const NAMESPACE = 'User';
 
-const validateToken = (req: Request, res: Response, next: NextFunction) => {
-    logging.info(NAMESPACE, 'Token validated, user authorized.');
 
-    return res.status(200).json({
-        message: 'Token(s) validated'
-    });
-};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/** create */
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/** register
+ * 
+ * 
+ */
 
 const register = (req: Request, res: Response, next: NextFunction) => {
     let { username, password, permissions} = req.body;
 
     /** check if token user is authorized to create a new user with permissions */
     if (permissions) {
-        
+        User.find({ username }, 'username createdAt')
+            .exec()
+            .then((users) => {
+                if (users.length == 0) {
+                    bcryptjs.hash(password, 11, (hashError, hash) => {
+                        if (hashError) {
+                            return res.status(401).json({
+                                message: hashError.message,
+                                error: hashError
+                            });
+                        }
+                        const _user = new User({
+                            _id: new mongoose.Types.ObjectId(),
+                            username,
+                            password: hash,
+                            permissions
+                        });
+                        return _user
+                            .save()
+                            .then((user) => {
+                                return res.status(201).json({
+                                    user
+                                });
+                            })
+                            .catch((error) => {
+                                return res.status(500).json({
+                                    message: error.message,
+                                    error
+                                });
+                            });
+                    });
+                }  
+            });
+    }    
+    else {
+        logging.error(NAMESPACE, `Username ${username} taken`);
+        return res.status(401).json({
+            message: `Username ${username} taken! try a different one`
+        });
     }
+};
 
 
-    User.find({ username }, 'username createdAt')
-    .exec()
-    .then((users) => {
-        if (users.length !== 0) {
-            return res.status(401).json({
-                message: 'Username taken! try a different one'
-            });
-        }
-        else {
-            bcryptjs.hash(password, 11, (hashError, hash) => {
-                if (hashError) {
-                    return res.status(401).json({
-                        message: hashError.message,
-                        error: hashError
-                    });
-                }
 
-                const _user = new User({
-                    _id: new mongoose.Types.ObjectId(),
-                    username,
-                    password: hash,
-                    permissions
-                });
-
-                return _user
-                    .save()
-                    .then((user) => {
-                        return res.status(201).json({
-                            user
-                        });
-                    })
-                    .catch((error) => {
-                        return res.status(500).json({
-                            message: error.message,
-                            error
-                        });
-                    });
-            });
-        };
-    });  
-}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/** delete */
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/** update */
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/** read */
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/** login
+ * 
+ * 
+ */
 
 const login = (req: Request, res: Response, next: NextFunction) => {
     let { username, password } = req.body;
@@ -111,6 +134,11 @@ const login = (req: Request, res: Response, next: NextFunction) => {
         });
 };
 
+/** getAllUsers
+ * 
+ * 
+ */
+
 const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
     User.find()
         .select('username createdAt permissions')
@@ -128,6 +156,23 @@ const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
             });
         });
 };
+
+
+/** validateToken
+ * 
+ * 
+ */
+
+const validateToken = (req: Request, res: Response, next: NextFunction) => {
+    logging.info(NAMESPACE, 'Token validated, user authorized.');
+    return res.status(200).json({
+        message: 'Token(s) validated'
+    });
+};
+
+
+
+
 
 
 

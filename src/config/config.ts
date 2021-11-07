@@ -1,10 +1,13 @@
 import dotenv from 'dotenv';
 import logging from '../config/logging';
 
+
 const NAMESPACE = 'config';
 
 dotenv.config();
 
+
+// mongoose options
 const MONGO_OPTIONS = {
     useUnifiedTopology: true,
     useNewUrlParser: true,
@@ -14,6 +17,8 @@ const MONGO_OPTIONS = {
     retryWrites: false
 };
 
+
+//mongoose connection configuration
 const mongoose = require('mongoose');
 const uri = "mongodb+srv://Admin:pass@mongocluster.8zgcv.mongodb.net/db?retryWrites=true&w=majority";
 mongoose.connect(uri, MONGO_OPTIONS)
@@ -23,8 +28,7 @@ mongoose.connect(uri, MONGO_OPTIONS)
 })
 
 
-
-
+//server configuration
 const SERVER_HOSTNAME = process.env.SERVER_HOSTNAME || 'localhost';
 const SERVER_PORT = process.env.SERVER_PORT || 3001;
 const SERVER_TOKEN_EXPIRETIME = process.env.SERVER_TOKEN_EXPIRETIME || 3600;
@@ -40,9 +44,11 @@ const SERVER = {
         secret: SERVER_TOKEN_SECRET
     }
 };
+
 const config = {
     mongo : mongoose,
     server: SERVER
 }
+
 
 export default config;

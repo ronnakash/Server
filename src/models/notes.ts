@@ -13,8 +13,5 @@ const NoteSchema: Schema = new Schema(
     }
 );
 
-NoteSchema.post<INote>('save', function () {
-    logging.info('Mongo', 'You created a new note: ', this);
-});
 
 export default mongoose.model<INote>('Note', NoteSchema);
