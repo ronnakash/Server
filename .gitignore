@@ -2,3 +2,4 @@ node_modules
 SSH_Key
 SSH_Key.pub
 .vscode
+src/config/config.ts
