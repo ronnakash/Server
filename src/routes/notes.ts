@@ -5,14 +5,14 @@ import JWT from '../middleware/authJWT';
 const router = express.Router();
 
 /** create */
-router.get('/post/note', JWT.extractJWT, controller.createNote);
+router.get('/post/note', JWT.getJWT, JWT.validateUserOrAdmin, controller.createNote);
 /** read */
-router.get('/get/allNotes', JWT.extractJWT ,controller.getAllNotes);
-router.get('/get/myNotes', JWT.getJWT, JWT.validateAdminToken, controller.getMyNotes);
+router.get('/get/allNotes', JWT.getJWT, JWT.validateAdminToken ,controller.getAllNotes);
+router.get('/get/myNotes', JWT.getJWT, JWT.validateUserOrAdmin, controller.getMyNotes);
 /** update */
-router.get('/put/updateNote', JWT.extractJWT, controller.updateNote);
+router.get('/put/updateNote', JWT.getJWT, JWT.validateUserOrAdmin, controller.updateNote);
 /** delete */
-router.get('/delete/deleteNote', JWT.extractJWT, controller.deleteNote);
+router.get('/delete/deleteNote', JWT.getJWT, JWT.validateUserOrAdmin, controller.deleteNote);
 
 
 

@@ -69,6 +69,8 @@ const getJWT = (req: Request, res: Response, next: NextFunction) => {
  * 
  * validates if a token exist and it user has administrator permissions in DB
  * saves token at res.locals.jwt
+ * always called after getJWT
+ * 
 */
 
 const validateAdminToken = (req: Request, res: Response, next: NextFunction) => {
@@ -119,4 +121,30 @@ const validateAdminToken = (req: Request, res: Response, next: NextFunction) => 
 
 
 
-export default { extractJWT, getJWT, validateAdminToken };
+const validateUserOrAdmin = (req: Request, res: Response, next: NextFunction) => {
+    let token = res.locals.jwt;
+    let { tokenUser , tokenPermissions } = token;
+    let { user } = req.body;
+    if (tokenPermissions == 'Admin') {
+        validateAdminToken(req, res, next);
+    }
+    else if (tokenUser == user) {
+        logging.info(NAMESPACE, `Token user ${tokenUser} does not have admin permisiions but match request user ${user}`);
+        next();
+    }
+    else {
+        logging.error(NAMESPACE, `Token user ${tokenUser} does not have admin permisiions and does not match request user ${user}`);
+        return res.status(400).json({
+            message: `Token user ${tokenUser} does not have admin permisiions and does not match request user ${user}`,
+            tokenUser: tokenUser,
+            tokenUserPermissions: tokenPermissions,
+            requestUser: user
+        });
+    }
+
+};
+
+
+
+
+export default { extractJWT, getJWT, validateAdminToken, validateUserOrAdmin };

@@ -89,37 +89,22 @@ const getMyNotes = (req: Request, res: Response, next: NextFunction) => {
 
 const updateNote = (req: Request, res: Response, next: NextFunction) => {
     let { id, author, body, title } = req.body;
-    let tokenAuthor = res.locals.jwt.username;
-    //validate author matches token
-    if (tokenAuthor && author && tokenAuthor==author) {
-        Note.findOneAndUpdate({id, author}, {body, title})
-            .exec()
-            .then((note) => {
-                logging.info(NAMESPACE, 'Updated note', note);
-                return res.status(200).json({
-                    messege: "Updated note",
-                    originalNote: note
-                });
-            })
-            .catch((error) => {
-                logging.error(NAMESPACE, error.message, error);
-                return res.status(500).json({
-                    message: error.message,
-                    error
-                });
+    Note.findOneAndUpdate({id, author}, {body, title})
+        .exec()
+        .then((note) => {
+            logging.info(NAMESPACE, 'Updated note', note);
+            return res.status(200).json({
+                messege: "Updated note",
+                originalNote: note
             });
-    }
-    else if (!tokenAuthor){
-        logging.error(NAMESPACE, "Cannot retreive user from token");
-        return res.status(404).json({
-            message: "Cannot retreive user from token"
+        })
+        .catch((error) => {
+            logging.error(NAMESPACE, error.message, error);
+            return res.status(500).json({
+                message: error.message,
+                error
+            });
         });
-    } else{
-        logging.error(NAMESPACE, "Token does not match author");
-        return res.status(401).json({
-            message: "Token does not match author"
-        });
-    }
 };
 
 
@@ -137,11 +122,7 @@ const updateNote = (req: Request, res: Response, next: NextFunction) => {
 */
 
 const deleteNote = (req: Request, res: Response, next: NextFunction) => {
-let { id, author } = req.body;
-let tokenAuthor = res.locals.jwt.username;
-//validate author matches token
-if (tokenAuthor && author && tokenAuthor==author) {
-    /** query */
+    let { id, author } = req.body;
     Note.findOneAndRemove({id, author})
         .exec()
         .then((note) => {
@@ -158,77 +139,112 @@ if (tokenAuthor && author && tokenAuthor==author) {
                 error
             });
         });
-    }
-    else if (!tokenAuthor){
-        logging.error(NAMESPACE, "Cannot retreive user from token");
-        return res.status(404).json({
-            message: "Cannot retreive user from token"
-        });
-    } else{
-        logging.error(NAMESPACE, "Token does not match author");
-        return res.status(401).json({
-            message: "Token does not match author"
-        });
-    }
-
 };
 
 
-/** deleteAllNotes */
+/** deleteAllNotes 
+ * 
+ * deletes all notes in database
+ * requires admin permissions 
+ * be very cautious when using! all notes for all users will be deleted
+ * 
+ * 
+*/
 
-/** deleteAllUsersNotes */
+const deleteAllNotes = (req: Request, res: Response, next: NextFunction) => {
+    Note.deleteMany({})
+        .exec()
+        .then((notes) => {
+            return res.status(200).json({
+
+                message: `Deleted ${notes.deletedCount} notes`,
+                notes: notes,
+                count: notes.deletedCount
+            });
+        })
+        .catch((error) => {
+            logging.error(NAMESPACE, error.message, error);
+            return res.status(500).json({
+                message: error.message,
+                error
+            });
+        });
+};
+
+
+
+/** deleteAllUsersNotes 
+ * 
+ * delete all notes of a selected user
+ * request must contain username for which notes to delete
+ * token must be admin or belong to the user who's notes will be deleted 
+ * 
+*/
+
+const deleteAllUsersNotes = (req: Request, res: Response, next: NextFunction) => {
+    let { user } = req.body;
+    Note.deleteMany({author: user})
+    .select('-username')
+    .exec()
+    .then((notes) => {
+        return res.status(200).json({
+
+            message: `Deleted ${notes.deletedCount} notes for user ${user}`,
+            user: user,
+            notes: notes,
+            count: notes.deletedCount
+        });
+    })
+    .catch((error) => {
+        logging.error(NAMESPACE, error.message, error);
+        return res.status(500).json({
+            message: error.message,
+            error
+        });
+    });
+
+
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /** create */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**  getAllNotes
+/**  createNote
  * 
  * saves new note to database
  * user must be author of the note and have a valid token connected to username
+ * admins can also create notes for other users
  * req.body must contain author, body and title
  * 
 */
 
 const createNote = (req: Request, res: Response, next: NextFunction) => {
     let { author, title, body} = req.body;
-    let tokenAuthor = res.locals.jwt.username;
-    //validate author matches token
-    if (tokenAuthor && author && tokenAuthor==author) {
-        const note = new Note({
-            _id: new mongoose.Types.ObjectId(),
-            author,
-            title, 
-            body
-        });
-        return note.save()
-            .then((result) => {
-                logging.info(NAMESPACE, 'Created note', note);
-                return res.status(201).json({
-                    note: result
-                });
-            })
-            .catch((error) => {
-                logging.error(NAMESPACE, error.message, error);
-                return res.status(500).json({
-                    message: error.message,
-                    error
-                });
+    const note = new Note({
+        _id: new mongoose.Types.ObjectId(),
+        author,
+        title, 
+        body
+    });
+    return note.save()
+        .then((result) => {
+            logging.info(NAMESPACE, 'Created note', note);
+            return res.status(201).json({
+                note: result
             });
-    }
-    else if (!tokenAuthor){
-        return res.status(404).json({
-            message: "Cannot retreive user from token"
+        })
+        .catch((error) => {
+            logging.error(NAMESPACE, error.message, error);
+            return res.status(500).json({
+                message: error.message,
+                error
+            });
         });
-    } else if (author != tokenAuthor){
-        return res.status(401).json({
-            message: "Token does not match author"
-        });
-    }
 };
 
 
 
 
-export default { createNote, getAllNotes, updateNote, getMyNotes, deleteNote };
+export default { createNote, getAllNotes, updateNote, getMyNotes, deleteNote, deleteAllNotes, deleteAllUsersNotes};
