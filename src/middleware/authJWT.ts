@@ -119,6 +119,13 @@ const validateAdminToken = (req: Request, res: Response, next: NextFunction) => 
     }
 };
 
+/** validateUserOrAdmin 
+ * 
+ * checks if token user is admin or if token user matches request's first field
+ * the first field should always be author for note requests and username for user requests
+ * always called after getJWT
+ * 
+*/
 
 
 const validateUserOrAdmin = (req: Request, res: Response, next: NextFunction) => {
