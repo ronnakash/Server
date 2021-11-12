@@ -7,12 +7,14 @@ import { Request, Response, NextFunction } from 'express';
 
 const NAMESPACE = 'Auth';
 
+
 /** existsJWT 
  * 
  * checks if token exists
  * always called after getJWT
  * 
 */
+
 
 const existsJWT = (req: Request, res: Response, next: NextFunction) => {
     logging.info(NAMESPACE, 'verifying token exists');
@@ -27,12 +29,14 @@ const existsJWT = (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
+
 /** getJWT 
  * 
  * extracts token and verifies it
  * saves token at res.locals.jwt
  * 
 */
+
 
 const getJWT = (req: Request, res: Response, next: NextFunction) => {
     logging.info(NAMESPACE, 'Getting token');
@@ -62,7 +66,6 @@ const getJWT = (req: Request, res: Response, next: NextFunction) => {
 */
 
 
-
 const validateAdminToken = (req: Request, res: Response, next: NextFunction) => {
     let token = res.locals.jwt;
     let {username, permissions} = token;
@@ -79,6 +82,7 @@ const validateAdminToken = (req: Request, res: Response, next: NextFunction) => 
             });
         }
 };
+
 
 /** validateUserOrAdmin 
  * 
@@ -110,7 +114,6 @@ const validateUserOrAdmin = (req: Request, res: Response, next: NextFunction) =>
         });
     }
 };
-
 
 
 
