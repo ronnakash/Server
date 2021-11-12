@@ -67,6 +67,14 @@ const register = (req: Request, res: Response, next: NextFunction) => {
 
 
 
+
+const reg = (req: Request, res: Response, next: NextFunction) => {
+    let { newUserName, password, newUserPermissions} = req.body;
+    
+
+};
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /** delete */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,42 +102,39 @@ const register = (req: Request, res: Response, next: NextFunction) => {
 const login = (req: Request, res: Response, next: NextFunction) => {
     let { username, password } = req.body;
 
-    User.find({ username })
+    User.findOne({ username })
         .exec()
-        .then((users) => {
-            if (users.length !== 1) {
-                return res.status(401).json({
-                    message: 'Username does not exist'
+        .then((user) => {
+            if (user){
+                bcryptjs.compare(password, user.password, (error, result) => {
+                    if (error) {
+                        return res.status(401).json({
+                            message: 'Password Mismatch'
+                        });
+                    } else if (result) {
+                        JWT.signJWT(user, (error, token) => {
+                            if (error) {
+                                return res.status(500).json({
+                                    message: error.message,
+                                    error: error
+                                });
+                            } else if (token) {
+                                return res.status(200).json({
+                                    message: 'Auth successful',
+                                    token: token,
+                                    user: user
+                                });
+                            }
+                        });
+                    }
                 });
             }
-
-            bcryptjs.compare(password, users[0].password, (error, result) => {
-                if (error) {
-                    return res.status(401).json({
-                        message: 'Password Mismatch'
-                    });
-                } else if (result) {
-                    JWT.signJWT(users[0], (_error, token) => {
-                        if (_error) {
-                            return res.status(500).json({
-                                message: _error.message,
-                                error: _error
-                            });
-                        } else if (token) {
-                            return res.status(200).json({
-                                message: 'Auth successful',
-                                token: token,
-                                user: users[0]
-                            });
-                        }
-                    });
-                }
-            });
         })
-        .catch((err) => {
-            console.log(err);
+        .catch((error) => {
+            logging.error(NAMESPACE, error.message, error);
             res.status(500).json({
-                error: err
+                message: error.message,
+                error
             });
         });
 };

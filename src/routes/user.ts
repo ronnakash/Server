@@ -6,11 +6,11 @@ const router = express.Router();
 
 
 /** create */
-router.get('/post/register',JWT.getJWT, JWT.validateAdminToken, controller.register);
+router.post('/post/register',JWT.getJWT, JWT.validateAdminToken, controller.register);
 /** read */
-router.get('/get/validate', JWT.extractJWT, controller.validateToken);
-router.get('/post/login', controller.login);
-router.get('/get/all', JWT.extractJWT, controller.getAllUsers);
+router.get('/get/validate', JWT.getJWT, JWT.existsJWT, controller.validateToken);
+router.post('/post/login', controller.login);
+router.get('/get/all',JWT.getJWT, JWT.existsJWT, JWT.validateAdminToken, controller.getAllUsers);
 /** update */
 //chane password
 /** delete */
