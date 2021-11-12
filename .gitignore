@@ -1,6 +1,6 @@
 node_modules
-SSH_Key
-SSH_Key.pub
+sshKey
+sshKey.pub
 .vscode
 src/config/secret.ts
 docker.sh

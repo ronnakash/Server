@@ -101,13 +101,14 @@ const validateAdminToken = (req: Request, res: Response, next: NextFunction) => 
                     });
                 });
             
-            logging.info(NAMESPACE, 'validated Admin Token for ', username);
+            logging.info(NAMESPACE, `validated Admin Token for user ${username} with permissions ${permissions}`);
             next();
         } 
         else {
             logging.error(NAMESPACE,'No token found for action requiring admin permissions')
             return res.status(401).json({
-            message: 'No token found for action requiring admin permissions'
+            message: 'No token found for action requiring Admin permissions',
+            token: token
             });
         }
     }
