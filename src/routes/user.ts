@@ -12,7 +12,7 @@ router.get('/get/validate', JWT.getJWT, JWT.existsJWT, controller.validateToken)
 router.post('/post/login', controller.login);
 router.get('/get/all',JWT.getJWT, JWT.existsJWT, JWT.validateAdminToken, controller.getAllUsers);
 /** update */
-//chane password
+//change password
 /** delete */
 //delete user
 

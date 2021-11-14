@@ -92,7 +92,7 @@ const updateNote = (req: Request, res: Response, next: NextFunction) => {
     Note.findOneAndUpdate({id, author}, {body, title})
         .exec()
         .then((note) => {
-            logging.info(NAMESPACE, 'Updated note', note);
+            logging.info(NAMESPACE, 'Updated note');
             return res.status(200).json({
                 messege: "Updated note",
                 originalNote: note

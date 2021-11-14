@@ -13,6 +13,9 @@ router.get('/get/myNotes', JWT.getJWT, JWT.existsJWT, JWT.validateUserOrAdmin, c
 router.put('/put/updateNote', JWT.getJWT, JWT.existsJWT, JWT.validateUserOrAdmin, controller.updateNote);
 /** delete */
 router.delete('/delete/deleteNote', JWT.getJWT, JWT.existsJWT, JWT.validateUserOrAdmin, controller.deleteNote);
+router.delete('/delete/allNotes', JWT.getJWT, JWT.existsJWT, JWT.validateAdminToken ,controller.deleteAllNotes);
+router.delete('/delete/allUsersNotes', JWT.getJWT, JWT.existsJWT, JWT.validateUserOrAdmin ,controller.deleteAllUsersNotes);
+
 
 
 
