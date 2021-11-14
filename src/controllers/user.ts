@@ -15,6 +15,10 @@ const NAMESPACE = 'User';
 
 /** register
  * 
+ * register a new user
+ * 
+ * if you want to create a user with admin permissions,
+ * request must contain token with admin permissions
  * 
  */
 
@@ -198,6 +202,8 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
 
 /** login
  * 
+ * attempt to log a user in and create a token for the user
+ * request body must conain username and password
  * 
  */
 
@@ -245,6 +251,8 @@ const login = (req: Request, res: Response, next: NextFunction) => {
 
 /** getAllUsers
  * 
+ * get a list of all users
+ * requires admin permissions
  * 
  */
 
@@ -269,6 +277,9 @@ const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
 
 /** validateToken
  * 
+ * validates that token user exists and validates it
+ * actual verification happens before by middleware
+ * returns confirmation message if token is valid
  * 
  */
 
