@@ -66,8 +66,6 @@ const register = (req: Request, res: Response, next: NextFunction) => {
 };
 
 
-
-
 const reg = (req: Request, res: Response, next: NextFunction) => {
     let { newUserName, password, newUserPermissions} = req.body;
     
@@ -80,6 +78,35 @@ const reg = (req: Request, res: Response, next: NextFunction) => {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+/** deleteUser
+ * 
+ * deletes user from database by username
+ * requires admin permissions or token user must match username to delete
+ * request must contain username to delete
+ * 
+ */
+
+ const deleteUser = (req: Request, res: Response, next: NextFunction) => {
+    let { username } = req.body;
+    User.deleteOne()
+        .select ('-password')
+        .exec()
+        .then((user) => {
+            logging.info(NAMESPACE, `Deleted user ${username}`, user);
+            return res.status(200).json({
+                message: `Deleted user ${username}`,
+                user
+            });
+        })
+        .catch((error) => {
+            logging.error(NAMESPACE, error.message, error);
+            return res.status(500).json({
+                message: error.message,
+                error
+            });
+        });
+
+ }
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

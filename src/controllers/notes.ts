@@ -123,7 +123,7 @@ const updateNote = (req: Request, res: Response, next: NextFunction) => {
 
 const deleteNote = (req: Request, res: Response, next: NextFunction) => {
     let { id, author } = req.body;
-    Note.findOneAndRemove({id, author})
+    Note.deleteOne({id, author})
         .exec()
         .then((note) => {
             logging.info(NAMESPACE, 'Deleted note', note);
