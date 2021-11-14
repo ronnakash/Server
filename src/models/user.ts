@@ -3,10 +3,24 @@ import IUser from '../interfaces/user';
 
 const UserSchema: Schema = new Schema(
     {
-        username: { type: String, required: true, unique: true },
-        password: { type: String, required: true },
-        permissions: { type: String, required: false}
+        username: { 
+            type: String,
+            required: true,
+            unique: true 
+        },
+
+        password: { 
+            type: String,
+            required: true 
+        },
+
+        permissions: { 
+            type: String,
+            enum: ["Admin", "none"], 
+            default: "none" 
+        }
     },
+    
     {
         timestamps: true
     }

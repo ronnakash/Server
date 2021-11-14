@@ -116,5 +116,22 @@ const validateUserOrAdmin = (req: Request, res: Response, next: NextFunction) =>
 };
 
 
+/** adminIfNeeded 
+ * 
+ * checks if request contains admin permissions,
+ * and if so, verifies that an admin token exists
+ * 
+*/
 
-export default { existsJWT, getJWT, validateAdminToken, validateUserOrAdmin };
+const adminIfNeeded = (req: Request, res: Response, next: NextFunction) => {
+    let { permissions } = req.body;
+    if (permissions) {
+        validateAdminToken(req, res, next);
+    }
+    else {
+        next();
+    }
+};
+
+
+export default { existsJWT, getJWT, validateAdminToken, validateUserOrAdmin, adminIfNeeded };
