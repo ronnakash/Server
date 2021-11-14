@@ -113,7 +113,82 @@ const reg = (req: Request, res: Response, next: NextFunction) => {
 /** update */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/** changePassword
+ * 
+ * changes a users password in database
+ * requires admin permissions or token user must match username to update it's password
+ * request must contain username and old and new passwords
+ * old password provided must match password in database
+ * 
+ */
 
+async function changePassword (req: Request, res: Response, next: NextFunction) {
+    let { username, oldPassword, newPassword } = req.body;
+    //get user from database
+    const user = await User.findOne({username})
+        .exec()
+        .catch((error) => {
+            logging.error(NAMESPACE,error.message, error);
+            return res.status(500).json({
+                message: error.message,
+                error
+            });
+        });
+
+    if(user && user instanceof User && oldPassword != newPassword) {
+        // compare passwords
+        bcryptjs.compare(oldPassword, user.password, (error, success) => {
+            if (error) {
+                logging.error(NAMESPACE,error.message, error);
+                return res.status(500).json({
+                    message: error.message,
+                    error
+                });
+            }
+            else if (!success){
+                logging.error(NAMESPACE, `password mismatch for user ${username}`);
+                return res.status(500).json({
+                    message: `password mismatch for user ${username}`,
+                    oldPasswordProvided: oldPassword
+                });
+            } 
+            else { //success 
+                User.updateOne({username}, {password: newPassword})
+                    .select('-password')
+                    .exec()
+                    .then((user) => {
+                        logging.info(NAMESPACE,`changed password successfully for user ${username}`);
+                        return res.status(200).json({
+                            message: `changed password successfully`,
+                            user: user,
+                            newPassword: newPassword
+                        });
+                    })
+                    .catch ((error) => {
+                        logging.error(NAMESPACE, error.message, error);
+                        res.status(500).json({
+                            message: error.message,
+                            error
+                        });
+                    })
+            }
+        });
+    }
+    else if (oldPassword == newPassword) {
+        logging.error(NAMESPACE, `trying to change password to current password for user ${username}`);
+        return res.status(500).json({
+            message: `trying to change password to current password for user ${username}`,
+            oldPasswordProvided: oldPassword, 
+            newPassword: newPassword
+        });
+    }
+    else {
+        logging.error(NAMESPACE,`user ${username} not found`);
+        return res.status(400).json({
+            message: `user ${username} not found`
+        });
+    }
+ };
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,8 +210,10 @@ const login = (req: Request, res: Response, next: NextFunction) => {
             if (user){
                 bcryptjs.compare(password, user.password, (error, result) => {
                     if (error) {
+                        logging.error(NAMESPACE, error.message, error);
                         return res.status(401).json({
-                            message: 'Password Mismatch'
+                            message: 'Password mismatch',
+                            error
                         });
                     } else if (result) {
                         JWT.signJWT(user, (error, token) => {
@@ -173,7 +250,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
 
 const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
     User.find()
-        .select('username createdAt permissions')
+        .select('username permissions createdAt')
         .exec()
         .then((users) => {
             return res.status(200).json({
