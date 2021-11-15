@@ -6,8 +6,8 @@ const router = express.Router();
 
 
 /** create */
-router.post('/post/register',JWT.getJWT, JWT.adminIfNeeded, controller.register);
-router.post('/post/registerAndLogin',JWT.getJWT, JWT.adminIfNeeded, controller.register, controller.login);
+router.post('/post/register',JWT.getJWT, JWT.adminIfNeeded, controller.register, controller.returnLocals);
+router.post('/post/registerAndLogin',JWT.getJWT, JWT.adminIfNeeded, controller.register, controller.safeLogin, controller.returnLocals);
 /** read */
 router.get('/get/validate', JWT.getJWT, JWT.existsJWT, controller.validateToken);
 router.post('/post/login', controller.login);

@@ -27,18 +27,19 @@ const NAMESPACE = 'User';
 async function register (req: Request, res: Response, next: NextFunction) {
     let { username, password, permissions} = req.body;
     const hash = await bcryptjs.hash(password, 11);
-     new User({
+    const newUser = new User({
         username,
         password: hash,
         permissions
-        })
-            .save()
+        });
+        newUser.save()
             .then((user) => {
                 logging.info(NAMESPACE, `registered new user ${username} with permissions ${permissions}`);
-                return res.status(200).json({
+                res.locals.registered = {
                     registerMessage: `registered new user ${username} with permissions ${permissions}`, 
                     registerUser: user
-                });
+                };
+                res.locals.user = newUser
                 next();
             })
             .catch((error) => {
@@ -48,7 +49,6 @@ async function register (req: Request, res: Response, next: NextFunction) {
                     error
                 });
             });
-
 };
 
 
@@ -185,7 +185,7 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
 
 const login = (req: Request, res: Response, next: NextFunction) => {
     let { username, password } = req.body;
-
+    logging.info(NAMESPACE,`logging ${username} in`);
     User.findOne({ username })
         .exec()
         .then((user) => {
@@ -206,9 +206,9 @@ const login = (req: Request, res: Response, next: NextFunction) => {
                                 });
                             } else if (token) {
                                 return res.status(200).json({
-                                    loginMessage: 'Auth successful',
+                                    message: 'Auth successful',
                                     token: token,
-                                    loginUser: user
+                                    user
                                 });
                             }
                         });
@@ -224,6 +224,34 @@ const login = (req: Request, res: Response, next: NextFunction) => {
             });
         });
 };
+
+/** safeLogin 
+ * 
+ * login user right after user creation
+ * does not compare password to database
+ * 
+*/
+
+const safeLogin = (req: Request, res: Response, next: NextFunction) => {
+    let newUser = res.locals.user;
+    JWT.signJWT(newUser, (error, token) => {
+        if (error) {
+            return res.status(500).json({
+                message: error.message,
+                error: error
+            });
+        } else if (token) {
+            res.locals.login = {
+                loginMessage: 'Auth successful',
+                token: token,
+                loginUser: newUser
+            };
+            next();
+        }
+    });
+   
+};
+
 
 /** getAllUsers
  * 
@@ -267,10 +295,34 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
 };
 
 
+/** returnLocals */
+
+const returnLocals = (req: Request, res: Response, next: NextFunction) => {
+    let { registered , login } = res.locals;
+    if (registered && login) {
+        return res.status(200).json({
+            registered, 
+            login
+        });
+    } else if (registered) {
+        return res.status(200).json({
+            registered
+        });
+    } else if (login) {
+        return res.status(200).json({
+            login
+        });
+    } else {
+        logging.error(NAMESPACE,"Internal server error logging in or registering new user");
+        return res.status(500).json({
+            message:"Internal server error logging in or registering new user"
+        })
+    }
+
+};
 
 
 
 
 
-
-export default { validateToken, register, login, getAllUsers };
+export default { validateToken, register, login, getAllUsers, returnLocals, safeLogin };

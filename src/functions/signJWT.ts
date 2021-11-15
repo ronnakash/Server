@@ -4,7 +4,7 @@ import logging from '../config/logging';
 import IUser from '../interfaces/user';
 
 
-const NAMESPACE = 'Auth';
+const NAMESPACE = 'SignJWT';
 
 /** signJWT
  * 
@@ -14,7 +14,7 @@ const NAMESPACE = 'Auth';
 
 const signJWT = (user: IUser, callback: (error: Error | null, token: string | null) => void): void => {
 
-    logging.info(NAMESPACE, `Attempting to sign token for ${user._id}`);
+    logging.info(NAMESPACE, `Attempting to sign token for user ${user.username}`);
     
     try {
         jwt.sign(
