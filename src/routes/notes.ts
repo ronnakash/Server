@@ -21,8 +21,8 @@ router.get('/get/myNotes', controller.getMyNotes);
 router.put('/put/updateNote', controller.updateNote);
 /** delete */
 router.delete('/delete/deleteNote', controller.deleteNote);
-router.delete('/delete/allNotes' ,controller.deleteAllNotes);
-router.delete('/Admin/delete/allUsersNotes' ,controller.deleteAllUsersNotes);
+router.delete('/Admin/delete/allNotes' ,controller.deleteAllNotes);
+router.delete('/delete/allUsersNotes' ,controller.deleteAllUsersNotes);
 
 
 

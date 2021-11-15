@@ -7,11 +7,10 @@ const router = express.Router();
 
 //insert middleware
 router
-    .use(JWT.getJWT)
-    .get('/', JWT.existsJWT)
+    .use(JWT.getJWT, JWT.existsJWT)
     .post('/post/', JWT.adminIfNeeded)
-    .patch('/', JWT.existsJWT, JWT.validateUserOrAdmin)
-    .delete('/', JWT.existsJWT, JWT.validateUserOrAdmin)
+    .patch('/', JWT.validateUserOrAdmin)
+    .delete('/', JWT.validateUserOrAdmin)
     .use('/Admin', JWT.validateAdminToken);
 
 
