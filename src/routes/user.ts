@@ -13,9 +13,9 @@ router.get('/get/validate', JWT.getJWT, JWT.existsJWT, controller.validateToken)
 router.post('/post/login', controller.login);
 router.get('/get/all',JWT.getJWT, JWT.existsJWT, JWT.validateAdminToken, controller.getAllUsers);
 /** update */
-//change password
+router.post('/post/changePassword', JWT.getJWT, JWT.existsJWT, JWT.validateUserOrAdmin ,controller.changePassword);
 /** delete */
-//delete user
+router.post('/post/deleteUser', JWT.getJWT, JWT.existsJWT, JWT.validateUserOrAdmin ,controller.deleteUser);
 
 
 export default { router };

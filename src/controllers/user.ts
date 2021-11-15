@@ -185,7 +185,6 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
 
 const login = (req: Request, res: Response, next: NextFunction) => {
     let { username, password } = req.body;
-    logging.info(NAMESPACE,`logging ${username} in`);
     User.findOne({ username })
         .exec()
         .then((user) => {
@@ -200,13 +199,15 @@ const login = (req: Request, res: Response, next: NextFunction) => {
                     } else if (result) {
                         JWT.signJWT(user, (error, token) => {
                             if (error) {
+                                logging.error(NAMESPACE, error.message, error);
                                 return res.status(500).json({
                                     message: error.message,
                                     error: error
                                 });
                             } else if (token) {
+                                logging.info(NAMESPACE,`Auth successful for ${username}`);
                                 return res.status(200).json({
-                                    message: 'Auth successful',
+                                    message: `Auth successful for ${username}`,
                                     token: token,
                                     user
                                 });
@@ -236,13 +237,15 @@ const safeLogin = (req: Request, res: Response, next: NextFunction) => {
     let newUser = res.locals.user;
     JWT.signJWT(newUser, (error, token) => {
         if (error) {
+            logging.error(NAMESPACE, error.message, error);
             return res.status(500).json({
                 message: error.message,
                 error: error
             });
         } else if (token) {
+            logging.info(NAMESPACE,`Auth successful for ${newUser.username}`);
             res.locals.login = {
-                loginMessage: 'Auth successful',
+                loginMessage: `Auth successful for ${newUser.username}`,
                 token: token,
                 loginUser: newUser
             };
@@ -295,7 +298,12 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
 };
 
 
-/** returnLocals */
+/** returnLocals 
+ * 
+ * return objects saved in res.locals
+ * used for logging in right after registering new user
+ * 
+*/
 
 const returnLocals = (req: Request, res: Response, next: NextFunction) => {
     let { registered , login } = res.locals;
@@ -307,10 +315,6 @@ const returnLocals = (req: Request, res: Response, next: NextFunction) => {
     } else if (registered) {
         return res.status(200).json({
             registered
-        });
-    } else if (login) {
-        return res.status(200).json({
-            login
         });
     } else {
         logging.error(NAMESPACE,"Internal server error logging in or registering new user");
@@ -325,4 +329,4 @@ const returnLocals = (req: Request, res: Response, next: NextFunction) => {
 
 
 
-export default { validateToken, register, login, getAllUsers, returnLocals, safeLogin };
+export default { validateToken, register, deleteUser, changePassword, login, getAllUsers, returnLocals, safeLogin };

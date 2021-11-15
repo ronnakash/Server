@@ -4,3 +4,5 @@ sshKey.pub
 .vscode
 src/config/secret.ts
 docker.sh
+push.sh
+commitAndPush.sh
