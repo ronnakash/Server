@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import logging from '../config/logging';
 import mongoose from 'mongoose';
 import Note from '../models/notes';
+import notes from '../interfaces/notes';
 
 const NAMESPACE = 'Notes Controller';
 
@@ -245,6 +246,44 @@ const createNote = (req: Request, res: Response, next: NextFunction) => {
 };
 
 
+/** createNotes 
+ * 
+ * saves new notes to database
+ * user must be author of the note and have a valid token connected to username
+ * admins can also create notes for other users
+ * req.body must contain list of notes to create
+ * each containing author, body and title
+ * 
+*/
+
+const createNotes = (req: Request, res: Response, next: NextFunction) => {
+    let {notes} = req.body;
+    let newNotes: (notes & { _id: any; })[] = [];
+    notes.forEach((note: { author: any; title: any; body: any; }) => {
+        let { author, title, body } = note;
+        newNotes.push(new Note({
+            author,
+            title,
+            body
+        }));
+    });
+    Note.insertMany(newNotes)
+        .then((savedNotes) => {
+            logging.info(NAMESPACE, `Created ${savedNotes.length} new notes`)
+            return res.status(200).json({
+                message: `Created ${savedNotes.length} new notes`, 
+                newNotes
+            })
+        })
+        .catch((error) => {
+            logging.error(NAMESPACE, error.message, error);
+            return res.status(500).json({
+                message: error.message,
+                error
+            });
+        });
+};
 
 
-export default { createNote, getAllNotes, updateNote, getMyNotes, deleteNote, deleteAllNotes, deleteAllUsersNotes};
+
+export default { createNote, getAllNotes, updateNote, getMyNotes, deleteNote, deleteAllNotes, deleteAllUsersNotes, createNotes};
