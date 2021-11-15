@@ -62,4 +62,19 @@ const httpServer = http.createServer(app);
 httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server running on ${config.server.hostname}:${config.server.port}`));
 
 
+process.on('unhandledRejection', (error) => {
+    logging.error(NAMESPACE,`Unhandled rejection ${error}`)
+    httpServer.close(() => {
+        process.exit(1);
+    });
+});
+
+
+process.on('uncaughtException', (error) => {
+    logging.error(NAMESPACE,`Uncaught exception ${error}`)
+    process.exit(1);
+
+});
+
+
 export default app ;

@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import mongoose from 'mongoose';
 import bcryptjs from 'bcryptjs';
 import logging from '../config/logging';
 import JWT from '../functions/signJWT';
 import User from '../models/user';
-import authJWT from '../middleware/authJWT'
+
 
 const NAMESPACE = 'User';
 

@@ -5,17 +5,27 @@ import JWT from '../middleware/authJWT';
 const router = express.Router();
 
 
+//insert middleware
+router
+    .use(JWT.getJWT)
+    .get('/', JWT.existsJWT)
+    .post('/post/', JWT.adminIfNeeded)
+    .patch('/', JWT.existsJWT, JWT.validateUserOrAdmin)
+    .delete('/', JWT.existsJWT, JWT.validateUserOrAdmin)
+    .use('/Admin', JWT.validateAdminToken);
+
+
 /** create */
-router.post('/post/register',JWT.getJWT, JWT.adminIfNeeded, controller.register, controller.returnLocals);
-router.post('/post/registerAndLogin',JWT.getJWT, JWT.adminIfNeeded, controller.register, controller.safeLogin, controller.returnLocals);
+router.post('/post/register', controller.register, controller.returnLocals);
+router.post('/post/registerAndLogin', controller.register, controller.safeLogin, controller.returnLocals);
 /** read */
-router.get('/get/validate', JWT.getJWT, JWT.existsJWT, controller.validateToken);
-router.post('/post/login', controller.login);
-router.get('/get/all',JWT.getJWT, JWT.existsJWT, JWT.validateAdminToken, controller.getAllUsers);
+router.get('/get/validate', controller.validateToken);
+router.post('/login', controller.login);
+router.get('/Admin/get/all', controller.getAllUsers);
 /** update */
-router.post('/post/changePassword', JWT.getJWT, JWT.existsJWT, JWT.validateUserOrAdmin ,controller.changePassword);
+router.patch('/patch/changePassword', controller.changePassword);
 /** delete */
-router.post('/post/deleteUser', JWT.getJWT, JWT.existsJWT, JWT.validateUserOrAdmin ,controller.deleteUser);
+router.delete('/delete/deleteUser', controller.deleteUser);
 
 
 export default { router };

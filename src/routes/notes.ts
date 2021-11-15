@@ -4,18 +4,27 @@ import JWT from '../middleware/authJWT';
 
 const router = express.Router();
 
+
+//insert middleware
+router
+    .use(JWT.getJWT, JWT.existsJWT, JWT.validateUserOrAdmin)
+    .use('/Admin', JWT.validateAdminToken)
+
+
 /** create */
-router.post('/post/note', JWT.getJWT, JWT.existsJWT, JWT.validateUserOrAdmin, controller.createNote);
-router.post('/post/createNotes', JWT.getJWT, JWT.existsJWT, JWT.validateUserOrAdmin, controller.createNotes);
+router.post('/post/note', controller.createNote);
+router.post('/post/createNotes', controller.createNotes);
 /** read */
-router.get('/get/allNotes', JWT.getJWT, JWT.existsJWT, JWT.validateAdminToken ,controller.getAllNotes);
-router.get('/get/myNotes', JWT.getJWT, JWT.existsJWT, JWT.validateUserOrAdmin, controller.getMyNotes);
+router.get('/Admin/get/allNotes' ,controller.getAllNotes);
+router.get('/get/myNotes', controller.getMyNotes);
 /** update */
-router.put('/put/updateNote', JWT.getJWT, JWT.existsJWT, JWT.validateUserOrAdmin, controller.updateNote);
+router.put('/put/updateNote', controller.updateNote);
 /** delete */
-router.delete('/delete/deleteNote', JWT.getJWT, JWT.existsJWT, JWT.validateUserOrAdmin, controller.deleteNote);
-router.delete('/delete/allNotes', JWT.getJWT, JWT.existsJWT, JWT.validateAdminToken ,controller.deleteAllNotes);
-router.delete('/delete/allUsersNotes', JWT.getJWT, JWT.existsJWT, JWT.validateUserOrAdmin ,controller.deleteAllUsersNotes);
+router.delete('/delete/deleteNote', controller.deleteNote);
+router.delete('/delete/allNotes' ,controller.deleteAllNotes);
+router.delete('/Admin/delete/allUsersNotes' ,controller.deleteAllUsersNotes);
+
+
 
 
 export default { router };

@@ -19,6 +19,7 @@ const signJWT = (user: IUser, callback: (error: Error | null, token: string | nu
     try {
         jwt.sign(
             {
+                _id: user._id,
                 username: user.username,
                 permissions: user.permissions
             },

@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import config from '../config/config';
 import logging from '../config/logging';
-import User from '../models/user';
 import { Request, Response, NextFunction } from 'express';
 
 
@@ -94,7 +93,9 @@ const validateAdminToken = (req: Request, res: Response, next: NextFunction) => 
 
 
 const validateUserOrAdmin = (req: Request, res: Response, next: NextFunction) => {
+    
     let token = res.locals.jwt;
+    logging.info(NAMESPACE, 'token', token);
     let { tokenUser , tokenPermissions } = token;
     let { username } = req.body;
     if (tokenPermissions == 'Admin') {
