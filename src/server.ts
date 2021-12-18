@@ -3,8 +3,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import logging  from './config/logging';
 import config from './config/config';
-import noteRouter from './routes/notes';
-import userRouter from './routes/user';
+import AppError from './utils/appError';
+import adminRouter from './routes/authAdmin';
 
 
 const NAMESPACE = 'Server';
@@ -43,16 +43,17 @@ app.use((req, res, next) => {
 
 
 /** Routes */
-app.use('/users', userRouter.router);
-app.use('/notes', noteRouter.router);
+
+app.use('/Admin', adminRouter.router);
+
 
 
 
 /** Error logging */
 app.use((req, res, next) => {
-    const error = new Error('not found');
-    return res.status(404).json({
-        message: error.message
+    const appError = new AppError('not found', 404);
+    return res.status(appError.statusCode).json({
+        appError
     });
 })
 
@@ -63,7 +64,7 @@ httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server runn
 
 
 process.on('unhandledRejection', (error) => {
-    logging.error(NAMESPACE,`Unhandled rejection ${error}`)
+    logging.error(NAMESPACE,`Unhandled rejection ${error}`, error)
     httpServer.close(() => {
         process.exit(1);
     });

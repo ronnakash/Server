@@ -24,7 +24,7 @@ const SERVER = {
     token: {
         expireTime: secret.SERVER_TOKEN_EXPIRETIME || 3600,
         issuer: secret.SERVER_TOKEN_ISSUER || 'Administrator',
-        secret: secret.SERVER_TOKEN_SECRET || 'tokenSecret'
+        secret: secret.SERVER_TOKEN_SECRET || 'superencryptedsecret'
     }
 };
 

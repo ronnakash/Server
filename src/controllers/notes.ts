@@ -3,6 +3,9 @@ import logging from '../config/logging';
 import mongoose from 'mongoose';
 import Note from '../models/notes';
 import notes from '../interfaces/notes';
+import AppError from '../utils/appError';
+import QueryFeatures from '../utils/queryFeatures';
+import Query from './query';
 
 const NAMESPACE = 'Notes Controller';
 
@@ -19,24 +22,21 @@ const NAMESPACE = 'Notes Controller';
  * 
 */
 
-const getAllNotes = (req: Request, res: Response, next: NextFunction) => {
-    Note.find({})
-        .select('author title body createdAt')
-        .exec()
-        .then((notes) => {
-            logging.info(NAMESPACE, `Got ${notes.length} notes from mongoose`);
-            return res.status(200).json({
-                notes: notes,
-                count: notes.length
-            });
-        })
-        .catch((error) => {
-            logging.error(NAMESPACE, error.message, error);
-            return res.status(500).json({
-                message: error.message,
-                error
-            });
-        });
+const getAllNotes = async (req: Request, res: Response, next: NextFunction) => {
+    res.locals.result = await Query.getMany(Note, req.body);
+    next();
+};
+
+/**  QueryNotes
+ * 
+ * get all notes from mongoose using custom query
+ * requires token from administrator user
+ * 
+*/
+
+const QueryNotes = async (req: Request, res: Response, next: NextFunction) => {
+    res.locals.result = await Query.getMany(Note, req.body);
+    next();
 };
 
 
@@ -47,27 +47,10 @@ const getAllNotes = (req: Request, res: Response, next: NextFunction) => {
  * 
 */
 
-const getMyNotes = (req: Request, res: Response, next: NextFunction) => {
+const getMyNotes = async (req: Request, res: Response, next: NextFunction) => {
     let author = res.locals.jwt.username;
-  
-    Note.find({ author: author })
-        .select('title author body createdAt')
-        .exec()
-        .then((notes) => {
-            logging.info(NAMESPACE, `Got ${notes.length} notes from mongoose`);
-            return res.status(200).json({
-            author: author,
-            notes: notes,
-            count: notes.length
-            });
-        })
-        .catch((error) => {
-            logging.error(NAMESPACE, error.message, error);
-            return res.status(500).json({
-                message: error.message,
-                error
-            });
-        });
+    res.locals.result = await Query.getMany(Note,{find: {author: author}});
+    next();
 };
 
 
@@ -88,24 +71,13 @@ const getMyNotes = (req: Request, res: Response, next: NextFunction) => {
  * res.body contains the original note before edits
 */
 
-const updateNote = (req: Request, res: Response, next: NextFunction) => {
-    let { id, author, body, title } = req.body;
-    Note.findOneAndUpdate({id, author}, {body, title})
-        .exec()
-        .then((note) => {
-            logging.info(NAMESPACE, 'Updated note');
-            return res.status(200).json({
-                messege: "Updated note",
-                originalNote: note
-            });
-        })
-        .catch((error) => {
-            logging.error(NAMESPACE, error.message, error);
-            return res.status(500).json({
-                message: error.message,
-                error
-            });
-        });
+const updateNote = async (req: Request, res: Response, next: NextFunction) => {
+    let { _id, body, title } = req.body;
+    res.locals.result = await Query.updateOne(Note,{
+        _id: _id, 
+        toUpdate: {body, title}
+    });
+    next();
 };
 
 
@@ -122,55 +94,13 @@ const updateNote = (req: Request, res: Response, next: NextFunction) => {
  * 
 */
 
-const deleteNote = (req: Request, res: Response, next: NextFunction) => {
-    let { id, author } = req.body;
-    Note.deleteOne({id, author})
-        .exec()
-        .then((note) => {
-            logging.info(NAMESPACE, 'Deleted note', note);
-            return res.status(200).json({
-                messege: "Deleted note",
-                deletedNote: note
-            });
-        })
-        .catch((error) => {
-            logging.error(NAMESPACE, error.message, error);
-            return res.status(500).json({
-                message: error.message,
-                error
-            });
-        });
+const deleteNote = async (req: Request, res: Response, next: NextFunction) => {
+    let { _id } = req.body;
+    res.locals.result = await Query.deleteOne(Note, _id);
+    next();
 };
 
 
-/** deleteAllNotes 
- * 
- * deletes all notes in database
- * requires admin permissions 
- * be very cautious when using! all notes for all users will be deleted
- * 
- * 
-*/
-
-const deleteAllNotes = (req: Request, res: Response, next: NextFunction) => {
-    Note.deleteMany({})
-        .exec()
-        .then((notes) => {
-            return res.status(200).json({
-
-                message: `Deleted ${notes.deletedCount} notes`,
-                notes: notes,
-                count: notes.deletedCount
-            });
-        })
-        .catch((error) => {
-            logging.error(NAMESPACE, error.message, error);
-            return res.status(500).json({
-                message: error.message,
-                error
-            });
-        });
-};
 
 
 
@@ -182,29 +112,13 @@ const deleteAllNotes = (req: Request, res: Response, next: NextFunction) => {
  * 
 */
 
-const deleteAllUsersNotes = (req: Request, res: Response, next: NextFunction) => {
-    let { user } = req.body;
-    Note.deleteMany({author: user})
-    .select('-username')
-    .exec()
-    .then((notes) => {
-        return res.status(200).json({
-
-            message: `Deleted ${notes.deletedCount} notes for user ${user}`,
-            user: user,
-            notes: notes,
-            count: notes.deletedCount
-        });
-    })
-    .catch((error) => {
-        logging.error(NAMESPACE, error.message, error);
-        return res.status(500).json({
-            message: error.message,
-            error
-        });
-    });
-
-
+const deleteAllUsersNotes = async (req: Request, res: Response, next: NextFunction) => {
+    let { author } = req.body;
+    if (author)
+        res.locals.result = await Query.deleteMany(Note, {find: {author: author}});
+    else 
+        res.locals.result = new AppError("no author provided for delete many!", 400);
+    next();
 }
 
 
@@ -221,7 +135,7 @@ const deleteAllUsersNotes = (req: Request, res: Response, next: NextFunction) =>
  * 
 */
 
-const createNote = (req: Request, res: Response, next: NextFunction) => {
+const createNote = async (req: Request, res: Response, next: NextFunction) => {
     let { author, title, body} = req.body;
     const note = new Note({
         _id: new mongoose.Types.ObjectId(),
@@ -229,20 +143,7 @@ const createNote = (req: Request, res: Response, next: NextFunction) => {
         title, 
         body
     });
-    return note.save()
-        .then((result) => {
-            logging.info(NAMESPACE, 'Created note', note);
-            return res.status(201).json({
-                note: result
-            });
-        })
-        .catch((error) => {
-            logging.error(NAMESPACE, error.message, error);
-            return res.status(500).json({
-                message: error.message,
-                error
-            });
-        });
+    res.locals.result = await Query.createOne(Note, note);
 };
 
 
@@ -256,9 +157,9 @@ const createNote = (req: Request, res: Response, next: NextFunction) => {
  * 
 */
 
-const createNotes = (req: Request, res: Response, next: NextFunction) => {
+const createNotes = async (req: Request, res: Response, next: NextFunction) => {
     let {notes} = req.body;
-    let newNotes: (notes & { _id: any; })[] = [];
+    let newNotes: (notes & { _id: any })[] = [];
     notes.forEach((note: { author: any; title: any; body: any; }) => {
         let { author, title, body } = note;
         newNotes.push(new Note({
@@ -267,23 +168,10 @@ const createNotes = (req: Request, res: Response, next: NextFunction) => {
             body
         }));
     });
-    Note.insertMany(newNotes)
-        .then((savedNotes) => {
-            logging.info(NAMESPACE, `Created ${savedNotes.length} new notes`)
-            return res.status(200).json({
-                message: `Created ${savedNotes.length} new notes`, 
-                newNotes
-            })
-        })
-        .catch((error) => {
-            logging.error(NAMESPACE, error.message, error);
-            return res.status(500).json({
-                message: error.message,
-                error
-            });
-        });
+    res.locals.result = await Query.createMany(Note, newNotes);
+    next();
 };
 
 
 
-export default { createNote, getAllNotes, updateNote, getMyNotes, deleteNote, deleteAllNotes, deleteAllUsersNotes, createNotes};
+export default { createNote, getAllNotes, updateNote, getMyNotes, deleteNote, deleteAllUsersNotes, createNotes, QueryNotes};

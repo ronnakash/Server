@@ -21,10 +21,13 @@ const existsJWT = (req: Request, res: Response, next: NextFunction) => {
     if (token) {
         next();
     } else {
+        /*
         logging.error(NAMESPACE, 'No token found');
         return res.status(401).json({
             message: 'No token found'
         });
+        */
+        next();
     }
 };
 
@@ -69,7 +72,7 @@ const validateAdminToken = (req: Request, res: Response, next: NextFunction) => 
     let token = res.locals.jwt;
     let {username, permissions} = token;
         logging.info(NAMESPACE, `Validating Token for user ${username} with permissions ${permissions}`);
-        if (permissions == "Admin"){            
+        if (permissions == 'Admin'){            
             logging.info(NAMESPACE, `validated Admin Token for user ${username} with permissions ${permissions}`);
             next();
         } 
@@ -95,23 +98,24 @@ const validateAdminToken = (req: Request, res: Response, next: NextFunction) => 
 const validateUserOrAdmin = (req: Request, res: Response, next: NextFunction) => {
     
     let token = res.locals.jwt;
-    logging.info(NAMESPACE, 'token', token);
-    let { tokenUser , tokenPermissions } = token;
-    let { username } = req.body;
-    if (tokenPermissions == 'Admin') {
+    logging.info(NAMESPACE, 'token: ', token);
+    let { username , permissions } = token;
+    let { reqUser } = req.body;
+    logging.info(NAMESPACE, 'request user: ', reqUser);
+    if (permissions == 'Admin') {
         validateAdminToken(req, res, next);
     }
-    else if (tokenUser == username) {
-        logging.info(NAMESPACE, `Token user ${tokenUser} does not have admin permisiions but match request user ${username}`);
+    else if (username == reqUser) {
+        logging.info(NAMESPACE, `Token user ${username} does not have admin permissions but match request user ${username}`);
         next();
     }
     else {
-        logging.error(NAMESPACE, `Token user ${tokenUser} does not have admin permisiions and does not match request user ${username}`);
+        logging.error(NAMESPACE, `Token user ${username} does not have admin permissions and does not match request user ${username}`);
         return res.status(400).json({
-            message: `Token user ${tokenUser} does not have admin permisiions and does not match request user ${username}`,
-            tokenUser: tokenUser,
-            tokenUserPermissions: tokenPermissions,
-            requestUser: username
+            message: `Token user ${username} does not have admin permissions and does not match request user ${username}`,
+            tokenUser: username,
+            tokenUserPermissions: permissions,
+            requestUser: reqUser
         });
     }
 };
