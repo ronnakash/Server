@@ -2,8 +2,7 @@ import QueryFeatures from '../utils/queryFeatures';
 import mongoose from 'mongoose';
 import AppError from '../utils/appError';
 import logging from '../config/logging';
-import CatchAsync from '../utils/catchAsync';
-import catchAsync from '../utils/catchAsync';
+
 import { Request, Response, NextFunction } from 'express';
 
 
