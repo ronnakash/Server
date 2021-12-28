@@ -48,7 +48,7 @@ const getJWT = (req: Request, res: Response, next: NextFunction) => {
             if (error) {
                 logging.error(NAMESPACE,error.message, error);
                 return res.status(404).json({
-                    message: error,
+                    message: error.message,
                     error
                 });
             } else {

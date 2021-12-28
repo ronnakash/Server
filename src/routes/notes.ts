@@ -11,7 +11,7 @@ const router = express.Router();
 router.post('/post/note', controller.createNote);
 router.post('/post/createNotes', controller.createNotes);
 /** read */
-router.get('/Admin/get/allNotes' ,controller.getAllNotes, handler.ResultHandler);
+router.get('/Admin/get/allNotes' ,controller.getAllNotes);
 
 
 router.get('/get/myNotes', controller.getMyNotes);
@@ -21,7 +21,7 @@ router.put('/put/updateNote', controller.updateNote);
 router.delete('/delete/deleteNote', controller.deleteNote);
 router.delete('/delete/allUsersNotes' ,controller.deleteAllUsersNotes);
 
-
+router.use(handler.ResultHandler);
 
 
 export default { router };

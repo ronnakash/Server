@@ -24,7 +24,7 @@ const ErrorHandler = (req: Request, res: Response, next: NextFunction) => {
 const ResultHandler = (req: Request, res: Response, next: NextFunction) => {
     logging.info(NAMESPACE, 'result handler')
     let result = res.locals.result;
-    let statusCode = result.statusCode
+    let statusCode = (result ? result.statusCode : 202) | 200;
     return res.status(statusCode).json({
         result: result,
         length: result.length

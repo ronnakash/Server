@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import config from '../config/config';
 import logging from '../config/logging';
 import IUser from '../interfaces/user';
+import AppError from '../utils/appError';
 
 
 const NAMESPACE = 'SignJWT';
@@ -27,11 +28,11 @@ const signJWT = (user: IUser, callback: (error: Error | null, token: string | nu
             {
                 issuer: config.server.token.issuer,
                 algorithm: 'HS256',
-                expiresIn: "10 days"
+                expiresIn: "30 days"
             },
             (error, token) => {
                 if (error) {
-                    callback(error, null);
+                    callback(new AppError(`error in signJWT: ${error.message}`, 500), null)
                 } else if (token) {
                     callback(null, token);
                 }

@@ -73,7 +73,7 @@ const getMyNotes = async (req: Request, res: Response, next: NextFunction) => {
 
 const updateNote = async (req: Request, res: Response, next: NextFunction) => {
     let { _id, body, title } = req.body;
-    res.locals.result = await Query.updateOne(Note,{
+    res.locals.result = await Query.updateOneById(Note,{
         _id: _id, 
         toUpdate: {body, title}
     });
@@ -96,7 +96,7 @@ const updateNote = async (req: Request, res: Response, next: NextFunction) => {
 
 const deleteNote = async (req: Request, res: Response, next: NextFunction) => {
     let { _id } = req.body;
-    res.locals.result = await Query.deleteOne(Note, _id);
+    res.locals.result = await Query.deleteOneById(Note, _id);
     next();
 };
 
@@ -117,7 +117,7 @@ const deleteAllUsersNotes = async (req: Request, res: Response, next: NextFuncti
     if (author)
         res.locals.result = await Query.deleteMany(Note, {find: {author: author}});
     else 
-        res.locals.result = new AppError("no author provided for delete many!", 400);
+        res.locals.result = new AppError("no author provided for deleteAllUsersNotes!", 400);
     next();
 }
 
@@ -136,6 +136,7 @@ const deleteAllUsersNotes = async (req: Request, res: Response, next: NextFuncti
 */
 
 const createNote = async (req: Request, res: Response, next: NextFunction) => {
+
     let { author, title, body} = req.body;
     const note = new Note({
         _id: new mongoose.Types.ObjectId(),
@@ -144,6 +145,7 @@ const createNote = async (req: Request, res: Response, next: NextFunction) => {
         body
     });
     res.locals.result = await Query.createOne(Note, note);
+    next();
 };
 
 

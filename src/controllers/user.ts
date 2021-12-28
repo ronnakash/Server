@@ -3,6 +3,10 @@ import bcryptjs from 'bcryptjs';
 import logging from '../config/logging';
 import JWT from '../functions/signJWT';
 import User from '../models/user';
+import Query from './query';
+import AppError from '../utils/appError';
+import IUser from '../interfaces/user';
+import { Document } from 'mongoose';
 
 
 const NAMESPACE = 'User';
@@ -182,48 +186,40 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
  * 
  */
 
-const login = (req: Request, res: Response, next: NextFunction) => {
+const login = async (req: Request, res: Response, next: NextFunction) => {
     let { username, password } = req.body;
-    User.findOne({ username })
-        .exec()
-        .then((user) => {
-            if (user){
-                bcryptjs.compare(password, user.password, (error, result) => {
-                    if (error) {
-                        logging.error(NAMESPACE, error.message, error);
-                        return res.status(401).json({
-                            message: 'Password mismatch',
-                            error
-                        });
-                    } else if (result) {
-                        JWT.signJWT(user, (error, token) => {
-                            if (error) {
-                                logging.error(NAMESPACE, error.message, error);
-                                return res.status(500).json({
-                                    message: error.message,
-                                    error: error
-                                });
-                            } else if (token) {
-                                logging.info(NAMESPACE,`Auth successful for ${username}`);
-                                return res.status(200).json({
-                                    message: `Auth successful for ${username}`,
-                                    token: token,
-                                    user
-                                });
-                            }
-                        });
-                    }
+    const user = await User.findOne({username: username}).exec();
+    if (!user) {
+        res.locals.result = new AppError(`user ${username} not found`, 400);
+        next();
+    }
+    else {
+        if (!await bcryptjs.compare(password, user.password)) {
+            res.locals.result = new AppError(`password mismatch for user ${username}`, 400);
+            next();
+        }
+        JWT.signJWT(user, (error, token) => {
+            if (error) {
+                logging.error(NAMESPACE, error.message, error);
+                return res.status(500).json({
+                    message: error.message,
+                    error: error
+                });
+            } else if (token) {
+                logging.info(NAMESPACE,`Auth successful for ${username}`);
+                return res.status(200).json({
+                    message: `Auth successful for ${username}`,
+                    token: token,
+                    user
                 });
             }
-        })
-        .catch((error) => {
-            logging.error(NAMESPACE, error.message, error);
-            res.status(500).json({
-                message: error.message,
-                error
-            });
         });
+    }
+
+
+
 };
+
 
 /** safeLogin 
  * 
