@@ -7,6 +7,7 @@ import Query from './query';
 import AppError from '../utils/appError';
 import IUser from '../interfaces/user';
 import { Document } from 'mongoose';
+import validator from 'validator';
 
 
 const NAMESPACE = 'User';
@@ -29,29 +30,18 @@ const NAMESPACE = 'User';
 
 async function register (req: Request, res: Response, next: NextFunction) {
     let { username, password, permissions} = req.body;
+    if (!validator.isStrongPassword(password)){
+        res.locals.result = new AppError(`Provided password for user ${username} is too weak`, 500);
+        next();
+    }
     const hash = await bcryptjs.hash(password, 11);
     const newUser = new User({
         username,
         password: hash,
         permissions
         });
-        newUser.save()
-            .then((user) => {
-                logging.info(NAMESPACE, `registered new user ${username} with permissions ${permissions}`);
-                res.locals.registered = {
-                    registerMessage: `registered new user ${username} with permissions ${permissions}`, 
-                    registerUser: user
-                };
-                res.locals.user = newUser
-                next();
-            })
-            .catch((error) => {
-                logging.error(NAMESPACE, error.message, error);
-                return res.status(500).json({
-                    message: error.message,
-                    error
-                });
-            });
+    res.locals.result = await Query.createOne(User, newUser);
+    next();
 };
 
 
@@ -69,26 +59,10 @@ async function register (req: Request, res: Response, next: NextFunction) {
  * 
  */
 
- const deleteUser = (req: Request, res: Response, next: NextFunction) => {
+ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     let { username } = req.body;
-    User.deleteOne()
-        .select ('-password')
-        .exec()
-        .then((user) => {
-            logging.info(NAMESPACE, `Deleted user ${username}`, user);
-            return res.status(200).json({
-                message: `Deleted user ${username}`,
-                user
-            });
-        })
-        .catch((error) => {
-            logging.error(NAMESPACE, error.message, error);
-            return res.status(500).json({
-                message: error.message,
-                error
-            });
-        });
-
+    res.locals.result = await Query.deleteOne(User, {find: {username: username}});
+    next();
  }
 
 
@@ -107,6 +81,22 @@ async function register (req: Request, res: Response, next: NextFunction) {
 
 async function changePassword (req: Request, res: Response, next: NextFunction) {
     let { username, oldPassword, newPassword } = req.body;
+    //get user from database
+    const user = await Query.getOne(User, {find: {username: username}});
+    if (!user || user instanceof AppError){
+        res.locals.result = new AppError(`Error finding user ${username}`,500);
+        next();
+    }
+    //compare passwords
+    if (!bcryptjs.compare(oldPassword, user.password)) {
+        
+    }
+    
+    
+    
+    
+    
+    /*
     //get user from database
     const user = await User.findOne({username})
         .exec()
@@ -171,6 +161,7 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
             message: `user ${username} not found`
         });
     }
+    */
  };
 
 
@@ -200,18 +191,15 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
         }
         JWT.signJWT(user, (error, token) => {
             if (error) {
-                logging.error(NAMESPACE, error.message, error);
-                return res.status(500).json({
-                    message: error.message,
-                    error: error
-                });
+                res.locals.result = new AppError(`Error while logging in user ${username} in singJWT:\n${error.message}`, 500);
+                next();
             } else if (token) {
                 logging.info(NAMESPACE,`Auth successful for ${username}`);
-                return res.status(200).json({
+                res.locals.result = {
                     message: `Auth successful for ${username}`,
                     token: token,
                     user
-                });
+                };
             }
         });
     }

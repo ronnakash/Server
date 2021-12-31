@@ -4,7 +4,6 @@ import mongoose from 'mongoose';
 import Note from '../models/notes';
 import notes from '../interfaces/notes';
 import AppError from '../utils/appError';
-import QueryFeatures from '../utils/queryFeatures';
 import Query from './query';
 
 const NAMESPACE = 'Notes Controller';
@@ -162,7 +161,7 @@ const createNote = async (req: Request, res: Response, next: NextFunction) => {
 const createNotes = async (req: Request, res: Response, next: NextFunction) => {
     let {notes} = req.body;
     let newNotes: (notes & { _id: any })[] = [];
-    notes.forEach((note: { author: any; title: any; body: any; }) => {
+    notes.forEach((note: { author: string; title: string; body: string; }) => {
         let { author, title, body } = note;
         newNotes.push(new Note({
             author,

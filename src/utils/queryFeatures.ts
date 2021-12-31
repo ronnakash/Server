@@ -1,27 +1,29 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Query } from "mongoose";
 import { NextFunction, Request, Response } from 'express';
 import logging from "../config/logging";
+import AppError from "./appError";
+import AppError from "./appError";
 import AppError from "./appError";
 
 
 const NAMESPACE = "QueryFeatures";
 
 class QueryFeatures {
-    query: any;
+    params: any;
     schema: mongoose.Model<Document, {}, {}, {}>;
     find: any;
     select: any;
     sort: any;
-    doc: any;
+    doc: Document[] | Document | AppError | undefined;
 
-constructor(schema : mongoose.Model<Document, {}, {}, {}>, query : any) {
+    constructor(schema : mongoose.Model<Document, {}, {}, {}>, params : any) {
     this.schema = schema;
-    if (query){
-        this.query = query;
-        if (query.find)
-            this.filter(query.find);
-        this.select = this.query.select;
-        this.sort = this.query.sort;
+    if (params){
+        this.params = params;
+        if (params.find)
+            this.filter(params.find);
+        this.select = this.params.select;
+        this.sort = this.params.sort;
     }
 }
 
@@ -46,43 +48,22 @@ constructor(schema : mongoose.Model<Document, {}, {}, {}>, query : any) {
         return this;
     }
 
-    async assertOne() {
-        this.exec();
-        if (this.doc.length != 1) {
-            this.doc = new AppError(`asserted one on query which results in ${this.doc.length} documents`, 400);
-            return this.doc;
-        }
-        return this;
-    }
-    
     
 
-    async exec() : Promise<Document[] | AppError | undefined>{
+    async many() : Promise<Document[]>{
         this.doc =  await this.schema
             .find(this.find)
             .select(this.select)
             .sort(this.sort)
             .exec();
-        
         return this.doc;
     }
 
-    async update(toUpdate: any) : Promise<Document[] | undefined> {
-        this.doc =  await this.schema
-            .updateMany(this.find, toUpdate)
-            .exec();
-        return this.doc;
-    }
-
-    async delete() {
-        if (!this.find)
-            return new AppError("no arguments for delete!", 400);
-        else{
-            this.doc = await this.schema
-                .deleteMany(this.find)
-                .exec();
-            return this.doc;
-        }
+    async one() : Promise<Document | AppError>{
+        this.doc = await this.many();
+        if (this.doc.length !== 1)
+            return new AppError(`Error in QueryFeatures.one(): got ${this.doc.length} results`,400);
+        return this.doc[0];
     }
     
 }

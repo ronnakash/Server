@@ -8,6 +8,7 @@ import logging from '../config/logging';
 const NAMESPACE = 'Query Controller';
 
 const getOne = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, params : any) => {
+
     return await new QueryFeatures(model,params).exec().catch( (error) => {
         logging.error(NAMESPACE,"!!!!")
         return new AppError("error in getOne",500);
@@ -16,16 +17,14 @@ const getOne = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, par
 
 
 const getOneById = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, _id : string) => {
-    return await new QueryFeatures(model,{find: {_id: _id}}).assertOne().catch((error) => {
+    return await new QueryFeatures(model,{find: {_id: _id}}).exec().catch((error) => {
         logging.error(NAMESPACE,"!!!!")
         return new AppError("error in getOneByID",500);
     });
 }
 
 const createOne = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, doc : mongoose.Document ) => {
-
-    let docs: mongoose.Document[] = [doc];
-    return await model.create(docs).catch((error) => {
+    return await doc.save().catch((error) => {
         logging.error(NAMESPACE,"!!!!")
         return new AppError(`error in createOne ${error.message}`,501);
     });
@@ -33,7 +32,7 @@ const createOne = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, 
 
 const updateOneById = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, params : any) => {
     let {_id, toUpdate } = params;
-    return await (await new QueryFeatures(model, { find: { _id: _id } }).assertOne()).update(toUpdate).catch((error : Error) => {
+    return await new QueryFeatures(model, { find: { _id: _id } }).update(toUpdate).catch((error : Error) => {
         logging.error(NAMESPACE, "!!!!")
         return new AppError("error in updateOne" + error.message,500);
     });
@@ -41,7 +40,7 @@ const updateOneById = async (model : mongoose.Model<mongoose.Document, {}, {}, {
 
 const updateOne = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, query : any) => {
     let {find, toUpdate } = query;
-    return await (await new QueryFeatures(model, { find: find }).assertOne()).update(toUpdate).catch((error : Error) => {
+    return await new QueryFeatures(model, { find: find }).update(toUpdate).catch((error : Error) => {
         logging.error(NAMESPACE, "!!!!")
         return new AppError("error in updateOne" + error.message,500);
     });
@@ -71,21 +70,21 @@ const updateMany = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>,
 const getMany = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, query : any) => {
     return await new QueryFeatures(model,query).exec().catch((error) => {
         logging.error(NAMESPACE,"!!!!")
-        return new AppError(error.message,error.status | 501);
+        return new AppError(error.message,error.status | 500);
     });
 }
 
 const createMany = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, docs : mongoose.Document[] ) => {
     return await model.insertMany(docs).catch((error) => {
         logging.error(NAMESPACE,"!!!!")
-        return new AppError(error.message,error.status | 501);
+        return new AppError(error.message,error.status | 500);
     });
 }
 
 const deleteMany = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, query : any) => {
     return await new QueryFeatures(model,query).delete().catch((error) => {
         logging.error(NAMESPACE,"!!!!")
-        return new AppError(error.message,error.status | 501);
+        return new AppError(error.message,error.status | 500);
     });
 
 }
