@@ -83,15 +83,25 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
     let { username, oldPassword, newPassword } = req.body;
     //get user from database
     const user = await Query.getOne(User, {find: {username: username}});
-    if (!user || user instanceof AppError){
-        res.locals.result = new AppError(`Error finding user ${username}`,500);
-        next();
+    if (!user)
+        res.locals.result = new AppError(`Error finding user ${username}`,400);
+    else if (user instanceof User) {
+        //compare passwords
+        if (!bcryptjs.compare(oldPassword, user.password)) 
+            res.locals.result = new AppError(`Password mismatch for ${username}`,400);
+        else {
+            user.password = newPassword;
+            user.save().catch(error => {
+                res.locals.result = new AppError(`Error changing password for user ${username}: ${error.message}`, 500);
+                next();
+            });
+            res.locals.result = {
+                message: `Changed password successfuly for user ${username}`,
+                user: user
+            }
+        }
     }
-    //compare passwords
-    if (!bcryptjs.compare(oldPassword, user.password)) {
-        
-    }
-    
+    next();
     
     
     
@@ -227,7 +237,7 @@ const safeLogin = (req: Request, res: Response, next: NextFunction) => {
             });
         } else if (token) {
             logging.info(NAMESPACE,`Auth successful for ${newUser.username}`);
-            res.locals.login = {
+            res.locals.result = {
                 loginMessage: `Auth successful for ${newUser.username}`,
                 token: token,
                 loginUser: newUser

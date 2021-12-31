@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import logging from '../config/logging';
 import mongoose from 'mongoose';
 import Note from '../models/notes';
 import notes from '../interfaces/notes';
@@ -100,9 +99,6 @@ const deleteNote = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 
-
-
-
 /** deleteAllUsersNotes 
  * 
  * delete all notes of a selected user
@@ -172,7 +168,6 @@ const createNotes = async (req: Request, res: Response, next: NextFunction) => {
     res.locals.result = await Query.createMany(Note, newNotes);
     next();
 };
-
 
 
 export default { createNote, getAllNotes, updateNote, getMyNotes, deleteNote, deleteAllUsersNotes, createNotes, QueryNotes};
