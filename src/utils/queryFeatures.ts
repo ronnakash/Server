@@ -1,4 +1,5 @@
 import mongoose, { Document, Query } from "mongoose";
+import logging from "../config/logging";
 import AppError from "./appError";
 
 
@@ -21,6 +22,7 @@ class QueryFeatures {
         this.select = this.params.select;
         this.sort = this.params.sort;
     }
+    logging.info(NAMESPACE, "this:", this);
 }
 
     filter( find : any ) {
@@ -43,8 +45,6 @@ class QueryFeatures {
             this.sort = sort;
         return this;
     }
-
-    
 
     async many() : Promise<Document[]>{
         this.doc =  await this.schema

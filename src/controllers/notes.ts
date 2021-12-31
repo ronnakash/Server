@@ -4,6 +4,7 @@ import Note from '../models/notes';
 import notes from '../interfaces/notes';
 import AppError from '../utils/appError';
 import Query from './query';
+import logging from '../config/logging';
 
 const NAMESPACE = 'Notes Controller';
 
@@ -46,8 +47,15 @@ const QueryNotes = async (req: Request, res: Response, next: NextFunction) => {
 */
 
 const getMyNotes = async (req: Request, res: Response, next: NextFunction) => {
-    let author = res.locals.jwt.username;
-    res.locals.result = await Query.getMany(Note,{find: {author: author}});
+    let username = res.locals.jwt.username;
+    let { select, sort } = req.body;
+    let params = {
+        find: {author: username},
+        select: select,
+        sort: sort
+    };
+    logging.info(NAMESPACE, "params:", params);
+    res.locals.result = await Query.getMany(Note, params);
     next();
 };
 
@@ -84,7 +92,7 @@ const updateNote = async (req: Request, res: Response, next: NextFunction) => {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-/**  deleteNote
+/**  deleteNoteById
  * 
  * delete note by id
  * user must be author of the note or have administrator permissions
@@ -92,9 +100,14 @@ const updateNote = async (req: Request, res: Response, next: NextFunction) => {
  * 
 */
 
-const deleteNote = async (req: Request, res: Response, next: NextFunction) => {
+const deleteNoteById = async (req: Request, res: Response, next: NextFunction) => {
     let { _id } = req.body;
-    res.locals.result = await Query.deleteOneById(Note, _id);
+    let deleted = await Query.deleteOneById(Note, _id);
+    res.locals.result = {
+        message: deleted? `Deleted note sucsessfuly` : `Note not found`,
+        note: deleted,
+        statusCode: deleted? 200 : 400
+    };
     next();
 };
 
@@ -170,4 +183,4 @@ const createNotes = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 
-export default { createNote, getAllNotes, updateNote, getMyNotes, deleteNote, deleteAllUsersNotes, createNotes, QueryNotes};
+export default { createNote, getAllNotes, updateNote, getMyNotes, deleteNoteById, deleteAllUsersNotes, createNotes, QueryNotes};

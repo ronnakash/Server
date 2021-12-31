@@ -22,12 +22,13 @@ const ErrorHandler = (req: Request, res: Response, next: NextFunction) => {
 }
 
 const ResultHandler = (req: Request, res: Response, next: NextFunction) => {
-    logging.info(NAMESPACE, 'result handler')
+    logging.info(NAMESPACE, `result handler`);
     let result = res.locals.result;
-    let statusCode = (result ? result.statusCode : 202) | 200;
+    let statusCode = result.statusCode | 500;
+    let len = (result ? result.length : 0);
     return res.status(statusCode).json({
         result: result,
-        length: result.length
+        length: len
     });
 
 }
