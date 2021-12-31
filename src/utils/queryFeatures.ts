@@ -2,8 +2,6 @@ import mongoose, { Document, Query } from "mongoose";
 import { NextFunction, Request, Response } from 'express';
 import logging from "../config/logging";
 import AppError from "./appError";
-import AppError from "./appError";
-import AppError from "./appError";
 
 
 const NAMESPACE = "QueryFeatures";
