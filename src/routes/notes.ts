@@ -20,7 +20,6 @@ router.delete('/delete/deleteNote', controller.deleteNoteById);
 router.delete('/delete/allUsersNotes' ,controller.deleteAllUsersNotes);
 
 
-
 router.use(handler);
 
 

@@ -22,7 +22,9 @@ const NAMESPACE = 'Notes Controller';
 */
 
 const getAllNotes = async (req: Request, res: Response, next: NextFunction) => {
-    let docs = await Query.getMany(Note, req.body);
+    let docs = await Query
+        .getMany(Note, req.body)
+        .catch( error => next(error));
         res.locals.result = docs;
     next();
 };
@@ -35,7 +37,9 @@ const getAllNotes = async (req: Request, res: Response, next: NextFunction) => {
 */
 
 const QueryNotes = async (req: Request, res: Response, next: NextFunction) => {
-    res.locals.result = await Query.getMany(Note, req.body);
+    res.locals.result = await Query
+        .getMany(Note, req.body)
+        .catch( error => next(error));
     next();
 };
 
@@ -55,7 +59,9 @@ const getMyNotes = async (req: Request, res: Response, next: NextFunction) => {
         select: select,
         sort: sort
     };
-    res.locals.result = await Query.getMany(Note, params);
+    res.locals.result = await Query
+        .getMany(Note, params)
+        .catch( error => next(error));
     next();
 };
 
@@ -82,7 +88,7 @@ const updateNote = async (req: Request, res: Response, next: NextFunction) => {
     res.locals.result = await Query.updateOneById(Note,{
         _id: _id, 
         toUpdate: {body, title}
-    });
+    }).catch( error => next(error));
     next();
 };
 
@@ -125,7 +131,7 @@ const deleteAllUsersNotes = async (req: Request, res: Response, next: NextFuncti
     if (author)
         res.locals.result = await Query.deleteMany(Note, {find: {author: author}});
     else 
-        res.locals.result = new AppError("no author provided for deleteAllUsersNotes!", 400);
+        next(new AppError("no author provided for deleteAllUsersNotes!", 400));
     next();
 }
 

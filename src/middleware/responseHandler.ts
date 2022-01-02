@@ -10,11 +10,10 @@ const NAMESPACE = "ResultHandler"
 const ResultHandler = (req: Request, res: Response, next: NextFunction) => {
     logging.info(NAMESPACE, "done!");
     let result = res.locals.result;
-    let statusCode = (result? result.statusCode : 500) | 500;
+    let statusCode = (result? result.statusCode : 200) | 200;
     let len = (result ? result.length : 0);
     return res.status(statusCode).json({
-        result: result,
-        length: len
+        result: result
     });
 
 }

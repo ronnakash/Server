@@ -56,7 +56,7 @@ class QueryFeatures {
         return this.doc;
     }
 
-    async one() : Promise<Document | AppError>{
+    async one() : Promise<Document>{
         this.doc = await this.many();
         if (this.doc.length !== 1)
             throw new AppError(`Error in QueryFeatures.one(): got ${this.doc.length} results`,400);

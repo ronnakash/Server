@@ -31,16 +31,19 @@ const NAMESPACE = 'User';
 async function register (req: Request, res: Response, next: NextFunction) {
     let { username, password, permissions} = req.body;
     if (!validator.isStrongPassword(password)){
-        res.locals.result = new AppError(`Provided password for user ${username} is too weak`, 500);
-        next();
+        next(new AppError(`Provided password for user ${username} is too weak`, 400));
     }
+    //check tokenUserPermissions
+
     const hash = await bcryptjs.hash(password, 11);
     const newUser = new User({
         username,
         password: hash,
         permissions
         });
-    res.locals.result = await Query.createOne(User, newUser);
+    res.locals.result = await Query
+        .createOne(User, newUser)
+        .catch( error => next(error));
     next();
 };
 
@@ -61,7 +64,13 @@ async function register (req: Request, res: Response, next: NextFunction) {
 
  const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     let { username } = req.body;
-    res.locals.result = await Query.deleteOne(User, {find: {username: username}});
+    let user = await Query
+        .deleteOne(User, {find: {username: username}})
+        .catch( error => next(error));
+    res.locals.result = {
+        message: `Deleted user ${username}`,
+        user: user
+    }
     next();
  }
 
@@ -82,29 +91,21 @@ async function register (req: Request, res: Response, next: NextFunction) {
 async function changePassword (req: Request, res: Response, next: NextFunction) {
     let { username, oldPassword, newPassword } = req.body;
     //get user from database
-    const user = await Query.getOne(User, {find: {username: username}});
-    if (!user)
-        res.locals.result = new AppError(`Error finding user ${username}`,400);
-    else if (user instanceof User) {
+    const user = await Query
+        .getOne(User, {find: {username: username}})
+        .catch( error => next(error));;
+    if (user instanceof User) {
         //compare passwords
         if (!bcryptjs.compare(oldPassword, user.password)) 
-            res.locals.result = new AppError(`Password mismatch for ${username}`,400);
-        else {
-            user.password = newPassword;
-            user.save().catch(error => {
-                res.locals.result = new AppError(`Error changing password for user ${username}: ${error.message}`, 500);
-                next();
-            });
-            res.locals.result = {
-                message: `Changed password successfuly for user ${username}`,
-                user: user
-            }
-        }
+            next(new AppError(`Password mismatch for ${username}`,400));
+        user.password = newPassword;
+        user.save().catch( error => next(error));
+        res.locals.result = {
+            message: `Changed password successfuly for user ${username}`,
+            user: user
+        };
     }
     next();
-    
-    
-    
     
     /*
     //get user from database
@@ -189,33 +190,26 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
     let { username, password } = req.body;
-    const user = await User.findOne({username: username}).exec();
-    if (!user) {
-        res.locals.result = new AppError(`user ${username} not found`, 400);
-        next();
-    }
-    else {
-        if (!await bcryptjs.compare(password, user.password)) {
-            res.locals.result = new AppError(`password mismatch for user ${username}`, 400);
-            next();
-        }
+    const user = await Query
+        .getOne(User, {find: {username: username}})
+        .catch( error => next(error));
+    if (user instanceof User) {
+        if (!await bcryptjs.compare(password, user.password))
+            next(new AppError(`password mismatch for user ${username}`, 400));
         JWT.signJWT(user, (error, token) => {
-            if (error) {
-                res.locals.result = new AppError(`Error while logging in user ${username} in singJWT:\n${error.message}`, 500);
-                next();
-            } else if (token) {
+            if (error) next(error);
+            else if (token) {
                 logging.info(NAMESPACE,`Auth successful for ${username}`);
                 res.locals.result = {
                     message: `Auth successful for ${username}`,
                     token: token,
-                    user
+                    user: user
                 };
             }
         });
+        next();
     }
-
-
-
+    next(new AppError(`Unexpected error in login: query result is not a user`, 500));
 };
 
 
@@ -227,15 +221,10 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 */
 
 const safeLogin = (req: Request, res: Response, next: NextFunction) => {
-    let newUser = res.locals.user;
+    let newUser = res.locals.result.user;
     JWT.signJWT(newUser, (error, token) => {
-        if (error) {
-            logging.error(NAMESPACE, error.message, error);
-            return res.status(500).json({
-                message: error.message,
-                error: error
-            });
-        } else if (token) {
+        if (error) next(error);
+        else if (token) {
             logging.info(NAMESPACE,`Auth successful for ${newUser.username}`);
             res.locals.result = {
                 loginMessage: `Auth successful for ${newUser.username}`,
@@ -245,7 +234,6 @@ const safeLogin = (req: Request, res: Response, next: NextFunction) => {
             next();
         }
     });
-   
 };
 
 
@@ -256,22 +244,15 @@ const safeLogin = (req: Request, res: Response, next: NextFunction) => {
  * 
  */
 
-const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
-    User.find()
-        .select('username permissions createdAt')
-        .exec()
-        .then((users) => {
-            return res.status(200).json({
-                users: users,
-                count: users.length
-            });
-        })
-        .catch((error) => {
-            return res.status(500).json({
-                message: error.message,
-                error
-            });
-        });
+const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+    let users = await Query
+        .getMany(User, {select: 'username email permissions createdAt'});
+    logging.info(NAMESPACE,"hi");
+    res.locals.result = {
+        message: `Got ${users.length} results`,
+        users: users
+    }
+    next();
 };
 
 
@@ -291,35 +272,8 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
 };
 
 
-/** returnLocals 
- * 
- * return objects saved in res.locals
- * used for logging in right after registering new user
- * 
-*/
-
-const returnLocals = (req: Request, res: Response, next: NextFunction) => {
-    let { registered , login } = res.locals;
-    if (registered && login) {
-        return res.status(200).json({
-            registered, 
-            login
-        });
-    } else if (registered) {
-        return res.status(200).json({
-            registered
-        });
-    } else {
-        logging.error(NAMESPACE,"Internal server error logging in or registering new user");
-        return res.status(500).json({
-            message:"Internal server error logging in or registering new user"
-        })
-    }
-
-};
 
 
 
 
-
-export default { validateToken, register, deleteUser, changePassword, login, getAllUsers, returnLocals, safeLogin };
+export default { validateToken, register, deleteUser, changePassword, login, getAllUsers, safeLogin };

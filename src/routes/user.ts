@@ -18,8 +18,8 @@ router
 */
 
 /** create */
-router.post('/post/register', controller.register, controller.returnLocals);
-router.post('/post/registerAndLogin', controller.register, controller.safeLogin, controller.returnLocals);
+router.post('/post/register', controller.register);
+router.post('/post/registerAndLogin', controller.register, controller.safeLogin);
 /** read */
 router.get('/get/validate', controller.validateToken);
 router.post('/login', controller.login, handler);
@@ -29,5 +29,7 @@ router.patch('/patch/changePassword', controller.changePassword);
 /** delete */
 router.delete('/delete/deleteUser', controller.deleteUser);
 
+
+router.use(handler);
 
 export default { router };
