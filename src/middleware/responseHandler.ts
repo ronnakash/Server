@@ -4,27 +4,13 @@ import { Request, Response, NextFunction } from 'express';
 import AppError from '../utils/appError';
 import mongoose from 'mongoose';
 
-const NAMESPACE = "Handler"
+const NAMESPACE = "ResultHandler"
 
-const ErrorHandler = (req: Request, res: Response, next: NextFunction) => {
-    logging.error(NAMESPACE, 'error handler')
-    let result = res.locals.result;
-    if (result instanceof AppError){
-        logging.info(NAMESPACE, 'error!:' + result)
-        return res;
-    }
-    else{
-        logging.info(NAMESPACE, 'error handler done')
-        next();
-    }
-        
-
-}
 
 const ResultHandler = (req: Request, res: Response, next: NextFunction) => {
-    logging.info(NAMESPACE, `result handler`);
+    logging.info(NAMESPACE, "done!");
     let result = res.locals.result;
-    let statusCode = result.statusCode | 500;
+    let statusCode = (result? result.statusCode : 500) | 500;
     let len = (result ? result.length : 0);
     return res.status(statusCode).json({
         result: result,
@@ -34,4 +20,4 @@ const ResultHandler = (req: Request, res: Response, next: NextFunction) => {
 }
 
 
-export default {ErrorHandler, ResultHandler};
+export default ResultHandler;

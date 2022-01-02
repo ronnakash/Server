@@ -1,10 +1,12 @@
-import QueryFeatures from '../utils/queryFeatures';
+import QueryFeatures from './queryFeatures';
 import mongoose from 'mongoose';
-import AppError from '../utils/appError';
+import AppError from './appError';
 import logging from '../config/logging';
+import { Request, Response, NextFunction } from 'express';
 
 
 const NAMESPACE = 'Query Controller';
+
 
 
 const getOne = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, params : any) => {
@@ -78,4 +80,4 @@ const deleteMany = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>,
 }
 
 
-export default {getOne, getOneById, getMany, createOne, updateOneById, deleteOneById, updateOne, deleteOne, updateMany, createMany, deleteMany};
+export default { getOne, getOneById, getMany, createOne, updateOneById, deleteOneById, updateOne, deleteOne, updateMany, createMany, deleteMany};

@@ -3,7 +3,7 @@ import bcryptjs from 'bcryptjs';
 import logging from '../config/logging';
 import JWT from '../functions/signJWT';
 import User from '../models/user';
-import Query from './query';
+import Query from '../utils/query';
 import AppError from '../utils/appError';
 import IUser from '../interfaces/user';
 import { Document } from 'mongoose';

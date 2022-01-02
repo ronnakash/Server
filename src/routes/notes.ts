@@ -19,7 +19,10 @@ router.put('/put/updateNote', controller.updateNote);
 router.delete('/delete/deleteNote', controller.deleteNoteById);
 router.delete('/delete/allUsersNotes' ,controller.deleteAllUsersNotes);
 
-router.use(handler.ResultHandler);
+
+
+router.use(handler);
+
 
 
 export default { router };

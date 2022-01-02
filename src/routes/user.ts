@@ -22,7 +22,7 @@ router.post('/post/register', controller.register, controller.returnLocals);
 router.post('/post/registerAndLogin', controller.register, controller.safeLogin, controller.returnLocals);
 /** read */
 router.get('/get/validate', controller.validateToken);
-router.post('/login', controller.login, handler.ResultHandler);
+router.post('/login', controller.login, handler);
 router.get('/Admin/get/all', controller.getAllUsers);
 /** update */
 router.patch('/patch/changePassword', controller.changePassword);

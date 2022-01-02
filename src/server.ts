@@ -6,6 +6,7 @@ import config from './config/config';
 import AppError from './utils/appError';
 import adminRouter from './routes/authAdmin';
 import userRouter from './routes/user'
+import errorHandler from './middleware/errorHandler';
 
 
 const NAMESPACE = 'Server';
@@ -57,6 +58,10 @@ app.use((req, res, next) => {
         appError
     });
 })
+
+app.use(errorHandler.errorLogger);
+app.use(errorHandler.errorResponder);
+app.use(errorHandler.uncaughtErrorHandler);
 
 
 /** Server */

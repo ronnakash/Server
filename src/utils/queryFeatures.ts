@@ -1,6 +1,7 @@
 import mongoose, { Document, Query } from "mongoose";
 import logging from "../config/logging";
 import AppError from "./appError";
+//import catchAsync from './catchAsync';
 
 
 const NAMESPACE = "QueryFeatures";

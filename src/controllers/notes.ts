@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import Note from '../models/notes';
 import notes from '../interfaces/notes';
 import AppError from '../utils/appError';
-import Query from './query';
+import Query from '../utils/query';
 import logging from '../config/logging';
 
 const NAMESPACE = 'Notes Controller';
@@ -22,7 +22,8 @@ const NAMESPACE = 'Notes Controller';
 */
 
 const getAllNotes = async (req: Request, res: Response, next: NextFunction) => {
-    res.locals.result = await Query.getMany(Note, req.body);
+    let docs = await Query.getMany(Note, req.body);
+        res.locals.result = docs;
     next();
 };
 
@@ -54,7 +55,6 @@ const getMyNotes = async (req: Request, res: Response, next: NextFunction) => {
         select: select,
         sort: sort
     };
-    logging.info(NAMESPACE, "params:", params);
     res.locals.result = await Query.getMany(Note, params);
     next();
 };
