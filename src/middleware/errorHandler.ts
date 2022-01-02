@@ -10,7 +10,7 @@ const errorLogger = (error : Error, req: Request, res: Response, next: NextFunct
 };
 
 const errorResponder = (error : Error, req: Request, res: Response, next: NextFunction) => {
-    logging.error(NAMESPACE, "errorResponder", error.message);
+    logging.error(NAMESPACE, "errorResponder", error.stack);
     next(error);
 };
 

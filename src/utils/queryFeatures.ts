@@ -12,7 +12,7 @@ class QueryFeatures {
     find: any;
     select: any;
     sort: any;
-    doc: Document[] | Document | AppError | undefined;
+    doc: Document[] | Document | undefined;
 
     constructor(schema : mongoose.Model<Document, {}, {}, {}>, params : any) {
     this.schema = schema;
@@ -59,7 +59,7 @@ class QueryFeatures {
     async one() : Promise<Document | AppError>{
         this.doc = await this.many();
         if (this.doc.length !== 1)
-            return new AppError(`Error in QueryFeatures.one(): got ${this.doc.length} results`,400);
+            throw new AppError(`Error in QueryFeatures.one(): got ${this.doc.length} results`,400);
         return this.doc[0];
     }
     
