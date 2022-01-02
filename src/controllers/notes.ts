@@ -102,7 +102,7 @@ const updateNote = async (req: Request, res: Response, next: NextFunction) => {
 
 const deleteNoteById = async (req: Request, res: Response, next: NextFunction) => {
     let { _id } = req.body;
-    let deleted = await Query.deleteOneById(Note, _id);
+    let deleted = await Query.deleteOneById(Note, _id).catch( error => next(error));
     res.locals.result = {
         message: deleted? `Deleted note sucsessfuly` : `Note not found`,
         note: deleted,
@@ -144,7 +144,6 @@ const deleteAllUsersNotes = async (req: Request, res: Response, next: NextFuncti
 */
 
 const createNote = async (req: Request, res: Response, next: NextFunction) => {
-
     let { author, title, body} = req.body;
     const note = new Note({
         _id: new mongoose.Types.ObjectId(),

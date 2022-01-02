@@ -5,17 +5,17 @@ import logging from '../config/logging';
 const NAMESPACE = 'ErrorHandler';
 
 const errorLogger = (error : Error, req: Request, res: Response, next: NextFunction) => {
-    logging.error(NAMESPACE, error.message, error);
-    next();
+    logging.error(NAMESPACE, "errorLogger", error.message);
+    next(error);
 };
 
 const errorResponder = (error : Error, req: Request, res: Response, next: NextFunction) => {
-
-    next();
+    logging.error(NAMESPACE, "errorResponder", error.message);
+    next(error);
 };
 
 const uncaughtErrorHandler = (error : Error, req: Request, res: Response, next: NextFunction) => {
-    logging.error(NAMESPACE, `Unhandled error: ${error.message}`);
+    logging.error(NAMESPACE, `uncaughtErrorHandler`);
     return res.status(500).json({
         message: `Unhandled error: ${error.message}`,
         error
