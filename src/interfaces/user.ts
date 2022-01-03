@@ -5,5 +5,5 @@ export default interface IUser extends Document {
     email : string;
     password: string;
     permissions: string;
-    passwordChangedAt: Date;
+    passwordChangedAt: number;
 }

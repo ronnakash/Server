@@ -7,7 +7,8 @@ const UserSchema: Schema = new Schema(
     {
         username: { 
             type: String,
-            required: true
+            required: [true, 'user must have a username'],
+            unique: true
         },
 
         email: {
@@ -32,7 +33,8 @@ const UserSchema: Schema = new Schema(
         },
 
         passwordChangedAt: {
-            type: Date
+            type: Number,
+            select: false
         }
 
     },

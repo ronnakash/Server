@@ -45,8 +45,8 @@ const updateMany = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>,
     return await model.updateMany(find, toUpdate);
 }
 
-const getMany = (model : mongoose.Model<mongoose.Document, {}, {}, {}>, params : any) : Promise<mongoose.Document<any, any, any>[]> => {
-    return new QueryFeatures(model,params).many();
+const getMany = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, params : any) : Promise<mongoose.Document<any, any, any>[]> => {
+    return await new QueryFeatures(model,params).many();
 }
 
 const createMany = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, docs : mongoose.Document[] ) => {

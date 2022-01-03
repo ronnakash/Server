@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import config from '../config/config';
 import logging from '../config/logging';
 import { Request, Response, NextFunction } from 'express';
+import AppError from '../utils/appError';
 
 
 const NAMESPACE = 'Auth';
@@ -18,17 +19,10 @@ const NAMESPACE = 'Auth';
 const existsJWT = (req: Request, res: Response, next: NextFunction) => {
     logging.info(NAMESPACE, 'verifying token exists');
     let token = res.locals.jwt;
-    if (token) {
+    if (token) 
         next();
-    } else {
-        /*
-        logging.error(NAMESPACE, 'No token found');
-        return res.status(401).json({
-            message: 'No token found'
-        });
-        */
-        next();
-    }
+     else 
+        next(new AppError(`no token provided`,400));
 };
 
 
@@ -46,11 +40,7 @@ const getJWT = (req: Request, res: Response, next: NextFunction) => {
     if (token) {
         jwt.verify(token, config.server.token.secret, (error, decoded) => {
             if (error) {
-                logging.error(NAMESPACE,error.message, error);
-                return res.status(401).json({
-                    message: error.message,
-                    error
-                });
+                next(error);
             } else {
                 res.locals.jwt = decoded;
             }
@@ -128,15 +118,7 @@ const validateUserOrAdmin = (req: Request, res: Response, next: NextFunction) =>
  * 
 */
 
-const adminIfNeeded = (req: Request, res: Response, next: NextFunction) => {
-    let { permissions } = req.body;
-    if (permissions) {
-        validateAdminToken(req, res, next);
-    }
-    else {
-        next();
-    }
-};
 
 
-export default { existsJWT, getJWT, validateAdminToken, validateUserOrAdmin, adminIfNeeded };
+
+export default { existsJWT, getJWT, validateAdminToken, validateUserOrAdmin };

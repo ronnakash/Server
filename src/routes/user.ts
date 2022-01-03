@@ -22,10 +22,10 @@ router.post('/post/register', controller.register);
 router.post('/post/registerAndLogin', controller.register, controller.safeLogin);
 /** read */
 router.get('/get/validate', controller.validateToken);
-router.post('/login', controller.login, handler);
-router.get('/Admin/get/all', controller.getAllUsers);
+router.post('/login', controller.login);
+router.get('/get/all',JWT.validateAdminToken, controller.getAllUsers);
 /** update */
-router.patch('/patch/changePassword', controller.changePassword);
+router.patch('/patch/changePassword', controller.changePassword, controller.safeLogin);
 /** delete */
 router.delete('/delete/deleteUser', controller.deleteUser);
 

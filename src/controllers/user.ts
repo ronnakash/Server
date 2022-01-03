@@ -30,20 +30,27 @@ const NAMESPACE = 'User';
 
 async function register (req: Request, res: Response, next: NextFunction) {
     let { username, password, permissions} = req.body;
+    let {token} = res.locals.jwt;
+    // check that password is strong
     if (!validator.isStrongPassword(password)){
         next(new AppError(`Provided password for user ${username} is too weak`, 400));
     }
-    //check tokenUserPermissions
-
+    //check token user permission
+    if (permissions ==='Admin' && !(token.tokenUserPermissions === 'Admin'))
+        next(new AppError(`You are not authorised to create Admin users!`,400));
     const hash = await bcryptjs.hash(password, 11);
     const newUser = new User({
         username,
         password: hash,
         permissions
         });
-    res.locals.result = await Query
+    const user = await Query
         .createOne(User, newUser)
         .catch( error => next(error));
+    res.locals.result = {
+        message: `Created new user ${username} sucsessfuly`,
+        user: user
+    }
     next();
 };
 
@@ -98,7 +105,12 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
         //compare passwords
         if (!bcryptjs.compare(oldPassword, user.password)) 
             next(new AppError(`Password mismatch for ${username}`,400));
+        // validate new password strength
+        if (!validator.isStrongPassword(newPassword)){
+            next(new AppError(`New password for user ${username} is too weak`, 400));
+        }
         user.password = newPassword;
+        user.passwordChangedAt = Date.now();
         user.save().catch( error => next(error));
         res.locals.result = {
             message: `Changed password successfuly for user ${username}`,
@@ -246,11 +258,13 @@ const safeLogin = (req: Request, res: Response, next: NextFunction) => {
 
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     let users = await Query
-        .getMany(User, {select: 'username email permissions createdAt'});
+        .getMany(User, {select: 'username email permissions createdAt'})
+        .catch( error => next(error));
     logging.info(NAMESPACE,"hi");
     res.locals.result = {
-        message: `Got ${users.length} results`,
-        users: users
+        message: users? `Got ${users.length} results` : `Unexpected error in getAllUsers`,
+        users: users,
+        statusCode: users? 200 : 500
     }
     next();
 };
