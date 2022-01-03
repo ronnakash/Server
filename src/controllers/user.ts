@@ -29,18 +29,19 @@ const NAMESPACE = 'User';
 
 
 async function register (req: Request, res: Response, next: NextFunction) {
-    let { username, password, permissions} = req.body;
-    let {token} = res.locals.jwt;
+    let { username,email, password, permissions} = req.body;
+    let token = res.locals.jwt;
     // check that password is strong
     if (!validator.isStrongPassword(password)){
         next(new AppError(`Provided password for user ${username} is too weak`, 400));
     }
     //check token user permission
-    if (permissions ==='Admin' && !(token.tokenUserPermissions === 'Admin'))
+    if (permissions ==='Admin' && !(token.permissions === 'Admin'))
         next(new AppError(`You are not authorised to create Admin users!`,400));
     const hash = await bcryptjs.hash(password, 11);
     const newUser = new User({
         username,
+        email,
         password: hash,
         permissions
         });
@@ -99,23 +100,28 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
     let { username, oldPassword, newPassword } = req.body;
     //get user from database
     const user = await Query
-        .getOne(User, {find: {username: username}})
+        .getOne(User, {find: {username: username}, select: '+passwordChangedAt, +password'})
         .catch( error => next(error));;
     if (user instanceof User) {
         //compare passwords
-        if (!bcryptjs.compare(oldPassword, user.password)) 
+        if (!(await bcryptjs.compare(oldPassword, user.password))) 
             next(new AppError(`Password mismatch for ${username}`,400));
+        else if (oldPassword == newPassword)
+            next(new AppError(`Can't change password to the current one`,400));
         // validate new password strength
-        if (!validator.isStrongPassword(newPassword)){
+        else if (!validator.isStrongPassword(newPassword))
             next(new AppError(`New password for user ${username} is too weak`, 400));
+        else {
+            user.password = await bcryptjs.hash(newPassword, 11);
+            user.passwordChangedAt = Date.now();
+            await user
+                .save()
+                .catch( error => next(error));
+            res.locals.result = {
+                message: `Changed password successfuly for user ${username}`,
+                user: user
+            };
         }
-        user.password = newPassword;
-        user.passwordChangedAt = Date.now();
-        user.save().catch( error => next(error));
-        res.locals.result = {
-            message: `Changed password successfuly for user ${username}`,
-            user: user
-        };
     }
     next();
     
@@ -203,8 +209,9 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
 const login = async (req: Request, res: Response, next: NextFunction) => {
     let { username, password } = req.body;
     const user = await Query
-        .getOne(User, {find: {username: username}})
+        .getOne(User, {find: {username: username}, select: '+password'})
         .catch( error => next(error));
+    logging.info(NAMESPACE,"user:", user);
     if (user instanceof User) {
         if (!await bcryptjs.compare(password, user.password))
             next(new AppError(`password mismatch for user ${username}`, 400));
@@ -212,16 +219,17 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
             if (error) next(error);
             else if (token) {
                 logging.info(NAMESPACE,`Auth successful for ${username}`);
+                user.password = ""
                 res.locals.result = {
                     message: `Auth successful for ${username}`,
                     token: token,
                     user: user
                 };
+                next();
             }
         });
-        next();
     }
-    next(new AppError(`Unexpected error in login: query result is not a user`, 500));
+    else next(new AppError(`Unexpected error in login: query result is not a user`, 500));
 };
 
 
@@ -257,8 +265,9 @@ const safeLogin = (req: Request, res: Response, next: NextFunction) => {
  */
 
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+    let {sort, select} = req.body;
     let users = await Query
-        .getMany(User, {select: 'username email permissions createdAt'})
+        .getMany(User, {select, sort})
         .catch( error => next(error));
     logging.info(NAMESPACE,"hi");
     res.locals.result = {

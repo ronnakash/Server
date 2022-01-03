@@ -1,21 +1,29 @@
 import { Request, Response, NextFunction } from 'express';
+import { errorMonitor } from 'stream';
 import logging from '../config/logging';
 
 
 const NAMESPACE = 'ErrorHandler';
 
 const errorLogger = (error : Error, req: Request, res: Response, next: NextFunction) => {
-    logging.error(NAMESPACE, "errorLogger", error.message);
+    logging.error("errorLogger", `${error.message}`, error.stack);
     next(error);
 };
 
 const errorResponder = (error : Error, req: Request, res: Response, next: NextFunction) => {
-    logging.error(NAMESPACE, "errorResponder", error.stack);
-    next(error);
+    logging.error("errorResponder", "errorResponder");
+    if (error.name === 'ValidationError'){
+        logging.error("errorResponder", "ValidationError");
+        return res.status(500).json({
+            message: `Unhandled error: ${error.message}`,
+            error
+        });
+    }
+    else next(error);
 };
 
 const uncaughtErrorHandler = (error : Error, req: Request, res: Response, next: NextFunction) => {
-    logging.error(NAMESPACE, `uncaughtErrorHandler`);
+    logging.error("uncaughtErrorHandler", `uncaughtErrorHandler`);
     return res.status(500).json({
         message: `Unhandled error: ${error.message}`,
         error

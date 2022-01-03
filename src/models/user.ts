@@ -38,9 +38,9 @@ const UserSchema: Schema = new Schema(
         }
 
     },
-    
     {
-        timestamps: true
+        timestamps: true,
+        versionKey: '1'
     }
 );
 

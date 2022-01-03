@@ -43,10 +43,10 @@ const getJWT = (req: Request, res: Response, next: NextFunction) => {
                 next(error);
             } else {
                 res.locals.jwt = decoded;
+                next();
             }
         });
     }
-    next();
 };
 
 
@@ -61,18 +61,12 @@ const getJWT = (req: Request, res: Response, next: NextFunction) => {
 const validateAdminToken = (req: Request, res: Response, next: NextFunction) => {
     let token = res.locals.jwt;
     let {username, permissions} = token;
-        logging.info(NAMESPACE, `Validating Token for user ${username} with permissions ${permissions}`);
-        if (permissions == 'Admin'){            
-            logging.info(NAMESPACE, `validated Admin Token for user ${username} with permissions ${permissions}`);
-            next();
-        } 
-        else {
-            logging.error(NAMESPACE,'No admin token found for action requiring admin permissions')
-            return res.status(401).json({
-            message: 'No admin token found for action requiring Admin permissions',
-            token: token
-            });
-        }
+    logging.info(NAMESPACE, `Validating Token for Admin permissions for user ${username} with permissions ${permissions}`);
+    if (permissions !== 'Admin')
+        next(new AppError(`User ${username} does not have admin permissions`,400));           
+    logging.info(NAMESPACE, `validated Admin Token for user ${username} with permissions ${permissions}`);
+    next();
+
 };
 
 
@@ -111,12 +105,6 @@ const validateUserOrAdmin = (req: Request, res: Response, next: NextFunction) =>
 };
 
 
-/** adminIfNeeded 
- * 
- * checks if request contains admin permissions,
- * and if so, verifies that an admin token exists
- * 
-*/
 
 
 
