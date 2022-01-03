@@ -34,13 +34,14 @@ const UserSchema: Schema = new Schema(
 
         passwordChangedAt: {
             type: Number,
-            select: false
-        }
+            select: false,
+            default: Date.now()
+        },
 
     },
     {
         timestamps: true,
-        versionKey: '1'
+        versionKey: '__v'
     }
 );
 

@@ -106,7 +106,7 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
         //compare passwords
         if (!(await bcryptjs.compare(oldPassword, user.password))) 
             next(new AppError(`Password mismatch for ${username}`,400));
-        else if (oldPassword == newPassword)
+        else if (oldPassword !== newPassword)
             next(new AppError(`Can't change password to the current one`,400));
         // validate new password strength
         else if (!validator.isStrongPassword(newPassword))
@@ -117,6 +117,7 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
             await user
                 .save()
                 .catch( error => next(error));
+            user.password = ""; // hide password hash
             res.locals.result = {
                 message: `Changed password successfuly for user ${username}`,
                 user: user
@@ -124,73 +125,6 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
         }
     }
     next();
-    
-    /*
-    //get user from database
-    const user = await User.findOne({username})
-        .exec()
-        .catch((error) => {
-            logging.error(NAMESPACE,error.message, error);
-            return res.status(500).json({
-                message: error.message,
-                error
-            });
-        });
-
-    if(user && user instanceof User && oldPassword != newPassword) {
-        // compare passwords
-        bcryptjs.compare(oldPassword, user.password, (error, success) => {
-            if (error) {
-                logging.error(NAMESPACE,error.message, error);
-                return res.status(500).json({
-                    message: error.message,
-                    error
-                });
-            }
-            else if (!success){
-                logging.error(NAMESPACE, `password mismatch for user ${username}`);
-                return res.status(500).json({
-                    message: `password mismatch for user ${username}`,
-                    oldPasswordProvided: oldPassword
-                });
-            } 
-            else { //success 
-                User.updateOne({username}, {password: newPassword})
-                    .select('-password')
-                    .exec()
-                    .then((user) => {
-                        logging.info(NAMESPACE,`changed password successfully for user ${username}`);
-                        return res.status(200).json({
-                            message: `changed password successfully`,
-                            user: user,
-                            newPassword: newPassword
-                        });
-                    })
-                    .catch ((error) => {
-                        logging.error(NAMESPACE, error.message, error);
-                        res.status(500).json({
-                            message: error.message,
-                            error
-                        });
-                    })
-            }
-        });
-    }
-    else if (oldPassword == newPassword) {
-        logging.error(NAMESPACE, `trying to change password to current password for user ${username}`);
-        return res.status(500).json({
-            message: `trying to change password to current password for user ${username}`,
-            oldPasswordProvided: oldPassword, 
-            newPassword: newPassword
-        });
-    }
-    else {
-        logging.error(NAMESPACE,`user ${username} not found`);
-        return res.status(400).json({
-            message: `user ${username} not found`
-        });
-    }
-    */
  };
 
 
@@ -265,9 +199,9 @@ const safeLogin = (req: Request, res: Response, next: NextFunction) => {
  */
 
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
-    let {sort, select} = req.body;
+    let {find, select, sort} = req.body;
     let users = await Query
-        .getMany(User, {select, sort})
+        .getMany(User, {find, select, sort})
         .catch( error => next(error));
     logging.info(NAMESPACE,"hi");
     res.locals.result = {
@@ -279,24 +213,8 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 
-/** validateToken
- * 
- * validates that token user exists and validates it
- * actual verification happens before by middleware
- * returns confirmation message if token is valid
- * 
- */
-
-const validateToken = (req: Request, res: Response, next: NextFunction) => {
-    logging.info(NAMESPACE, 'Token validated, user authorized.');
-    return res.status(200).json({
-        message: 'Token(s) validated'
-    });
-};
 
 
 
 
-
-
-export default { validateToken, register, deleteUser, changePassword, login, getAllUsers, safeLogin };
+export default { register, deleteUser, changePassword, login, getAllUsers, safeLogin };

@@ -8,16 +8,15 @@ const router = express.Router();
 
 
 /** create */
-router.post('/post/register', controller.register);
-router.post('/post/registerAndLogin', controller.register, controller.safeLogin);
-/** read */
-router.get('/get/validate', controller.validateToken);
+router.post('/register', controller.register);
+router.post('/registerAndLogin', controller.register, controller.safeLogin);
 router.post('/login', controller.login);
+/** read */
 router.get('/get/all',JWT.validateAdminToken, controller.getAllUsers);
 /** update */
-router.patch('/patch/changePassword', controller.changePassword);
+router.patch('/changePassword', controller.changePassword);
 /** delete */
-router.delete('/delete/deleteUser', controller.deleteUser);
+router.delete('/deleteUser', controller.deleteUser);
 
 
 router.use(handler);
