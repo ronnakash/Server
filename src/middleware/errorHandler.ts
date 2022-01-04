@@ -16,26 +16,39 @@ const errorResponder = (error : Error, req: Request, res: Response, next: NextFu
     if (error instanceof AppError){
         logging.error("errorResponder", "AppError");
         return res.status(500).json({
-            message: `Caught Error:${error.message}`,
+            message: `${error.message}`,
             error
         });
     }
     else if (error.name === 'ValidationError'){
         logging.error("errorResponder", "ValidationError");
-        return res.status(500).json({
-            message: `Validation Error: ${error.message}`,
+        return res.status(400).json({
+            message: `Validation Error: ${error.message.split(':'[1])}`,
             error
         });
     }
     else if (error.name === 'ObjectParameterError'){
         logging.error("errorResponder", "ObjectParameterError");
+        return res.status(400).json({
+            message: `Object Parameter Error: ${error.message.split(':'[1])}`,
+            error
+        });
+    }
+    else if (error.name === 'CastError'){
+        logging.error("errorResponder", "CastError");
         return res.status(500).json({
-            message: `Object Parameter Error: ${error.message}`,
+            message: `Casting Error: ${error.message.split(':'[1])}`,
+            error
+        });
+    }
+    else if (error.name === 'SyntaxError'){
+        logging.error("errorResponder", "SyntaxError");
+        return res.status(400).json({
+            message: `Syntax Error: ${error.message.split(':'[1])}`,
             error
         });
     }
     else next(error);
-
 
 };
 
