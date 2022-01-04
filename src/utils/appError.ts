@@ -13,7 +13,6 @@ class AppError extends Error {
         this.statusCode = statusCode;
         this.status  = `${statusCode}`.startsWith('4') ? 'client error' : 'server error';
         Error.captureStackTrace(this);
-        logging.error(NAMESPACE, `ERROR: ${this.status} with code ${this.statusCode}\n`, this.stack);
     }
 
 }

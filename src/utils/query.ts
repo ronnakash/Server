@@ -24,12 +24,12 @@ const createOne = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, 
 
 const updateOne = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, params : any) => {
     let {find, toUpdate } = params;
-    return await model.updateOne(find, toUpdate);
+    return await model.findOneAndUpdate(find, toUpdate);
 }
 
 const updateOneById = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, params : any) => {
     let {_id, toUpdate } = params;
-    return await model.updateOne(_id, toUpdate);
+    return await model.findOneAndUpdate(_id, toUpdate);
 }
 
 const deleteOne = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, params : any) => {

@@ -14,24 +14,33 @@ const errorLogger = (error : Error, req: Request, res: Response, next: NextFunct
 const errorResponder = (error : Error, req: Request, res: Response, next: NextFunction) => {
     logging.error("errorResponder", "errorResponder");
     if (error instanceof AppError){
-        logging.error("errorResponder", "ValidationError");
+        logging.error("errorResponder", "AppError");
         return res.status(500).json({
-            message: `${error.message}`,
+            message: `Caught Error:${error.message}`,
             error
         });
     }
     else if (error.name === 'ValidationError'){
         logging.error("errorResponder", "ValidationError");
         return res.status(500).json({
-            message: `Unhandled error: ${error.message}`,
+            message: `Validation Error: ${error.message}`,
+            error
+        });
+    }
+    else if (error.name === 'ObjectParameterError'){
+        logging.error("errorResponder", "ObjectParameterError");
+        return res.status(500).json({
+            message: `Object Parameter Error: ${error.message}`,
             error
         });
     }
     else next(error);
+
+
 };
 
 const uncaughtErrorHandler = (error : Error, req: Request, res: Response, next: NextFunction) => {
-    logging.error("uncaughtErrorHandler", `uncaughtErrorHandler`);
+    logging.error("uncaughtErrorHandler", `uncaughtErrorHandler`, error);
     return res.status(500).json({
         message: `Unhandled error: ${error.message}`,
         error
