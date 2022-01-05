@@ -5,6 +5,7 @@ import { IToDoList } from '../interfaces/todoList';
 import AppError from '../utils/appError';
 import Query from '../utils/query';
 import logging from '../config/logging';
+import modelsController from '../controllers/models';
 
 
 const NAMESPACE = 'lists Controller';
@@ -22,30 +23,14 @@ const NAMESPACE = 'lists Controller';
  * 
 */
 
+
 const getAllLists = async (req: Request, res: Response, next: NextFunction) => {
-    let docs = await Query
-        .getMany(ToDoList, req.body)
-        .catch( error => next(error));
-    res.locals.result = {
-        message: docs ? `Got ${docs.length} results` : `Got no results`,
-        docs
-    };
-    next();
+    modelsController.getAllModels(ToDoList,req,res, next);
 };
 
 const getListById = async (req: Request, res: Response, next: NextFunction) => {
-    let { _id } = req.body;
-    let list = await Query
-        .getOneById(ToDoList, _id)
-        .catch( error => next(error));
-    res.locals.result = {
-        message: `Got list sucsessfuly`,
-        list
-    };
-    next();
+    modelsController.getModelById(ToDoList,req,res, next);
 }; 
-
-
 
 /**  getMyLists
  * 
@@ -55,18 +40,7 @@ const getListById = async (req: Request, res: Response, next: NextFunction) => {
 */
 
 const getMyLists = async (req: Request, res: Response, next: NextFunction) => {
-    let username = res.locals.jwt.username;
-    let { find, select, sort } = req.body;
-    find.author = username;
-    let params = {find, select, sort};
-    const lists = await Query
-        .getMany(ToDoList, params)
-        .catch( error => next(error));
-    res.locals.result = {
-        message: lists ? `Got ${lists.length} results` : `Got no results`,
-        lists
-    };
-    next();
+    modelsController.getMyModels(ToDoList,req,res, next);
 };
 
 
@@ -85,18 +59,7 @@ const getMyLists = async (req: Request, res: Response, next: NextFunction) => {
 */
 
 const updateList = async (req: Request, res: Response, next: NextFunction) => {
-    let { _id, body, title } = req.body;
-    logging.info(NAMESPACE,"id:" , _id);
-    const updated = await Query.updateOneById(ToDoList,{
-        _id: _id, 
-        toUpdate: {body, title}
-    }).catch( error => next(error));
-    res.locals.result = {
-        message: `Updated list sucsessfully`,
-        updated
-    }
-    next();
-
+    modelsController.updateModel(ToDoList,req,res, next);
 };
 
 
@@ -114,18 +77,8 @@ const updateList = async (req: Request, res: Response, next: NextFunction) => {
 */
 
 const deleteListById = async (req: Request, res: Response, next: NextFunction) => {
-    let { _id } = req.body;
-    let deleted = await Query
-        .deleteOneById(ToDoList, _id)
-        .catch( error => next(error));
-    res.locals.result = {
-        message: deleted? `Deleted list sucsessfuly` : `list not found`,
-        list: deleted,
-        statusCode: deleted? 200 : 400
-    };
-    next();
+    modelsController.deleteModelById(ToDoList,req,res, next);
 };
-
 
 /** deleteAllUsersLists 
  * 
@@ -136,19 +89,8 @@ const deleteListById = async (req: Request, res: Response, next: NextFunction) =
 */
 
 const deleteAllUsersLists = async (req: Request, res: Response, next: NextFunction) => {
-    let { author } = req.body;
-    let { username, permissions } = res.locals.jwt
-    author = author ? author : username;
-    if (author !== username && permissions !== "Admin")
-        next(new AppError("You don't have permissions to delete other users lists!", 400));
-    const deleted = await Query.deleteMany(ToDoList, {find: {author: author}});
-    res.locals.result = {
-        message: `Deleted lists sucsessfuly`,
-        list: deleted
-    };
-    next();
+    modelsController.deleteAllUsersModels(ToDoList,req,res, next);
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /** create */

@@ -5,6 +5,8 @@ import notes from '../interfaces/notes';
 import AppError from '../utils/appError';
 import Query from '../utils/query';
 import logging from '../config/logging';
+import modelsController from '../controllers/models';
+
 
 const NAMESPACE = 'Notes Controller';
 
@@ -22,28 +24,12 @@ const NAMESPACE = 'Notes Controller';
 */
 
 const getAllNotes = async (req: Request, res: Response, next: NextFunction) => {
-    let docs = await Query
-        .getMany(Note, req.body)
-        .catch( error => next(error));
-    res.locals.result = {
-        message: docs ? `Got ${docs.length} results` : `Got no results`,
-        docs
-    };
-    next();
+    modelsController.getAllModels(Note,req,res, next);
 };
 
 const getNoteById = async (req: Request, res: Response, next: NextFunction) => {
-    let { _id } = req.body;
-    let note = await Query
-        .getOneById(Note, _id)
-        .catch( error => next(error));
-    res.locals.result = {
-        message: `Got note sucsessfuly`,
-        note
-    };
-    next();
+    modelsController.getModelById(Note,req,res, next);
 }; 
-
 
 
 /**  getMyNotes
@@ -54,18 +40,7 @@ const getNoteById = async (req: Request, res: Response, next: NextFunction) => {
 */
 
 const getMyNotes = async (req: Request, res: Response, next: NextFunction) => {
-    let username = res.locals.jwt.username;
-    let { find, select, sort } = req.body;
-    find.author = username;
-    let params = {find, select, sort};
-    const notes = await Query
-        .getMany(Note, params)
-        .catch( error => next(error));
-    res.locals.result = {
-        message: notes ? `Got ${notes.length} results` : `Got no results`,
-        notes
-    };
-    next();
+    modelsController.getMyModels(Note,req,res, next);
 };
 
 
@@ -84,18 +59,7 @@ const getMyNotes = async (req: Request, res: Response, next: NextFunction) => {
 */
 
 const updateNote = async (req: Request, res: Response, next: NextFunction) => {
-    let { _id, body, title } = req.body;
-    logging.info(NAMESPACE,"id:" , _id);
-    const updated = await Query.updateOneById(Note,{
-        _id: _id, 
-        toUpdate: {body, title}
-    }).catch( error => next(error));
-    res.locals.result = {
-        message: `Updated note sucsessfully`,
-        updated
-    }
-    next();
-
+    modelsController.updateModel(Note,req,res, next);
 };
 
 
@@ -113,16 +77,7 @@ const updateNote = async (req: Request, res: Response, next: NextFunction) => {
 */
 
 const deleteNoteById = async (req: Request, res: Response, next: NextFunction) => {
-    let { _id } = req.body;
-    let deleted = await Query
-        .deleteOneById(Note, _id)
-        .catch( error => next(error));
-    res.locals.result = {
-        message: deleted? `Deleted note sucsessfuly` : `Note not found`,
-        note: deleted,
-        statusCode: deleted? 200 : 400
-    };
-    next();
+    modelsController.deleteModelById(Note,req,res, next);
 };
 
 
@@ -135,17 +90,7 @@ const deleteNoteById = async (req: Request, res: Response, next: NextFunction) =
 */
 
 const deleteAllUsersNotes = async (req: Request, res: Response, next: NextFunction) => {
-    let { author } = req.body;
-    let { username, permissions } = res.locals.jwt
-    author = author ? author : username;
-    if (author !== username && permissions !== "Admin")
-        next(new AppError("You don't have permissions to delete other users notes!", 400));
-    const deleted = await Query.deleteMany(Note, {find: {author: author}});
-    res.locals.result = {
-        message: `Deleted notes sucsessfuly`,
-        note: deleted
-    };
-    next();
+    modelsController.deleteAllUsersModels(Note,req,res, next);
 }
 
 
