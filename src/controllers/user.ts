@@ -5,8 +5,6 @@ import JWT from '../functions/signJWT';
 import User from '../models/user';
 import Query from '../utils/query';
 import AppError from '../utils/appError';
-import IUser from '../interfaces/user';
-import { Document } from 'mongoose';
 import validator from 'validator';
 
 
@@ -153,7 +151,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
             if (error) next(error);
             else if (token) {
                 logging.info(NAMESPACE,`Auth successful for ${username}`);
-                user.password = ""
+                user.password = "";
                 res.locals.result = {
                     message: `Auth successful for ${username}`,
                     token: token,
