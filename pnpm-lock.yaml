@@ -8,6 +8,7 @@ specifiers:
   '@types/jsonwebtoken': ^8.5.5
   '@types/mongoose': ^5.11.97
   '@types/node': ^16.11.6
+  '@types/validator': ^13.7.1
   bcryptjs: ^2.4.3
   cors: ^2.8.5
   dotenv: ^10.0.0
@@ -36,6 +37,7 @@ devDependencies:
   '@types/jsonwebtoken': 8.5.6
   '@types/mongoose': 5.11.97
   '@types/node': 16.11.17
+  '@types/validator': 13.7.1
   mongoose: 6.1.4
   nodemon: 2.0.15
   ts-node: 10.4.0_00264fd83560919cd06c986889baae0a
@@ -169,6 +171,10 @@ packages:
 
   /@types/strip-json-comments/0.0.30:
     resolution: {integrity: sha512-7NQmHra/JILCd1QqpSzl8+mJRc8ZHz3uDm8YV1Ks9IhK0epEiTw8aIErbvH9PI+6XbqhyIQy3462nEsn7UVzjQ==}
+    dev: true
+
+  /@types/validator/13.7.1:
+    resolution: {integrity: sha512-I6OUIZ5cYRk5lp14xSOAiXjWrfVoMZVjDuevBYgQDYzZIjsf2CAISpEcXOkFAtpAHbmWIDLcZObejqny/9xq5Q==}
     dev: true
 
   /@types/webidl-conversions/6.1.1:

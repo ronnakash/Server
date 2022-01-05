@@ -109,9 +109,9 @@ const deleteAllUsersNotes = async (req: Request, res: Response, next: NextFuncti
 */
 
 const createNote = async (req: Request, res: Response, next: NextFunction) => {
-    let { author, title, body} = req.body;
+    let { _id, author, title, body} = req.body;
     const note = new Note({
-        _id: new mongoose.Types.ObjectId(),
+        _id: _id? _id : new mongoose.Types.ObjectId(),
         author,
         title, 
         body
@@ -138,11 +138,12 @@ const createNote = async (req: Request, res: Response, next: NextFunction) => {
 const createNotes = async (req: Request, res: Response, next: NextFunction) => {
     let {notes} = req.body;
     let newNotes: (notes & { _id: any })[] = [];
-    notes.forEach((note: { author: string; title: string; body: string; }) => {
-        let { author, title, body } = note;
+    notes.forEach((note: { _id: any; author: string; title: string; body: string; }) => {
+        let { _id, author, title, body } = note;
         newNotes.push(new Note({
+            _id: _id? _id : new mongoose.Types.ObjectId(),
             author,
-            title,
+            title, 
             body
         }));
     });
