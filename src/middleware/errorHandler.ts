@@ -16,7 +16,6 @@ const errorResponder = (error : Error, req: Request, res: Response, next: NextFu
     if (error instanceof AppError){
         logging.error("errorResponder", "AppError");
         return res.status(500).json({
-            message: `${error.message}`,
             error
         });
     }

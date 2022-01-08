@@ -29,7 +29,7 @@ const updateOne = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, 
 
 const updateOneById = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, params : any) => {
     let {_id, toUpdate } = params;
-    return await model.findOneAndUpdate(_id, toUpdate);
+    return await model.findOneAndUpdate({_id: _id}, toUpdate);
 }
 
 const deleteOne = async (model : mongoose.Model<mongoose.Document, {}, {}, {}>, params : any) => {

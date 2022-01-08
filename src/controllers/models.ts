@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import mongoose, { Model, Document } from 'mongoose';
+import mongoose, { Model, Document, ObjectId } from 'mongoose';
 import AppError from '../utils/appError';
 import Query from '../utils/query';
 import logging from '../config/logging';
@@ -18,10 +18,29 @@ const NAMESPACE = 'Models Controller';
  * requires token from administrator user
  * 
 */
+function paramsToObject(entries : IterableIterator<[string, string]>) {
+    let result : any = {};
+    for(const [key, value] of entries) { // each 'entry' is a [key, value] tupple
+        let newVal = value;
+        if (value==='$gte=1234'){
+            let urlParams = new URLSearchParams(value);
+            //logging.debug("paramsToObject","debug",urlParams);
+            let entries = urlParams.entries();
+            //logging.debug("paramsToObject","debug2",entries);
+            newVal = paramsToObject(entries)
+        }
+        result[key] = value;
+    }
+    return result;
+  }
 
 const getAllModels = async (model: Model<Document>, req: Request, res: Response, next: NextFunction) => {
+    let urlParams = new URLSearchParams(req.url.split('?')[1]);
+    let entries = urlParams.entries();
+    let params = paramsToObject(entries)
+    logging.debug(NAMESPACE, `${req.url.split('?')[1]}`, params);
     let docs = await Query
-        .getMany(model, req.body)
+        .getMany(model, {find: params})
         .catch( error => next(error));
     res.locals.result = {
         message: docs ? `Got ${docs.length} results` : `Got no results`,
@@ -84,7 +103,6 @@ const getMyModels = async (model: Model<Document>, req: Request, res: Response, 
 
 const updateModel = async (model: Model<Document>, req: Request, res: Response, next: NextFunction) => {
     let { _id, body, title } = req.body;
-    logging.info(NAMESPACE,"id:" , _id);
     const updated = await Query.updateOneById(model,{
         _id: _id, 
         toUpdate: {body, title}

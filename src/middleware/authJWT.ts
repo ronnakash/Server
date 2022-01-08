@@ -47,6 +47,7 @@ const getJWT = (req: Request, res: Response, next: NextFunction) => {
             }
         });
     }
+    else next(new AppError('No token provided', 400));
 };
 
 
@@ -61,7 +62,8 @@ const getJWT = (req: Request, res: Response, next: NextFunction) => {
 const validateAdminToken = (req: Request, res: Response, next: NextFunction) => {
     let token = res.locals.jwt;
     let {username, permissions} = token;
-    logging.info(NAMESPACE, `Validating Token for Admin permissions for user ${username} with permissions ${permissions}`);
+    logging.info(NAMESPACE, `Validating Token for Admin permissions
+         for user ${username} with permissions ${permissions}`);
     if (permissions !== 'Admin')
         next(new AppError(`User ${username} does not have admin permissions`,400));           
     logging.info(NAMESPACE, `validated Admin Token for user ${username} with permissions ${permissions}`);
@@ -90,17 +92,15 @@ const validateUserOrAdmin = (req: Request, res: Response, next: NextFunction) =>
         validateAdminToken(req, res, next);
     }
     else if (username == reqUser) {
-        logging.info(NAMESPACE, `Token user ${username} does not have admin permissions but match request user ${username}`);
+        logging.info(NAMESPACE, `Token user ${username} does not have admin permissions
+             but match request user ${username}`);
         next();
     }
     else {
-        logging.error(NAMESPACE, `Token user ${username} does not have admin permissions and does not match request user ${username}`);
-        return res.status(400).json({
-            message: `Token user ${username} does not have admin permissions and does not match request user ${username}`,
-            tokenUser: username,
-            tokenUserPermissions: permissions,
-            requestUser: reqUser
-        });
+        logging.error(NAMESPACE, `Token user ${username} does not have admin permissions
+            and does not match request user ${username}`);
+        next (new AppError(`Token user ${username} does not have admin permissions
+            and does not match request user ${username}`,400));
     }
 };
 

@@ -110,18 +110,24 @@ const deleteAllUsersNotes = async (req: Request, res: Response, next: NextFuncti
 
 const createNote = async (req: Request, res: Response, next: NextFunction) => {
     let { _id, author, title, body} = req.body;
-    const note = new Note({
-        _id: _id? _id : new mongoose.Types.ObjectId(),
-        author,
-        title, 
-        body
-    });
-    const newNote = await Query.createOne(Note, note);
-    res.locals.result = {
-        message: `Created new note for ${author}`, 
-        newNote
+    if (!author || (!title && !body))
+        next(new AppError(`not all required args were provided`,400));
+    else {
+        const note = new Note({
+            _id: _id? _id : new mongoose.Types.ObjectId(),
+            author,
+            title, 
+            body
+        })
+        const newNote = await Query.createOne(Note, note);
+        res.locals.result = {
+            message: `Created new note for ${author}`, 
+            newNote
+        }
+        next();
+
     }
-    next();
+
 };
 
 
