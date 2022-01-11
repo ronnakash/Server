@@ -43,6 +43,10 @@ const getMyNotes = async (req: Request, res: Response, next: NextFunction) => {
     modelsController.getMyModels(Note,req,res, next);
 };
 
+const getMyNotesFromJWT = async (req: Request, res: Response, next: NextFunction) => {
+    modelsController.getMyModelsFromJWT(Note,req,res, next);
+};
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /** update */
@@ -162,4 +166,4 @@ const createNotes = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 
-export default { getNoteById, createNote, getAllNotes, updateNote, getMyNotes, deleteNoteById, deleteAllUsersNotes, createNotes};
+export default { getNoteById, createNote, getAllNotes, updateNote, getMyNotes, getMyNotesFromJWT, deleteNoteById, deleteAllUsersNotes, createNotes};

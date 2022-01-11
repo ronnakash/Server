@@ -3,6 +3,7 @@ import mongoose, { Model, Document, ObjectId } from 'mongoose';
 import AppError from '../utils/appError';
 import Query from '../utils/query';
 import logging from '../config/logging';
+import urlParser from '../utils/urlParser';
 
 const NAMESPACE = 'Models Controller';
 
@@ -18,27 +19,10 @@ const NAMESPACE = 'Models Controller';
  * requires token from administrator user
  * 
 */
-function paramsToObject(entries : IterableIterator<[string, string]>) {
-    let result : any = {};
-    for(const [key, value] of entries) { // each 'entry' is a [key, value] tupple
-        let newVal = value;
-        if (value==='$gte=1234'){
-            let urlParams = new URLSearchParams(value);
-            //logging.debug("paramsToObject","debug",urlParams);
-            let entries = urlParams.entries();
-            //logging.debug("paramsToObject","debug2",entries);
-            newVal = paramsToObject(entries)
-        }
-        result[key] = value;
-    }
-    return result;
-  }
 
 const getAllModels = async (model: Model<Document>, req: Request, res: Response, next: NextFunction) => {
-    let urlParams = new URLSearchParams(req.url.split('?')[1]);
-    let entries = urlParams.entries();
-    let params = paramsToObject(entries)
-    logging.debug(NAMESPACE, `${req.url.split('?')[1]}`, params);
+    let params = urlParser(req.url);
+    logging.debug(NAMESPACE, `params:`, req.params);
     let docs = await Query
         .getMany(model, {find: params})
         .catch( error => next(error));
@@ -71,6 +55,18 @@ const getModelById = async (model: Model<Document>, req: Request, res: Response,
 */
 
 const getMyModels = async (model: Model<Document>, req: Request, res: Response, next: NextFunction) => {
+    let params = urlParser(req.url);
+    const models = await Query
+        .getMany(model, params)
+        .catch( error => next(error));
+    res.locals.result = {
+        message: models ? `Got ${models.length} results` : `Got no results`,
+        models
+    };
+    next();
+};
+
+const getMyModelsFromJWT = async (model: Model<Document>, req: Request, res: Response, next: NextFunction) => {
     let username = res.locals.jwt.username;
     let { find, select, sort } = req.body;
     if (!find) find = {};
@@ -167,4 +163,4 @@ const deleteAllUsersModels = async (model: Model<Document>, req: Request, res: R
 
 
 
-export default { getAllModels, getModelById, deleteModelById, getMyModels, deleteAllUsersModels, updateModel};
+export default { getAllModels, getModelById, getMyModelsFromJWT, deleteModelById, getMyModels, deleteAllUsersModels, updateModel};
