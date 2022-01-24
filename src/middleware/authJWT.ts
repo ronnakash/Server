@@ -61,7 +61,7 @@ const getJWT = (req: Request, res: Response, next: NextFunction) => {
 
 const validateAdminToken = (req: Request, res: Response, next: NextFunction) => {
     let token = res.locals.jwt;
-    let {username, permissions} = token;
+    let {username, email, permissions} = token;
     logging.info(NAMESPACE, `Validating Token for Admin permissions
          for user ${username} with permissions ${permissions}`);
     if (permissions !== 'Admin')
@@ -82,7 +82,7 @@ const validateAdminToken = (req: Request, res: Response, next: NextFunction) => 
 
 
 const validateUserOrAdmin = (req: Request, res: Response, next: NextFunction) => {
-    
+    /*
     let token = res.locals.jwt;
     logging.info(NAMESPACE, 'token: ', token);
     let { username , permissions } = token;
@@ -102,6 +102,14 @@ const validateUserOrAdmin = (req: Request, res: Response, next: NextFunction) =>
         next (new AppError(`Token user ${username} does not have admin permissions
             and does not match request user ${username}`,400));
     }
+    */
+    let token = res.locals.jwt;
+    let { username , permissions } = token;
+    if (permissions == 'Admin' || permissions == 'user')
+        next();
+    else
+        next(new AppError('No token provided',400)); 
+
 };
 
 

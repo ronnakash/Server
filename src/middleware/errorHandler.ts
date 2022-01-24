@@ -3,24 +3,22 @@ import { errorMonitor } from 'stream';
 import logging from '../config/logging';
 import AppError from '../utils/appError';
 
-
 const NAMESPACE = 'ErrorHandler';
 
 const errorLogger = (error : Error, req: Request, res: Response, next: NextFunction) => {
-    logging.error("errorLogger", `${error.message}`, error.stack);
+    logging.error("errorLogger", `${error.stack}`);
     next(error);
 };
 
 const errorResponder = (error : Error, req: Request, res: Response, next: NextFunction) => {
-    logging.error("errorResponder", "errorResponder");
     if (error instanceof AppError){
         logging.error("errorResponder", "AppError");
         return res.status(500).json({
+            message: error.message,
             error
         });
     }
     else if (error.name === 'ValidationError'){
-        logging.error("errorResponder", "ValidationError");
         return res.status(400).json({
             message: `Validation Error: ${error.message.split(':'[1])}`,
             error

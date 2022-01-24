@@ -5,7 +5,7 @@ import logging  from './config/logging';
 import config from './config/config';
 import AppError from './utils/appError';
 import adminRouter from './routes/authAdmin';
-import userRouter from './routes/user'
+import userRouter from './routes/authUser'
 import errorHandler from './middleware/errorHandler';
 
 
@@ -47,7 +47,7 @@ app.use((req, res, next) => {
 /** Routes */
 
 app.use('/Admin', adminRouter.router);
-app.use('/users', userRouter.router);
+app.use('/User', userRouter.router);
 
 
 

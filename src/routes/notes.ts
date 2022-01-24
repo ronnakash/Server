@@ -18,7 +18,6 @@ router.get('/get/usersNotes', controller.getMyNotes);
 router.put('/put/updateNote', controller.updateNote);
 /** delete */
 router.delete('/delete/deleteNote', controller.deleteNoteById);
-router.delete('/delete/allUsersNotes' ,controller.deleteAllUsersNotes);
 
 
 router.use(handler);

@@ -17,7 +17,6 @@ router.get('/get/myLists', controller.getMyLists);
 router.put('/put/updateList', controller.updateList);
 /** delete */
 router.delete('/delete/deleteList', controller.deleteListById);
-router.delete('/delete/allUsersLists' ,controller.deleteAllUsersLists);
 
 
 router.use(handler);

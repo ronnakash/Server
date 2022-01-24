@@ -24,11 +24,11 @@ const NAMESPACE = 'Notes Controller';
 */
 
 const getAllNotes = async (req: Request, res: Response, next: NextFunction) => {
-    modelsController.getAllModels(Note,req,res, next);
+    modelsController.getAllModels(Note, req, res, next);
 };
 
 const getNoteById = async (req: Request, res: Response, next: NextFunction) => {
-    modelsController.getModelById(Note,req,res, next);
+    modelsController.getModelById(Note, req, res, next);
 }; 
 
 
@@ -40,11 +40,11 @@ const getNoteById = async (req: Request, res: Response, next: NextFunction) => {
 */
 
 const getMyNotes = async (req: Request, res: Response, next: NextFunction) => {
-    modelsController.getMyModels(Note,req,res, next);
+    modelsController.getMyModels(Note, req, res, next);
 };
 
 const getMyNotesFromJWT = async (req: Request, res: Response, next: NextFunction) => {
-    modelsController.getMyModelsFromJWT(Note,req,res, next);
+    modelsController.getMyModelsFromJWT(Note, req, res, next);
 };
 
 
@@ -63,7 +63,7 @@ const getMyNotesFromJWT = async (req: Request, res: Response, next: NextFunction
 */
 
 const updateNote = async (req: Request, res: Response, next: NextFunction) => {
-    modelsController.updateModel(Note,req,res, next);
+    modelsController.updateModel(Note, req, res, next);
 };
 
 
@@ -81,21 +81,9 @@ const updateNote = async (req: Request, res: Response, next: NextFunction) => {
 */
 
 const deleteNoteById = async (req: Request, res: Response, next: NextFunction) => {
-    modelsController.deleteModelById(Note,req,res, next);
+    modelsController.deleteModelById(Note, req, res, next);
 };
 
-
-/** deleteAllUsersNotes 
- * 
- * delete all notes of a selected user
- * request must contain username for which notes to delete
- * token must be admin or belong to the user who's notes will be deleted 
- * 
-*/
-
-const deleteAllUsersNotes = async (req: Request, res: Response, next: NextFunction) => {
-    modelsController.deleteAllUsersModels(Note,req,res, next);
-}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,6 +102,7 @@ const deleteAllUsersNotes = async (req: Request, res: Response, next: NextFuncti
 
 const createNote = async (req: Request, res: Response, next: NextFunction) => {
     let { _id, author, title, body} = req.body;
+    logging.info(NAMESPACE,'dbg:', author)
     if (!author || (!title && !body))
         next(new AppError(`not all required args were provided`,400));
     else {
@@ -166,4 +155,4 @@ const createNotes = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 
-export default { getNoteById, createNote, getAllNotes, updateNote, getMyNotes, getMyNotesFromJWT, deleteNoteById, deleteAllUsersNotes, createNotes};
+export default { getNoteById, createNote, getAllNotes, updateNote, getMyNotes, getMyNotesFromJWT, deleteNoteById, createNotes};

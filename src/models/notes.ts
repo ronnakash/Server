@@ -6,7 +6,7 @@ const NoteSchema: Schema = new Schema(
     {
         title: { 
             type: String, 
-            required: true 
+            required: true
         },
 
         author: { 

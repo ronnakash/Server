@@ -6,11 +6,9 @@ import JWT from '../middleware/authJWT';
 
 const router = express.Router();
 
-router
-    .use(JWT.getJWT, JWT.existsJWT, JWT.validateUserOrAdmin);
 
     router.use('/users', userRouter.router);
-    router.use('/notes', noteRouter.router);
+    router.use('/notes', JWT.getJWT, JWT.existsJWT, JWT.validateUserOrAdmin, noteRouter.router);
 
 
     

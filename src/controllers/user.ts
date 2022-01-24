@@ -27,30 +27,38 @@ const NAMESPACE = 'User';
 
 
 async function register (req: Request, res: Response, next: NextFunction) {
+    logging.info(NAMESPACE,"hi")
     let { username,email, password, permissions} = req.body;
     let token = res.locals.jwt;
-    // check that password is strong
-    if (!validator.isStrongPassword(password)){
-        next(new AppError(`Provided password for user ${username} is too weak`, 400));
-    }
-    //check token user permission
-    if (permissions ==='Admin' && !(token.permissions === 'Admin'))
-        next(new AppError(`You are not authorised to create Admin users!`,400));
-    const hash = await bcryptjs.hash(password, 11);
-    const newUser = new User({
-        username,
-        email,
-        password: hash,
-        permissions
-        });
-    const user = await Query
-        .createOne(User, newUser)
+    //check if user exists
+    let users = await Query
+        .getMany(User, {find: {$or: [{username: username}, {email: email}]}})
         .catch( error => next(error));
-    res.locals.result = {
-        message: `Created new user ${username} sucsessfuly`,
-        user: user
+    if (users && users instanceof Array && users.length > 0)
+        next(new AppError(`User already exists`,400));
+    // check that password is strong
+    else if (!validator.isStrongPassword(password))
+        next(new AppError(`Provided password for user ${username} is too weak`, 400));
+    //check token user permission
+    else if (permissions ==='Admin' && !(token.permissions === 'Admin'))
+        next(new AppError(`You are not authorised to create Admin users!`,400));
+    else {
+        const hash = await bcryptjs.hash(password, 11);
+        const newUser = new User({
+            username,
+            email,
+            password: hash,
+            permissions
+            });
+        const user = await Query
+            .createOne(User, newUser)
+            .catch( error => next(error));
+        res.locals.result = {
+            message: `Created new user ${username} sucsessfuly`,
+            user: user
+        }
+        next();
     }
-    next();
 };
 
 
@@ -95,10 +103,10 @@ async function register (req: Request, res: Response, next: NextFunction) {
  */
 
 async function changePassword (req: Request, res: Response, next: NextFunction) {
-    let { username, oldPassword, newPassword } = req.body;
+    let { username, email, oldPassword, newPassword } = req.body;
     //get user from database
     const user = await Query
-        .getOne(User, {find: {username: username}, select: '+passwordChangedAt, +password'})
+        .getOne(User, {find: {username: username, email: email}, select: '+passwordChangedAt, +password'})
         .catch( error => next(error));;
     if (user instanceof User) {
         //compare passwords
@@ -139,9 +147,9 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
  */
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
-    let { username, password } = req.body;
+    let { username, email, password } = req.body;
     const user = await Query
-        .getOne(User, {find: {username: username}, select: '+password'})
+        .getOne(User, {find: {username: username, email: email}, select: '+password'})
         .catch( error => next(error));
     logging.info(NAMESPACE,"user:", user);
     if (user instanceof User) {
@@ -181,7 +189,7 @@ const safeLogin = (req: Request, res: Response, next: NextFunction) => {
             res.locals.result = {
                 loginMessage: `Auth successful for ${newUser.username}`,
                 token: token,
-                loginUser: newUser
+                user: newUser
             };
             next();
         }

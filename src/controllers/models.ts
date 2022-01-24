@@ -50,7 +50,7 @@ const getModelById = async (model: Model<Document>, req: Request, res: Response,
 /**  getMyModels
  * 
  * get all models that belong to user from mongoose
- * gets username from token
+ * gets username from request url
  * 
 */
 
@@ -66,15 +66,18 @@ const getMyModels = async (model: Model<Document>, req: Request, res: Response, 
     next();
 };
 
+/**  getMyModelsFromJWT
+ * 
+ * get all models that belong to user from mongoose
+ * gets username from JWT token
+ * 
+*/
+
+
 const getMyModelsFromJWT = async (model: Model<Document>, req: Request, res: Response, next: NextFunction) => {
-    let username = res.locals.jwt.username;
-    let { find, select, sort } = req.body;
-    if (!find) find = {};
-    find.author = username;
-    let params = {find, select, sort};
     const models = await Query
-        .getMany(model, params)
-        .catch( error => next(error));
+        .getMany(model, {find: {uid: res.locals.token.uid}})
+        .catch(error => next(error));
     res.locals.result = {
         message: models ? `Got ${models.length} results` : `Got no results`,
         models
@@ -98,9 +101,10 @@ const getMyModelsFromJWT = async (model: Model<Document>, req: Request, res: Res
 */
 
 const updateModel = async (model: Model<Document>, req: Request, res: Response, next: NextFunction) => {
-    let { _id, body, title } = req.body;
+    let { id, body, title } = req.body;
+    console.log(req.body);
     const updated = await Query.updateOneById(model,{
-        _id: _id, 
+        _id: id, 
         toUpdate: {body, title}
     }).catch( error => next(error));
     res.locals.result = {
@@ -139,28 +143,5 @@ const deleteModelById = async (model: Model<Document>, req: Request, res: Respon
 };
 
 
-/** deleteAllUsersModels 
- * 
- * delete all models of a selected user
- * request must contain username for which models to delete
- * token must be admin or belong to the user who's models will be deleted 
- * 
-*/
 
-const deleteAllUsersModels = async (model: Model<Document>, req: Request, res: Response, next: NextFunction) => {
-    let { author } = req.body;
-    let { username, permissions } = res.locals.jwt
-    author = author ? author : username;
-    if (author !== username && permissions !== "Admin")
-        next(new AppError("You don't have permissions to delete other users models!", 400));
-    const deleted = await Query.deleteMany(model, {find: {author: author}});
-    res.locals.result = {
-        message: `Deleted models sucsessfuly`,
-        model: deleted
-    };
-    next();
-}
-
-
-
-export default { getAllModels, getModelById, getMyModelsFromJWT, deleteModelById, getMyModels, deleteAllUsersModels, updateModel};
+export default { getAllModels, getModelById, getMyModelsFromJWT, deleteModelById, getMyModels, updateModel};

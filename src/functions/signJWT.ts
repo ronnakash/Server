@@ -22,6 +22,7 @@ const signJWT = (user: IUser, callback: (error: Error | null, token: string | nu
             {
                 _id: user._id,
                 username: user.username,
+                email: user.email,
                 permissions: user.permissions
             },
             config.server.token.secret,

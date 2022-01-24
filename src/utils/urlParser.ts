@@ -4,7 +4,7 @@
 const urlParser = (url : string) : any => {
     let urlParams = new URLSearchParams(url.split('?')[1]);
     let entries = urlParams.entries();
-    return paramsToObject(entries)
+    return {find: paramsToObject(entries)}
 }
 
 function paramsToObject(entries : IterableIterator<[string, string]>) {
