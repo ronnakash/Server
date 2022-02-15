@@ -37,6 +37,9 @@ const UserSchema: Schema = new Schema(
             default: Date.now()
         },
 
+        metadata: {
+            type: Object,
+        }
     },
     {
         timestamps: true,

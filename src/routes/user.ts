@@ -11,6 +11,7 @@ const router = express.Router();
 router.post('/register', controller.register);
 router.post('/registerAndLogin', controller.register, controller.safeLogin);
 router.post('/login', controller.login);
+router.post('/google/login', controller.googleLogin)
 /** read */
 router.get('/get/all',JWT.validateAdminToken, controller.getAllUsers);
 /** update */

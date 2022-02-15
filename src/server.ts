@@ -8,6 +8,7 @@ import adminRouter from './routes/authAdmin';
 import userRouter from './routes/authUser'
 import errorHandler from './middleware/errorHandler';
 
+//require('dotenv').config();
 
 const NAMESPACE = 'Server';
 const app = express();

@@ -6,6 +6,10 @@ import User from '../models/user';
 import Query from '../utils/query';
 import AppError from '../utils/appError';
 import validator from 'validator';
+import urlParser from '../utils/urlParser';
+import axios from 'axios'
+import config from '../config/secret'
+import jwt from 'jsonwebtoken';
 
 
 const NAMESPACE = 'User';
@@ -180,7 +184,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
  * 
 */
 
-const safeLogin = (req: Request, res: Response, next: NextFunction) => {
+const safeLogin = async (req: Request, res: Response, next: NextFunction) => {
     let newUser = res.locals.result.user;
     JWT.signJWT(newUser, (error, token) => {
         if (error) next(error);
@@ -194,6 +198,52 @@ const safeLogin = (req: Request, res: Response, next: NextFunction) => {
             next();
         }
     });
+};
+
+/** googleLogin
+ * 
+ * 
+ */
+
+const googleLogin = async (req: Request, res: Response, next: NextFunction) => {
+    let {code} = req.body;
+    let {GOOGLE_CODE_EXCHANGE_REQUEST_CONFIG, GOOGLE_TOKEN_URI} = config.googleLoginConfig;
+    logging.debug(NAMESPACE,'dbg',req.body);
+    const googleCodeExchangeRequest = axios.create({
+        method: 'POST',
+        baseURL: GOOGLE_TOKEN_URI,
+        timeout: 5000
+    });
+    const googleResponse = await googleCodeExchangeRequest
+        .post('', {
+            code,
+            ...GOOGLE_CODE_EXCHANGE_REQUEST_CONFIG
+        }).catch( error => {
+            logging.info(NAMESPACE, `error in axios!!`)
+            next(error);
+        });
+        if (googleResponse){
+            logging.info(`response \n`, googleResponse.data);
+            let {access_token, id_token} = googleResponse.data;
+            logging.info(NAMESPACE, `access token: ${access_token}\nid token:${id_token}`)
+            const decodedIdToken = jwt.decode(id_token);
+            logging.info(NAMESPACE,`decoded:`, decodedIdToken)
+        }
+
+        /*
+        .then((response) => {
+            logging.info(`response \n`, response.data);
+            let {access_token, id_token} = response.data;
+            logging.info(NAMESPACE, `access token: ${access_token}\nid token:${id_token}`)
+            const decodedIdToken = jwt.decode(id_token);
+            logging.info(NAMESPACE,`decoded:`, decodedIdToken)
+            
+        }).catch( error => {
+            logging.info(NAMESPACE, `error in axios!!`)
+            next(error);
+        });
+        */
+    
 };
 
 
@@ -223,4 +273,4 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
 
 
 
-export default { register, deleteUser, changePassword, login, getAllUsers, safeLogin };
+export default { register, deleteUser, changePassword, login, getAllUsers, safeLogin, googleLogin};

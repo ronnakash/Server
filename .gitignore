@@ -5,3 +5,4 @@ sshKey.pub
 src/config/secret.ts
 docker.sh
 push.sh
+.env

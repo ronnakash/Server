@@ -114,7 +114,4 @@ const validateUserOrAdmin = (req: Request, res: Response, next: NextFunction) =>
 
 
 
-
-
-
 export default { existsJWT, getJWT, validateAdminToken, validateUserOrAdmin };

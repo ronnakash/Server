@@ -80,17 +80,6 @@ const deleteListById = async (req: Request, res: Response, next: NextFunction) =
     modelsController.deleteModelById(ToDoList,req,res, next);
 };
 
-/** deleteAllUsersLists 
- * 
- * delete all lists of a selected user
- * request must contain username for which lists to delete
- * token must be admin or belong to the user who's lists will be deleted 
- * 
-*/
-
-const deleteAllUsersLists = async (req: Request, res: Response, next: NextFunction) => {
-    modelsController.deleteAllUsersModels(ToDoList,req,res, next);
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /** create */
@@ -153,4 +142,4 @@ const createLists = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 
-export default { getListById, createList, getAllLists, updateList, getMyLists, deleteListById, deleteAllUsersLists, createLists};
+export default { getListById, createList, getAllLists, updateList, getMyLists, deleteListById, createLists};
