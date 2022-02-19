@@ -39,7 +39,7 @@ async function register (req: Request, res: Response, next: NextFunction) {
         .getMany(User, {find: {$or: [{username: username}, {email: email}]}})
         .catch( error => next(error));
     if (users && users instanceof Array && users.length > 0)
-        next(new AppError(`User already exists`,400));
+        next(new AppError(`User already exists: ${users[0]}`,400));
     // check that password is strong
     else if (!validator.isStrongPassword(password))
         next(new AppError(`Provided password for user ${username} is too weak`, 400));
@@ -205,15 +205,17 @@ const safeLogin = async (req: Request, res: Response, next: NextFunction) => {
  * 
  */
 
-const googleLogin = async (req: Request, res: Response, next: NextFunction) => {
+const googleCodeExchage = async (req: Request, res: Response, next: NextFunction) => {
     let {code} = req.body;
     let {GOOGLE_CODE_EXCHANGE_REQUEST_CONFIG, GOOGLE_TOKEN_URI} = config.googleLoginConfig;
     logging.debug(NAMESPACE,'dbg',req.body);
+    //code exchange request definition
     const googleCodeExchangeRequest = axios.create({
         method: 'POST',
         baseURL: GOOGLE_TOKEN_URI,
         timeout: 5000
     });
+    //code exchange request
     const googleResponse = await googleCodeExchangeRequest
         .post('', {
             code,
@@ -222,29 +224,69 @@ const googleLogin = async (req: Request, res: Response, next: NextFunction) => {
             logging.info(NAMESPACE, `error in axios!!`)
             next(error);
         });
-        if (googleResponse){
-            logging.info(`response \n`, googleResponse.data);
-            let {access_token, id_token} = googleResponse.data;
-            logging.info(NAMESPACE, `access token: ${access_token}\nid token:${id_token}`)
-            const decodedIdToken = jwt.decode(id_token);
-            logging.info(NAMESPACE,`decoded:`, decodedIdToken)
-        }
+    //if exchange successful
+    if (googleResponse){
+        logging.info(`response \n`, googleResponse.data);
+        let {access_token, id_token} = googleResponse.data;
+        logging.info(NAMESPACE, `access token: ${access_token}\nid token:${id_token}`)
+        const decodedIdToken : any = jwt.decode(id_token);
+        logging.info(NAMESPACE,`decoded:`, decodedIdToken);
+        res.locals.result = {
+            token: decodedIdToken
+        };
+        next();
 
-        /*
-        .then((response) => {
-            logging.info(`response \n`, response.data);
-            let {access_token, id_token} = response.data;
-            logging.info(NAMESPACE, `access token: ${access_token}\nid token:${id_token}`)
-            const decodedIdToken = jwt.decode(id_token);
-            logging.info(NAMESPACE,`decoded:`, decodedIdToken)
-            
-        }).catch( error => {
-            logging.info(NAMESPACE, `error in axios!!`)
-            next(error);
-        });
-        */
+        let {name, email, picture} = decodedIdToken;
+        const newUser = new User({
+            username: name,
+            email,
+            permissions: 'user',
+            authProviders: ['google'],
+            picture
+            });
+        const user = await Query
+            .createOne(User, newUser)
+            .catch( error => next(error));
+        res.locals.result = {
+            message: `Created new user ${name} sucsessfuly`,
+            user: user
+        }
+        next();
+    }
     
 };
+
+const googleRegister = async (req: Request, res: Response, next: NextFunction) => {
+    let {name, email, picture} = res.locals.result.token;
+    let users = await Query
+        .getMany(User, {find: {$or: [{username: name}, {email: email}]}})
+        .catch( error => next(error));
+    if (users && users instanceof Array && users.length > 0){
+        res.locals.result = {
+            message: `Found google user ${name} sucsessfuly`,
+            user: users[0]
+        };
+    }
+    else{
+        const newUser = new User({
+            username: name,
+            email,
+            permissions: 'user',
+            authProviders: ['google'],
+            picture
+        });
+        const user = await Query
+            .createOne(User, newUser)
+            .catch( error => next(error));
+        res.locals.result = {
+            message: `Created new user ${name} sucsessfuly`,
+            user: user
+        };
+    }
+    next();
+};
+
+
 
 
 /** getAllUsers
@@ -273,4 +315,4 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
 
 
 
-export default { register, deleteUser, changePassword, login, getAllUsers, safeLogin, googleLogin};
+export default { register, deleteUser, changePassword, login, getAllUsers, safeLogin, googleCodeExchage, googleRegister};

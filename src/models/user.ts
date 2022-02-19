@@ -3,11 +3,20 @@ import IUser from '../interfaces/user';
 import validator from 'validator';
 import bcryptjs from 'bcryptjs'
 
+enum AuthProvider {
+    password = "password",
+    google = "google",
+    facebook = "facebook",
+    github = "github"
+};
+
+
 const UserSchema: Schema = new Schema(
     {
         username: { 
             type: String,
-            required: [true, 'user must have a username']
+            required: [true, 'user must have a username'],
+            unique: true
         },
 
         email: {
@@ -20,8 +29,7 @@ const UserSchema: Schema = new Schema(
 
         password: { 
             type: String,
-            required: [true, 'Please provide a password'],
-            minlength: 8,
+            required: false,
             select: false
         },
 
@@ -30,15 +38,9 @@ const UserSchema: Schema = new Schema(
             enum: ["Admin", "user"], 
             default: "user" 
         },
-
-        passwordChangedAt: {
-            type: Number,
-            select: false,
-            default: Date.now()
-        },
-
-        metadata: {
-            type: Object,
+        picture: {
+            type: String,
+            required: false
         }
     },
     {
