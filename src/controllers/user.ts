@@ -36,7 +36,7 @@ async function register (req: Request, res: Response, next: NextFunction) {
     let token = res.locals.jwt;
     //check if user exists
     let users = await Query
-        .getMany(User, {find: {$or: [{username: username}, {email: email}]}})
+        .getMany(User, {find: email})
         .catch( error => next(error));
     if (users && users instanceof Array && users.length > 0)
         next(new AppError(`User already exists: ${users[0]}`,400));
