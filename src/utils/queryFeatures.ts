@@ -1,4 +1,4 @@
-import mongoose, { Document, Query } from "mongoose";
+import mongoose, { Document, Query, HydratedDocument, Model } from "mongoose";
 import logging from "../config/logging";
 import AppError from "./appError";
 //import catchAsync from './catchAsync';
@@ -6,15 +6,15 @@ import AppError from "./appError";
 
 const NAMESPACE = "QueryFeatures";
 
-class QueryFeatures {
+class QueryFeatures<T> {
     params: any;
-    schema: mongoose.Model<Document, {}, {}, {}>;
+    schema: Model<T, {}, {}, {}>;
     find: any;
     select: any;
     sort: any;
     doc: Document[] | Document | undefined;
 
-    constructor(schema : mongoose.Model<Document, {}, {}, {}>, params : any) {
+    constructor(schema : Model<T,{}, {}, {}>, params : any) {
     this.schema = schema;
     if (params){
         this.params = params;
@@ -47,7 +47,7 @@ class QueryFeatures {
         return this;
     }
 
-    async many() : Promise<Document[]>{
+    async many() : Promise<Document<T, {}, {}>[]>{
         this.doc =  await this.schema
             .find(this.find)
             .select(this.select)
@@ -56,7 +56,7 @@ class QueryFeatures {
         return this.doc;
     }
 
-    async one() : Promise<Document>{
+    async one() : Promise<Document<T, {}, {}>>{
         this.doc = await this.many();
         if (this.doc.length !== 1)
             throw new AppError(`Error in QueryFeatures.one(): got ${this.doc.length} results`,400);

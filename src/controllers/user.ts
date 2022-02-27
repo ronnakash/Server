@@ -10,7 +10,7 @@ import urlParser from '../utils/urlParser';
 import axios from 'axios'
 import config from '../config/secret'
 import jwt from 'jsonwebtoken';
-
+import IUser, {IUserProps} from '../interfaces/user';
 
 const NAMESPACE = 'User';
 
@@ -18,6 +18,22 @@ const NAMESPACE = 'User';
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /** create */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/** new user
+ * 
+ * 
+ * 
+ */
+
+
+const makeNewUser = async ( user : IUserProps ) => {
+    const newUser = await Query
+        .createOne(User, new User(user))
+        .catch( error => {throw error});
+        logging.info('MAKENEWUSER','new user created: /n/n/n', newUser);
+    return newUser
+}
 
 
 /** register
@@ -32,7 +48,7 @@ const NAMESPACE = 'User';
 
 async function register (req: Request, res: Response, next: NextFunction) {
     logging.info(NAMESPACE,"hi")
-    let { username,email, password, permissions} = req.body;
+    let { username, email, password, permissions } = req.body;
     let token = res.locals.jwt;
     //check if user exists
     let users = await Query
@@ -48,7 +64,19 @@ async function register (req: Request, res: Response, next: NextFunction) {
         next(new AppError(`You are not authorised to create Admin users!`,400));
     else {
         const hash = await bcryptjs.hash(password, 11);
-        const newUser = new User({
+        const userProps : IUserProps = {
+            username,
+            email,
+            password: hash,
+            permissions
+            };
+        const user = await makeNewUser(userProps).catch(err=>next(err));
+        res.locals.result = {
+            message: `Created new user ${username} sucsessfuly`,
+            user: user
+        }
+/**     
+        const newUserr = new User({
             username,
             email,
             password: hash,
@@ -61,6 +89,7 @@ async function register (req: Request, res: Response, next: NextFunction) {
             message: `Created new user ${username} sucsessfuly`,
             user: user
         }
+        */
         next();
     }
 };
@@ -235,23 +264,6 @@ const googleCodeExchage = async (req: Request, res: Response, next: NextFunction
             token: decodedIdToken
         };
         next();
-
-        let {name, email, picture} = decodedIdToken;
-        const newUser = new User({
-            username: name,
-            email,
-            permissions: 'user',
-            authProviders: ['google'],
-            picture
-            });
-        const user = await Query
-            .createOne(User, newUser)
-            .catch( error => next(error));
-        res.locals.result = {
-            message: `Created new user ${name} sucsessfuly`,
-            user: user
-        }
-        next();
     }
     
 };
@@ -259,28 +271,30 @@ const googleCodeExchage = async (req: Request, res: Response, next: NextFunction
 const googleRegister = async (req: Request, res: Response, next: NextFunction) => {
     let {name, email, picture} = res.locals.result.token;
     let users = await Query
-        .getMany(User, {find: {$or: [{username: name}, {email: email}]}})
+        .getMany(User, {find: {email}})
         .catch( error => next(error));
+    if (users){
+        
+    }
     if (users && users instanceof Array && users.length > 0){
         res.locals.result = {
             message: `Found google user ${name} sucsessfuly`,
-            user: users[0]
+            user: users[0], 
+            new: false
         };
     }
     else{
-        const newUser = new User({
+        const userProps : IUserProps = {
             username: name,
             email,
             permissions: 'user',
-            authProviders: ['google'],
             picture
-        });
-        const user = await Query
-            .createOne(User, newUser)
-            .catch( error => next(error));
+            };
+        const user = await makeNewUser(userProps).catch(err=>next(err));
         res.locals.result = {
             message: `Created new user ${name} sucsessfuly`,
-            user: user
+            user: user, 
+            new: true
         };
     }
     next();

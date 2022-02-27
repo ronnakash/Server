@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 import logging from '../config/logging';
 import INote from '../interfaces/notes';
 
-const NoteSchema: Schema = new Schema(
+const NoteSchema: Schema = new Schema<INote>(
     {
         title: { 
             type: String, 
@@ -24,11 +24,6 @@ const NoteSchema: Schema = new Schema(
         timestamps: true
     }
 );
-
-
-
-
-
 
 
 

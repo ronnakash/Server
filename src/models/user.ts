@@ -3,15 +3,9 @@ import IUser from '../interfaces/user';
 import validator from 'validator';
 import bcryptjs from 'bcryptjs'
 
-enum AuthProvider {
-    password = "password",
-    google = "google",
-    facebook = "facebook",
-    github = "github"
-};
 
 
-const UserSchema: Schema = new Schema(
+const UserSchema: Schema = new Schema<IUser>(
     {
         username: { 
             type: String,
@@ -41,6 +35,10 @@ const UserSchema: Schema = new Schema(
         picture: {
             type: String,
             required: false
+        },
+        googleLogin: {
+            type: Boolean,
+            default: false
         }
     },
     {
@@ -50,4 +48,6 @@ const UserSchema: Schema = new Schema(
 );
 
 
-export default mongoose.model<IUser>('User', UserSchema);
+const UserModel = mongoose.model<IUser>('User', UserSchema);
+
+export default UserModel;

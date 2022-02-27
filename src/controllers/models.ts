@@ -20,7 +20,7 @@ const NAMESPACE = 'Models Controller';
  * 
 */
 
-const getAllModels = async (model: Model<Document>, req: Request, res: Response, next: NextFunction) => {
+const getAllModels = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
     let params = urlParser(req.url);
     logging.debug(NAMESPACE, `params:`, req.params);
     let docs = await Query
@@ -33,7 +33,7 @@ const getAllModels = async (model: Model<Document>, req: Request, res: Response,
     next();
 };
 
-const getModelById = async (model: Model<Document>, req: Request, res: Response, next: NextFunction) => {
+const getModelById = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
     let { _id } = req.body;
     let doc = await Query
         .getOneById(model, _id)
@@ -54,7 +54,7 @@ const getModelById = async (model: Model<Document>, req: Request, res: Response,
  * 
 */
 
-const getMyModels = async (model: Model<Document>, req: Request, res: Response, next: NextFunction) => {
+const getMyModels = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
     let params = urlParser(req.url);
     const models = await Query
         .getMany(model, params)
@@ -74,7 +74,7 @@ const getMyModels = async (model: Model<Document>, req: Request, res: Response, 
 */
 
 
-const getMyModelsFromJWT = async (model: Model<Document>, req: Request, res: Response, next: NextFunction) => {
+const getMyModelsFromJWT = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
     const models = await Query
         .getMany(model, {find: {uid: res.locals.token.uid}})
         .catch(error => next(error));
@@ -100,7 +100,7 @@ const getMyModelsFromJWT = async (model: Model<Document>, req: Request, res: Res
  * res.body contains the original model before edits
 */
 
-const updateModel = async (model: Model<Document>, req: Request, res: Response, next: NextFunction) => {
+const updateModel = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
     let { id, body, title } = req.body;
     console.log(req.body);
     const updated = await Query.updateOneById(model,{
@@ -129,7 +129,7 @@ const updateModel = async (model: Model<Document>, req: Request, res: Response, 
  * 
 */
 
-const deleteModelById = async (model: Model<Document>, req: Request, res: Response, next: NextFunction) => {
+const deleteModelById = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
     let { _id } = req.body;
     let deleted = await Query
         .deleteOneById(model, _id)
