@@ -9,7 +9,7 @@ import urlParser from '../utils/urlParser';
 import axios from 'axios'
 import config from '../config/secret'
 import jwt from 'jsonwebtoken';
-import IUser, {IUserProps} from '../interfaces/user';
+import UserDocument, {IUserProps} from '../interfaces/user';
 import bcryptjs from 'bcryptjs';
 
 const NAMESPACE = 'User';
@@ -27,11 +27,11 @@ const NAMESPACE = 'User';
  */
 
 
-const NewUser = async ( user : IUserProps ) => {
-    const newUser = new User(user);
-    return await Query
-        .createOne(User, newUser)
+const NewUser = async ( user : IUserProps ) : Promise<UserDocument> => {
+    const newUser = Query
+        .createOne(User, new User(user))
         .catch( error => {throw error});
+    return newUser;
 }
 
 
@@ -69,7 +69,7 @@ async function register (req: Request, res: Response, next: NextFunction) {
             password,
             permissions
             };
-        const user = await NewUser(userProps).catch(err=>next(err));
+        const user = await NewUser(userProps)
         res.locals.result = {
             message: `Created new user ${username} sucsessfuly`,
             user: user

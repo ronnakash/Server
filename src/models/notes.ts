@@ -1,7 +1,7 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
 import logging from '../config/logging';
 import INote from '../interfaces/notes';
-import { UserDocument } from './user';
+import UserDocument from '../interfaces/user';
 
 const NoteSchema: Schema = new Schema<NoteDocument>(
     {

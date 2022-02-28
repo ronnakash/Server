@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import config from '../config/config';
 import logging from '../config/logging';
 import IUser from '../interfaces/user';
-import { UserDocument } from '../models/user';
+import UserDocument from '../interfaces/user';
 import AppError from '../utils/appError';
 
 

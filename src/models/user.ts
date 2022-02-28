@@ -1,5 +1,5 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
-import IUser from '../interfaces/user';
+import UserDocument from '../interfaces/user';
 import validator from 'validator';
 import bcryptjs from 'bcryptjs';
 import logging from '../config/logging';
@@ -48,21 +48,13 @@ const UserSchema = new Schema<UserDocument>(
     }
 );
 
-interface UserBaseDocument extends IUser, Document {
-}
-
-export interface UserDocument extends UserBaseDocument {
-    comparePassword(pass : String) : boolean;
-}
-
 UserSchema.pre("save", async function(next) {
     if (this.isModified("password")) {
         logging.info('UserMiddleware', 'hashing user password');
-      this.password = await bcryptjs
-        .hash(this.password, 11)
+        this.password = await bcryptjs
+            .hash(this.password, 11)
     }
-  });  
-
+});  
 
 
 const UserModel = mongoose.model<UserDocument, Model<UserDocument>, {}>('User', UserSchema);

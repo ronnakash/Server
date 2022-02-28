@@ -1,15 +1,5 @@
 import { Document } from 'mongoose';
 
-export default interface IUser{
-    username: string;
-    email : string;
-    password: string;
-    permissions: string;
-    passwordChangedAt: number;
-    picture: string;
-    googleLogin: Boolean;
-}
-
 export interface IUserProps {
     username: string;
     email : string;
@@ -17,3 +7,20 @@ export interface IUserProps {
     permissions?: string;
     picture?: string;
 }
+
+interface IUser extends IUserProps{
+    password: string;
+    permissions: string;
+    passwordChangedAt: number;
+    googleLogin: Boolean;
+    picture: string;
+}
+
+
+interface UserBaseDocument extends IUser, Document {
+}
+
+export default interface UserDocument extends UserBaseDocument {
+    comparePassword(pass : String) : boolean;
+}
+
