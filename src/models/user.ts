@@ -3,8 +3,10 @@ import UserDocument from '../interfaces/user';
 import validator from 'validator';
 import bcryptjs from 'bcryptjs';
 import logging from '../config/logging';
+import Query from '../utils/query'
+import AppError from '../utils/appError';
 
-
+const NAMESPACE = 'UserValidation'
 
 const UserSchema = new Schema<UserDocument>(
     {
@@ -33,14 +35,22 @@ const UserSchema = new Schema<UserDocument>(
             enum: ["Admin", "user"], 
             default: "user" 
         },
+
         picture: {
             type: String,
             required: false
         },
+
         googleLogin: {
             type: Boolean,
             default: false
+        },
+
+        googleAccessToken: {
+            type: String,
+            required: false
         }
+
     },
     {
         timestamps: true,
@@ -48,12 +58,26 @@ const UserSchema = new Schema<UserDocument>(
     }
 );
 
+UserSchema.pre("init", async function(next) {
+    logging.debug(NAMESPACE, 'checking if user already existes')
+    let users = await Query
+        .getMany(UserModel,{find: {email: this.email}})
+        .catch(error => next(error));
+    if (users && users.length > 0) {
+        logging.debug(NAMESPACE, 'user already existes!')
+        next(new AppError(`Error in mongoose: user ${this.email} already exists`,400))
+    }
+    next()
+});  
+
+
 UserSchema.pre("save", async function(next) {
     if (this.isModified("password")) {
         logging.info('UserMiddleware', 'hashing user password');
         this.password = await bcryptjs
             .hash(this.password, 11)
     }
+    
 });  
 
 

@@ -23,7 +23,7 @@ class QueryFeatures<T extends Document> {
         this.select = this.params.select;
         this.sort = this.params.sort;
     }
-    logging.info(NAMESPACE, "this:", this);
+    logging.info(NAMESPACE,'', this);
 }
 
     filter( find : any ) {
@@ -52,7 +52,8 @@ class QueryFeatures<T extends Document> {
             .find(this.find)
             .select(this.select)
             .sort(this.sort)
-            .exec();
+            .exec()
+            .catch( error => {throw new AppError(`error in mongoose: ${error.message}`,500)});
         return this.doc;
     }
 

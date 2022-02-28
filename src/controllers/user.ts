@@ -5,12 +5,12 @@ import User from '../models/user';
 import Query from '../utils/query';
 import AppError from '../utils/appError';
 import validator from 'validator';
-import urlParser from '../utils/urlParser';
-import axios from 'axios'
 import config from '../config/secret'
 import jwt from 'jsonwebtoken';
 import UserDocument, {IUserProps} from '../interfaces/user';
 import bcryptjs from 'bcryptjs';
+import googleCodeExchange from '../functions/googleCodeExchange';
+import getGoogleTokens from '../functions/googleCodeExchange';
 
 const NAMESPACE = 'User';
 
@@ -28,10 +28,7 @@ const NAMESPACE = 'User';
 
 
 const NewUser = async ( user : IUserProps ) : Promise<UserDocument> => {
-    const newUser = Query
-        .createOne(User, new User(user))
-        .catch( error => {throw error});
-    return newUser;
+    return Query.createOne(User, new User(user))
 }
 
 
@@ -46,7 +43,6 @@ const NewUser = async ( user : IUserProps ) : Promise<UserDocument> => {
 
 
 async function register (req: Request, res: Response, next: NextFunction) {
-    logging.info(NAMESPACE,"hi")
     let { username, email, password, permissions } = req.body;
     let token = res.locals.jwt;
     //check if user exists
@@ -70,25 +66,11 @@ async function register (req: Request, res: Response, next: NextFunction) {
             permissions
             };
         const user = await NewUser(userProps)
-        res.locals.result = {
-            message: `Created new user ${username} sucsessfuly`,
-            user: user
-        }
-/**     
-        const newUserr = new User({
-            username,
-            email,
-            password: hash,
-            permissions
-            });
-        const user = await Query
-            .createOne(User, newUser)
             .catch( error => next(error));
         res.locals.result = {
             message: `Created new user ${username} sucsessfuly`,
             user: user
         }
-        */
         next();
     }
 };
@@ -236,32 +218,17 @@ const safeLogin = async (req: Request, res: Response, next: NextFunction) => {
 
 const googleCodeExchage = async (req: Request, res: Response, next: NextFunction) => {
     let {code} = req.body;
-    let {GOOGLE_CODE_EXCHANGE_REQUEST_CONFIG, GOOGLE_TOKEN_URI} = config.googleLoginConfig;
     logging.debug(NAMESPACE,'dbg',req.body);
-    //code exchange request definition
-    const googleCodeExchangeRequest = axios.create({
-        method: 'POST',
-        baseURL: GOOGLE_TOKEN_URI,
-        timeout: 5000
-    });
     //code exchange request
-    const googleResponse = await googleCodeExchangeRequest
-        .post('', {
-            code,
-            ...GOOGLE_CODE_EXCHANGE_REQUEST_CONFIG
-        }).catch( error => {
-            logging.info(NAMESPACE, `error in axios!!`)
-            next(error);
-        });
+    const googleResponse = await getGoogleTokens(code)
+        .catch( error => next(error));
     //if exchange successful
     if (googleResponse){
-        logging.info(`response \n`, googleResponse.data);
-        let {access_token, id_token} = googleResponse.data;
-        logging.info(NAMESPACE, `access token: ${access_token}\nid token:${id_token}`)
+        let {access_token, id_token} = googleResponse;
         const decodedIdToken : any = jwt.decode(id_token);
-        logging.info(NAMESPACE,`decoded:`, decodedIdToken);
         res.locals.result = {
-            token: decodedIdToken
+            token: decodedIdToken,
+            access_token
         };
         next();
     }
@@ -270,15 +237,16 @@ const googleCodeExchage = async (req: Request, res: Response, next: NextFunction
 
 const googleRegister = async (req: Request, res: Response, next: NextFunction) => {
     let {name, email, picture} = res.locals.result.token;
+    let access_token = res.locals.result.access_token;
     let users = await Query
         .getMany(User, {find: {email}})
         .catch( error => next(error));
     if (users){
         let user = users[0];
         if (!user.googleLogin){
-            logging.info(NAMESPACE, 'no google login!!!');
             user.googleLogin = true;
             user.picture = picture;
+            user.googleAccessToken = access_token;
             await Query.updateDoc(user);
         }
         res.locals.result = {
@@ -292,7 +260,9 @@ const googleRegister = async (req: Request, res: Response, next: NextFunction) =
             username: name,
             email,
             permissions: 'user',
-            picture
+            picture,
+            googleLogin: true,
+            googleAccessToken: access_token
             };
         const user = await NewUser(userProps).catch(err=>next(err));
         res.locals.result = {
@@ -319,7 +289,6 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     let users = await Query
         .getMany(User, {find, select, sort})
         .catch( error => next(error));
-    logging.info(NAMESPACE,"hi");
     res.locals.result = {
         message: users? `Got ${users.length} results` : `Unexpected error in getAllUsers`,
         users: users,
