@@ -16,6 +16,7 @@ router.post('/google/login', controller.googleCodeExchage, controller.googleRegi
 router.get('/get/all',JWT.validateAdminToken, controller.getAllUsers);
 /** update */
 router.patch('/changePassword', controller.changePassword);
+router.patch('/updateUser', controller.updateUserInfo);
 /** delete */
 router.delete('/deleteUser', controller.deleteUser);
 

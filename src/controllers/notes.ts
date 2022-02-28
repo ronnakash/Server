@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
-import Note, {NoteDocument} from '../models/notes';
+import Note from '../models/notes';
 import AppError from '../utils/appError';
 import Query from '../utils/query';
 import logging from '../config/logging';
 import modelsController from '../controllers/models';
+import NoteDocument from '../interfaces/notes';
 
 
 const NAMESPACE = 'Notes Controller';
@@ -100,13 +101,11 @@ const deleteNoteById = async (req: Request, res: Response, next: NextFunction) =
 */
 
 const createNote = async (req: Request, res: Response, next: NextFunction) => {
-    let { _id, author, title, body} = req.body;
-    logging.info(NAMESPACE,'dbg:', author)
+    let { author, title, body} = req.body;
     if (!author || (!title && !body))
         next(new AppError(`not all required args were provided`,400));
     else {
         const note = new Note({
-            _id: _id? _id : new mongoose.Types.ObjectId(),
             author,
             title, 
             body
@@ -136,9 +135,8 @@ const createNotes = async (req: Request, res: Response, next: NextFunction) => {
     let {notes} = req.body;
     let newNotes: NoteDocument[] = [];
     notes.forEach((note: { _id: any; author: string; title: string; body: string; }) => {
-        let { _id, author, title, body } = note;
+        let { author, title, body } = note;
         newNotes.push(new Note({
-            _id: _id? _id : new mongoose.Types.ObjectId(),
             author,
             title, 
             body

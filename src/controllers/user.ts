@@ -246,7 +246,7 @@ const googleRegister = async (req: Request, res: Response, next: NextFunction) =
         if (!user.googleLogin){
             user.googleLogin = true;
             user.picture = picture;
-            user.googleAccessToken = access_token;
+            /*user.googleAccessToken = access_token;*/
             await Query.updateDoc(user);
         }
         res.locals.result = {
@@ -262,7 +262,7 @@ const googleRegister = async (req: Request, res: Response, next: NextFunction) =
             permissions: 'user',
             picture,
             googleLogin: true,
-            googleAccessToken: access_token
+            /*googleAccessToken: access_token*/
             };
         const user = await NewUser(userProps).catch(err=>next(err));
         res.locals.result = {
@@ -297,9 +297,23 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     next();
 };
 
+const updateUserInfo = async (req: Request, res: Response, next: NextFunction) => {
+    let {id, username ,picture, password} = req.body;
+    const user = await Query
+        .updateOneById(User, {
+            _id: id,
+            toUpdate: { username, picture, password }    
+        })
+        .catch( error => next(error));
+    res.locals.result = {
+        message: user? `Updated user ${username}` : `Can't find user to update`,
+        user: user,
+        statusCode: user? 200 : 500
+    };
+    next();
+}
 
 
 
 
-
-export default { register, deleteUser, changePassword, login, getAllUsers, safeLogin, googleCodeExchage, googleRegister};
+export default { register, deleteUser, changePassword, updateUserInfo, login, getAllUsers, safeLogin, googleCodeExchage, googleRegister};
