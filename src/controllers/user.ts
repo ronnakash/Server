@@ -274,10 +274,16 @@ const googleRegister = async (req: Request, res: Response, next: NextFunction) =
         .getMany(User, {find: {email}})
         .catch( error => next(error));
     if (users){
-        logging.info(NAMESPACE,'user document:', users[0]);
+        let user = users[0];
+        if (!user.googleLogin){
+            logging.info(NAMESPACE, 'no google login!!!');
+            user.googleLogin = true;
+            user.picture = picture;
+            await Query.updateDoc(user);
+        }
         res.locals.result = {
             message: `Found google user ${name} sucsessfuly`,
-            user: users[0], 
+            user: user, 
             new: false
         };
     }

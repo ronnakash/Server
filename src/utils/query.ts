@@ -22,6 +22,8 @@ const createOne = async <T extends Document>(model : Model<T>, doc : T ) : Promi
     return await doc.save();
 }
 
+
+//?????
 const updateOne = async <T extends Document>(model : Model<T>, params : any) : Promise<T | AppError> => {
     let {find, toUpdate } = params;
     return await model.findOneAndUpdate(find, toUpdate) || new AppError('Document not found', 500);
