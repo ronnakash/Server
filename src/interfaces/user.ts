@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 
 export interface IUserProps {
     username: string;
@@ -18,6 +18,10 @@ interface IUser extends IUserProps{
 
 
 interface UserBaseDocument extends IUser, Document {
+    _id: mongoose.ObjectId;
+    createdAt: mongoose.Date;
+    updatedAt: mongoose.Date;
+    __v: number;
 }
 
 export default interface UserDocument extends UserBaseDocument {
