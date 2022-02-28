@@ -1,8 +1,8 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, Model } from 'mongoose';
 import logging from '../config/logging';
 import INote from '../interfaces/notes';
 
-const NoteSchema: Schema = new Schema<INote>(
+const NoteSchema: Schema = new Schema<NoteDocument>(
     {
         title: { 
             type: String, 
@@ -25,9 +25,11 @@ const NoteSchema: Schema = new Schema<INote>(
     }
 );
 
+export interface NoteDocument extends INote {
+    
+}
 
 
-
-const NoteModel = mongoose.model<INote>('Note', NoteSchema)
+const NoteModel = mongoose.model<NoteDocument, Model<NoteDocument>>('Note', NoteSchema)
 
 export default NoteModel;

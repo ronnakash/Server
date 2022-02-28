@@ -6,13 +6,13 @@ import AppError from "./appError";
 
 const NAMESPACE = "QueryFeatures";
 
-class QueryFeatures<T> {
+class QueryFeatures<T extends Document> {
     params: any;
     schema: Model<T, {}, {}, {}>;
     find: any;
     select: any;
     sort: any;
-    doc: Document[] | Document | undefined;
+    doc: T[] | undefined;
 
     constructor(schema : Model<T,{}, {}, {}>, params : any) {
     this.schema = schema;
@@ -47,8 +47,8 @@ class QueryFeatures<T> {
         return this;
     }
 
-    async many() : Promise<Document<T, {}, {}>[]>{
-        this.doc =  await this.schema
+    async many() : Promise<T[]>{
+        this.doc = await this.schema
             .find(this.find)
             .select(this.select)
             .sort(this.sort)
@@ -56,13 +56,13 @@ class QueryFeatures<T> {
         return this.doc;
     }
 
-    async one() : Promise<Document<T, {}, {}>>{
+    async one() : Promise<T> {
         this.doc = await this.many();
         if (this.doc.length !== 1)
             throw new AppError(`Error in QueryFeatures.one(): got ${this.doc.length} results`,400);
         return this.doc[0];
     }
-    
+
 }
 
 export default QueryFeatures;

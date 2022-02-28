@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
-import Note from '../models/notes';
-import notes from '../interfaces/notes';
+import Note, {NoteDocument} from '../models/notes';
 import AppError from '../utils/appError';
 import Query from '../utils/query';
 import logging from '../config/logging';
@@ -118,7 +117,6 @@ const createNote = async (req: Request, res: Response, next: NextFunction) => {
             newNote
         }
         next();
-
     }
 
 };
@@ -136,7 +134,7 @@ const createNote = async (req: Request, res: Response, next: NextFunction) => {
 
 const createNotes = async (req: Request, res: Response, next: NextFunction) => {
     let {notes} = req.body;
-    let newNotes: (notes & { _id: any })[] = [];
+    let newNotes: NoteDocument[] = [];
     notes.forEach((note: { _id: any; author: string; title: string; body: string; }) => {
         let { _id, author, title, body } = note;
         newNotes.push(new Note({

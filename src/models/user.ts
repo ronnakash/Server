@@ -1,11 +1,12 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, Model } from 'mongoose';
 import IUser from '../interfaces/user';
 import validator from 'validator';
-import bcryptjs from 'bcryptjs'
+import bcryptjs from 'bcryptjs';
+import logging from '../config/logging';
 
 
 
-const UserSchema: Schema = new Schema<IUser>(
+const UserSchema: Schema = new Schema<UserDocument>(
     {
         username: { 
             type: String,
@@ -47,7 +48,21 @@ const UserSchema: Schema = new Schema<IUser>(
     }
 );
 
+export interface UserDocument extends IUser {
+    comparePassword(pass : String) : boolean;
+}
 
-const UserModel = mongoose.model<IUser>('User', UserSchema);
+UserSchema.pre("save", async function(next) {
+    if (this.isModified("password")) {
+        logging.info('UserMiddleware', 'hashing user password');
+      this.password = await bcryptjs
+        .hash(this.password, 11)
+        .catch( error => next(error))
+    }
+  });  
+
+
+
+const UserModel = mongoose.model<UserDocument, Model<UserDocument>, {}>('User', UserSchema);
 
 export default UserModel;

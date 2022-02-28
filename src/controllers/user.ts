@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import bcryptjs from 'bcryptjs';
 import logging from '../config/logging';
 import JWT from '../functions/signJWT';
 import User from '../models/user';
@@ -11,6 +10,7 @@ import axios from 'axios'
 import config from '../config/secret'
 import jwt from 'jsonwebtoken';
 import IUser, {IUserProps} from '../interfaces/user';
+import bcryptjs from 'bcryptjs';
 
 const NAMESPACE = 'User';
 
@@ -27,12 +27,10 @@ const NAMESPACE = 'User';
  */
 
 
-const makeNewUser = async ( user : IUserProps ) => {
-    const newUser = await Query
+const NewUser = async ( user : IUserProps ) => {
+    return await Query
         .createOne(User, new User(user))
         .catch( error => {throw error});
-        logging.info('MAKENEWUSER','new user created: /n/n/n', newUser);
-    return newUser
 }
 
 
@@ -54,23 +52,22 @@ async function register (req: Request, res: Response, next: NextFunction) {
     let users = await Query
         .getMany(User, {find: email})
         .catch( error => next(error));
-    if (users && users instanceof Array && users.length > 0)
+    if (users && users.length > 0)
         next(new AppError(`User already exists: ${users[0]}`,400));
     // check that password is strong
     else if (!validator.isStrongPassword(password))
         next(new AppError(`Provided password for user ${username} is too weak`, 400));
     //check token user permission
-    else if (permissions ==='Admin' && !(token.permissions === 'Admin'))
+    else if (permissions === 'Admin' && !(token.permissions === 'Admin'))
         next(new AppError(`You are not authorised to create Admin users!`,400));
     else {
-        const hash = await bcryptjs.hash(password, 11);
         const userProps : IUserProps = {
             username,
             email,
-            password: hash,
+            password,
             permissions
             };
-        const user = await makeNewUser(userProps).catch(err=>next(err));
+        const user = await NewUser(userProps).catch(err=>next(err));
         res.locals.result = {
             message: `Created new user ${username} sucsessfuly`,
             user: user
@@ -141,7 +138,7 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
     const user = await Query
         .getOne(User, {find: {username: username, email: email}, select: '+passwordChangedAt, +password'})
         .catch( error => next(error));;
-    if (user instanceof User) {
+    if (user) {
         //compare passwords
         if (!(await bcryptjs.compare(oldPassword, user.password))) 
             next(new AppError(`Password mismatch for ${username}`,400));
@@ -151,7 +148,7 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
         else if (!validator.isStrongPassword(newPassword))
             next(new AppError(`New password for user ${username} is too weak`, 400));
         else {
-            user.password = await bcryptjs.hash(newPassword, 11);
+            user.password = newPassword;
             user.passwordChangedAt = Date.now();
             await user
                 .save()
@@ -181,11 +178,12 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
     let { username, email, password } = req.body;
+    let ter = User.find().exec().catch( error => next(error));
     const user = await Query
         .getOne(User, {find: {username: username, email: email}, select: '+password'})
         .catch( error => next(error));
     logging.info(NAMESPACE,"user:", user);
-    if (user instanceof User) {
+    if (user) {
         if (!await bcryptjs.compare(password, user.password))
             next(new AppError(`password mismatch for user ${username}`, 400));
         JWT.signJWT(user, (error, token) => {
@@ -274,9 +272,7 @@ const googleRegister = async (req: Request, res: Response, next: NextFunction) =
         .getMany(User, {find: {email}})
         .catch( error => next(error));
     if (users){
-        
-    }
-    if (users && users instanceof Array && users.length > 0){
+        logging.info(NAMESPACE,'user document:', users[0]);
         res.locals.result = {
             message: `Found google user ${name} sucsessfuly`,
             user: users[0], 
@@ -290,7 +286,7 @@ const googleRegister = async (req: Request, res: Response, next: NextFunction) =
             permissions: 'user',
             picture
             };
-        const user = await makeNewUser(userProps).catch(err=>next(err));
+        const user = await NewUser(userProps).catch(err=>next(err));
         res.locals.result = {
             message: `Created new user ${name} sucsessfuly`,
             user: user, 
