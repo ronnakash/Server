@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import config from '../config/config';
 import logging from '../config/logging';
 import IUser from '../interfaces/user';
+import { UserDocument } from '../models/user';
 import AppError from '../utils/appError';
 
 
@@ -13,7 +14,7 @@ const NAMESPACE = 'SignJWT';
  * 
  */
 
-const signJWT = (user: IUser, callback: (error: Error | null, token: string | null) => void): void => {
+const signJWT = (user: UserDocument, callback: (error: Error | null, token: string | null) => void): void => {
 
     logging.info(NAMESPACE, `Attempting to sign token for user ${user.username}`);
     

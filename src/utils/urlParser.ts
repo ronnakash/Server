@@ -10,6 +10,14 @@ const urlParser = (url : string) : any => {
 function paramsToObject(entries : IterableIterator<[string, string]>) {
     let result : any = {};
     for(const [key, value] of entries) { // each 'entry' is a [key, value] tupple
+        let newVal = value;
+        if (value==='$gte=1234'){
+            let urlParams = new URLSearchParams(value);
+            //logging.debug("paramsToObject","debug",urlParams);
+            let entries = urlParams.entries();
+            //logging.debug("paramsToObject","debug2",entries);
+            newVal = paramsToObject(entries)
+        }
         result[key] = value;
     }
     return result;

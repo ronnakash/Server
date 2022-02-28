@@ -1,6 +1,7 @@
-import mongoose, { Schema, Model } from 'mongoose';
+import mongoose, { Schema, Model, Document } from 'mongoose';
 import logging from '../config/logging';
 import INote from '../interfaces/notes';
+import { UserDocument } from './user';
 
 const NoteSchema: Schema = new Schema<NoteDocument>(
     {
@@ -25,10 +26,12 @@ const NoteSchema: Schema = new Schema<NoteDocument>(
     }
 );
 
-export interface NoteDocument extends INote {
-    
+interface NoteBaseDocument extends INote, Document {
 }
 
+export interface NoteDocument extends NoteBaseDocument {
+    getAuthor() : Promise<UserDocument>
+}
 
 const NoteModel = mongoose.model<NoteDocument, Model<NoteDocument>>('Note', NoteSchema)
 

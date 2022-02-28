@@ -10,19 +10,19 @@ const NAMESPACE = 'Query Controller';
 
 
 
-const getOne = async <T extends Document>(model : Model<T, {}, {}, {}>, params : any) : Promise<T> => {
+const getOne = async <T extends Document>(model : Model<T>, params : any) : Promise<T> => {
     return await new QueryFeatures(model,params).one();
 }
 
-const getOneById = async <T extends Document>(model : Model<T, {}, {}, {}>, _id : string) : Promise<T> => {
+const getOneById = async <T extends Document>(model : Model<T>, _id : string) : Promise<T> => {
     return await new QueryFeatures(model,{find: {_id: _id}}).one();
 }
 
-const createOne = async <T extends Document>(model : Model<T, {}, {}, {}>, doc : T ) : Promise<T> => {
+const createOne = async <T extends Document>(model : Model<T>, doc : T ) : Promise<T> => {
     return await doc.save();
 }
 
-const updateOne = async <T extends Document>(model : Model<T, {}, {}, {}>, params : any) : Promise<T | AppError> => {
+const updateOne = async <T extends Document>(model : Model<T>, params : any) : Promise<T | AppError> => {
     let {find, toUpdate } = params;
     return await model.findOneAndUpdate(find, toUpdate) || new AppError('Document not found', 500);
 }
@@ -31,16 +31,16 @@ const updateDoc = async <T extends Document>(doc : T) : Promise<T> => {
     return await doc.save().catch(error => {throw new AppError(error.message,500)});
 }
 
-const updateOneById = async <T extends Document>(model : Model<T, {}, {}, {}>, params : any) : Promise<T | AppError> => {
+const updateOneById = async <T extends Document>(model : Model<T>, params : any) : Promise<T | AppError> => {
     let {_id, toUpdate } = params;
     return await model.findOneAndUpdate({_id: _id}, toUpdate) || new AppError('Document not found', 500);
 }
 
-const deleteOne = async <T extends Document>(model : Model<T, {}, {}, {}>, params : any) : Promise<T | AppError> =>  {
+const deleteOne = async <T extends Document>(model : Model<T>, params : any) : Promise<T | AppError> =>  {
     return await model.findOneAndDelete(params) || new AppError('Document not found', 500);
 }
 
-const deleteOneById = async <T extends Document>(model : Model<T, {}, {}, {}>, _id : string) : Promise<T | AppError> => {
+const deleteOneById = async <T extends Document>(model : Model<T>, _id : string) : Promise<T | AppError> => {
     return await model.findOneAndDelete({_id: _id}) || new AppError('Document not found', 500);
 };
 
@@ -48,16 +48,16 @@ const getMany = async <T extends Document>(model : Model<T>, params : any) : Pro
     return await new QueryFeatures(model,params).many();
 }
 
-const createMany = async <T extends Document>(model : Model<T, {}, {}, {}>, docs : Document[]) : Promise<T[]> => {
+const createMany = async <T extends Document>(model : Model<T>, docs : Document[]) : Promise<T[]> => {
     return await model.insertMany(docs);
 }
 
-const updateMany = async <T extends Document>(model : Model<T, {}, {}, {}>, params : any) => {
+const updateMany = async <T extends Document>(model : Model<T>, params : any) => {
     let {find, toUpdate } = params;
     return await model.updateMany(find, toUpdate);
 } 
 
-const deleteMany = async <T extends Document>(model : Model<T, {}, {}, {}>, params : any) => {
+const deleteMany = async <T extends Document>(model : Model<T>, params : any) => {
     return await model.deleteMany(params);
 }
 

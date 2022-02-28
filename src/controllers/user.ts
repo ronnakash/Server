@@ -28,8 +28,9 @@ const NAMESPACE = 'User';
 
 
 const NewUser = async ( user : IUserProps ) => {
+    const newUser = new User(user);
     return await Query
-        .createOne(User, new User(user))
+        .createOne(User, newUser)
         .catch( error => {throw error});
 }
 
@@ -50,7 +51,7 @@ async function register (req: Request, res: Response, next: NextFunction) {
     let token = res.locals.jwt;
     //check if user exists
     let users = await Query
-        .getMany(User, {find: email})
+        .getMany(User, {find: {email}})
         .catch( error => next(error));
     if (users && users.length > 0)
         next(new AppError(`User already exists: ${users[0]}`,400));
@@ -61,6 +62,7 @@ async function register (req: Request, res: Response, next: NextFunction) {
     else if (permissions === 'Admin' && !(token.permissions === 'Admin'))
         next(new AppError(`You are not authorised to create Admin users!`,400));
     else {
+        logging.info(NAMESPACE, 'Making new user!')
         const userProps : IUserProps = {
             username,
             email,
