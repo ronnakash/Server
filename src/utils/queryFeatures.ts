@@ -12,7 +12,7 @@ class QueryFeatures<T extends Document> {
     find: any;
     select: any;
     sort: any;
-    doc: T[] | undefined;
+    doc: T[] = [];
 
     constructor(schema : Model<T,{}, {}, {}>, params : any) {
     this.schema = schema;

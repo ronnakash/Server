@@ -57,7 +57,7 @@ const UserSchema = new Schema<UserDocument>(
         versionKey: '__v'
     }
 );
-
+/*
 UserSchema.pre("init", async function(next) {
     logging.debug(NAMESPACE, 'checking if user already existes')
     let users = await Query
@@ -69,7 +69,7 @@ UserSchema.pre("init", async function(next) {
     }
     next()
 });  
-
+*/
 
 UserSchema.pre("save", async function(next) {
     if (this.isModified("password")) {

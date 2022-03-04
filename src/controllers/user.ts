@@ -232,7 +232,6 @@ const googleCodeExchage = async (req: Request, res: Response, next: NextFunction
         };
         next();
     }
-    
 };
 
 const googleRegister = async (req: Request, res: Response, next: NextFunction) => {
@@ -299,18 +298,23 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
 
 const updateUserInfo = async (req: Request, res: Response, next: NextFunction) => {
     let {id, username ,picture, password} = req.body;
+    logging.info(NAMESPACE,'dbg', req.body)
     const user = await Query
-        .updateOneById(User, {
-            _id: id,
-            toUpdate: { username, picture, password }    
-        })
+        .getOneById(User, id)
         .catch( error => next(error));
-    res.locals.result = {
-        message: user? `Updated user ${username}` : `Can't find user to update`,
-        user: user,
-        statusCode: user? 200 : 500
-    };
-    next();
+    if (user) {
+        if (password) user.password = password;
+        if (picture) user.picture = picture;
+        if (username) user.username = username;
+        await Query.updateDoc(user).catch( error => next(error));
+        res.locals.result = {
+            message: user? `Updated user ${username}` : `Can't find user to update`,
+            user: user,
+            statusCode: user? 200 : 500
+        };
+        next();
+    }
+    else next(new AppError(`User ${id} not found`,400));
 }
 
 
