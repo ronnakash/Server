@@ -72,9 +72,6 @@ httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server runn
 
 process.on('unhandledRejection', (error) => {
     logging.error(NAMESPACE,`Unhandled rejection ${error}`, error)
-    httpServer.close(() => {
-        process.exit(1);
-    });
 });
 
 

@@ -311,7 +311,6 @@ const updateUserInfo = async (req: Request, res: Response, next: NextFunction) =
         };
         next();
     }
-    else next(new AppError(`User ${id} not found`,400));
 }
 
 
