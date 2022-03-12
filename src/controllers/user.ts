@@ -5,11 +5,9 @@ import User from '../models/user';
 import Query from '../utils/query';
 import AppError from '../utils/appError';
 import validator from 'validator';
-import config from '../config/secret'
 import jwt from 'jsonwebtoken';
 import UserDocument, {IUserProps} from '../interfaces/user';
 import bcryptjs from 'bcryptjs';
-import googleCodeExchange from '../functions/googleCodeExchange';
 import getGoogleTokens from '../functions/googleCodeExchange';
 
 const NAMESPACE = 'User';
@@ -162,12 +160,11 @@ async function changePassword (req: Request, res: Response, next: NextFunction) 
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
     let { username, email, password } = req.body;
-    let ter = User.find().exec().catch( error => next(error));
     const user = await Query
         .getOne(User, {find: {username: username, email: email}, select: '+password'})
         .catch( error => next(error));
-    logging.info(NAMESPACE,"user:", user);
-    if (user) {
+    if (user){
+        logging.info(NAMESPACE,"user:", user);
         if (!await bcryptjs.compare(password, user.password))
             next(new AppError(`password mismatch for user ${username}`, 400));
         JWT.signJWT(user, (error, token) => {
@@ -184,7 +181,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
             }
         });
     }
-    else next(new AppError(`Unexpected error in login: query result is not a user`, 500));
+
 };
 
 
