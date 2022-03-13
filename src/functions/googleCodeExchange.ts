@@ -1,10 +1,8 @@
 import axios from 'axios'
 import logging from '../config/logging';
-import config from '../config/secret';
+import {googleTokenUri, googleLoginConfig} from '../config/secret';
 
 const NAMESPACE = 'GoogleCodeExchange'
-
-let {GOOGLE_CODE_EXCHANGE_REQUEST_CONFIG, GOOGLE_TOKEN_URI} = config.googleLoginConfig;
 
 const parseTokensFromGoogleResponse = (res : any) : {access_token : any, id_token : any} => {
     logging.info(NAMESPACE,'res:', res);
@@ -17,7 +15,7 @@ const parseTokensFromGoogleResponse = (res : any) : {access_token : any, id_toke
 
 const googleCodeExchangeRequest = axios.create({
     method: 'POST',
-    baseURL: GOOGLE_TOKEN_URI,
+    baseURL: googleTokenUri,
     transformResponse: [parseTokensFromGoogleResponse],
     timeout: 5000
 });
@@ -26,7 +24,7 @@ const getGoogleTokens = async (code : any) : Promise<{ access_token: any; id_tok
     const googleResponse = await googleCodeExchangeRequest
     .post('', {
         code,
-        ...GOOGLE_CODE_EXCHANGE_REQUEST_CONFIG
+        ...googleLoginConfig
     });
     return googleResponse.data;
 }

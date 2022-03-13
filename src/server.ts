@@ -7,6 +7,9 @@ import AppError from './utils/appError';
 import adminRouter from './routes/authAdmin';
 import userRouter from './routes/authUser'
 import errorHandler from './middleware/errorHandler';
+import * as dotenv from "dotenv";
+
+dotenv.config({path:`${__dirname}/.env`});
 
 //require('dotenv').config();
 

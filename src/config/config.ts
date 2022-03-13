@@ -1,17 +1,21 @@
-import dotenv from 'dotenv';
 import logging from '../config/logging';
-import secret from './secret'
+import {mongoUri,
+        MONGO_OPTIONS,
+        SERVER_HOSTNAME, 
+        SERVER_PORT,
+        SERVER_TOKEN_EXPIRETIME,
+        SERVER_TOKEN_ISSUER,
+        SERVER_TOKEN_SECRET
+    } from './secret'
 
 
 const NAMESPACE = 'config';
 
 
-dotenv.config();
-
 
 //mongoose connect
 const mongoose = require('mongoose');
-mongoose.connect(secret.mongoUri, secret.MONGO_OPTIONS)
+mongoose.connect(mongoUri, MONGO_OPTIONS)
 .then(logging.info(NAMESPACE, 'mongodb connected'))
 .catch((error: any) => {
     logging.error(NAMESPACE, 'Error connecting to Database', error);
@@ -19,12 +23,12 @@ mongoose.connect(secret.mongoUri, secret.MONGO_OPTIONS)
 
 
 const SERVER = {
-    hostname: secret.SERVER_HOSTNAME || 'localhost',
-    port: secret.SERVER_PORT || 3001,
+    hostname: SERVER_HOSTNAME,
+    port: SERVER_PORT,
     token: {
-        expireTime: secret.SERVER_TOKEN_EXPIRETIME || 3600,
-        issuer: secret.SERVER_TOKEN_ISSUER || 'Administrator',
-        secret: secret.SERVER_TOKEN_SECRET || 'superencryptedsecret'
+        expireTime: SERVER_TOKEN_EXPIRETIME,
+        issuer: SERVER_TOKEN_ISSUER,
+        secret: SERVER_TOKEN_SECRET,
     }
 };
 
