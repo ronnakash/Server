@@ -80,8 +80,6 @@ process.on('unhandledRejection', (error) => {
 
 process.on('uncaughtException', (error) => {
     logging.error(NAMESPACE,`Uncaught exception ${error}`)
-    process.exit(1);
-
 });
 
 

@@ -22,7 +22,6 @@ const NAMESPACE = 'Models Controller';
 
 const getAllModels = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
     let params = urlParser(req.url);
-    logging.debug(NAMESPACE, `params:`, req.params);
     let docs = await Query
         .getMany(model, {find: params})
         .catch( error => next(error));

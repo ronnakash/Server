@@ -17,7 +17,6 @@ const NAMESPACE = 'Auth';
 
 
 const existsJWT = (req: Request, res: Response, next: NextFunction) => {
-    logging.info(NAMESPACE, 'verifying token exists');
     let token = res.locals.jwt;
     if (token) 
         next();
@@ -35,7 +34,6 @@ const existsJWT = (req: Request, res: Response, next: NextFunction) => {
 
 
 const getJWT = (req: Request, res: Response, next: NextFunction) => {
-    logging.info(NAMESPACE, 'Getting token');
     let token = req.headers.authorization?.split(' ')[1];
     if (token) {
         jwt.verify(token, config.server.token.secret, (error, decoded) => {
@@ -62,8 +60,6 @@ const getJWT = (req: Request, res: Response, next: NextFunction) => {
 const validateAdminToken = (req: Request, res: Response, next: NextFunction) => {
     let token = res.locals.jwt;
     let {username, email, permissions} = token;
-    logging.info(NAMESPACE, `Validating Token for Admin permissions
-         for user ${username} with permissions ${permissions}`);
     if (permissions !== 'Admin')
         next(new AppError(`User ${username} does not have admin permissions`,400));           
     logging.info(NAMESPACE, `validated Admin Token for user ${username} with permissions ${permissions}`);
@@ -82,29 +78,8 @@ const validateAdminToken = (req: Request, res: Response, next: NextFunction) => 
 
 
 const validateUserOrAdmin = (req: Request, res: Response, next: NextFunction) => {
-    /*
     let token = res.locals.jwt;
-    logging.info(NAMESPACE, 'token: ', token);
-    let { username , permissions } = token;
-    let { reqUser } = req.body;
-    logging.info(NAMESPACE, 'request user: ', reqUser);
-    if (permissions == 'Admin') {
-        validateAdminToken(req, res, next);
-    }
-    else if (username == reqUser) {
-        logging.info(NAMESPACE, `Token user ${username} does not have admin permissions
-             but match request user ${username}`);
-        next();
-    }
-    else {
-        logging.error(NAMESPACE, `Token user ${username} does not have admin permissions
-            and does not match request user ${username}`);
-        next (new AppError(`Token user ${username} does not have admin permissions
-            and does not match request user ${username}`,400));
-    }
-    */
-    let token = res.locals.jwt;
-    let { username , permissions } = token;
+    let { permissions } = token;
     if (permissions == 'Admin' || permissions == 'user')
         next();
     else

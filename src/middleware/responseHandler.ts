@@ -9,7 +9,7 @@ const NAMESPACE = "ResultHandler"
 
 const ResultHandler = (req: Request, res: Response, next: NextFunction) => {
     let result = res.locals.result;
-    logging.info(NAMESPACE, "done!", result);
+    logging.info(NAMESPACE, "", result);
     let statusCode = (result? result.statusCode : 200) | 200;
     return res.status(statusCode).json({
         result: result

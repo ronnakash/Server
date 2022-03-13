@@ -40,7 +40,6 @@ const signJWT = (user: UserDocument, callback: (error: Error | null, token: stri
             }
         );
     } catch (error : any) {
-        logging.error(NAMESPACE, error.message, error);
         callback(error, null);
     }
 };

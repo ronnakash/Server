@@ -56,7 +56,6 @@ async function register (req: Request, res: Response, next: NextFunction) {
     else if (permissions === 'Admin' && !(token.permissions === 'Admin'))
         next(new AppError(`You are not authorised to create Admin users!`,400));
     else {
-        logging.info(NAMESPACE, 'Making new user!')
         const userProps : IUserProps = {
             username,
             email,
@@ -164,7 +163,6 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
         .getOne(User, {find: {username: username, email: email}, select: '+password'})
         .catch( error => next(error));
     if (user){
-        logging.info(NAMESPACE,"user:", user);
         if (!await bcryptjs.compare(password, user.password))
             next(new AppError(`password mismatch for user ${username}`, 400));
         JWT.signJWT(user, (error, token) => {
@@ -215,7 +213,6 @@ const safeLogin = async (req: Request, res: Response, next: NextFunction) => {
 
 const googleCodeExchage = async (req: Request, res: Response, next: NextFunction) => {
     let {code} = req.body;
-    logging.debug(NAMESPACE,'dbg',req.body);
     //code exchange request
     const googleResponse = await getGoogleTokens(code)
         .catch( error => next(error));
@@ -295,7 +292,6 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
 
 const updateUserInfo = async (req: Request, res: Response, next: NextFunction) => {
     let {id, username ,picture, password} = req.body;
-    logging.info(NAMESPACE,'dbg', req.body)
     const user = await Query
         .getOneById(User, id)
         .catch( error => next(error));

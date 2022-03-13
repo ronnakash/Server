@@ -23,7 +23,6 @@ class QueryFeatures<T extends Document> {
         this.select = this.params.select;
         this.sort = this.params.sort;
     }
-    logging.info(NAMESPACE,'', this);
 }
 
     filter( find : any ) {
