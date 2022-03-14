@@ -7,7 +7,8 @@ const NoteSchema: Schema = new Schema<NoteDocument>(
     {
         title: { 
             type: String, 
-            required: true
+            required: false,
+            default: ''
         },
 
         author: { 
@@ -17,7 +18,8 @@ const NoteSchema: Schema = new Schema<NoteDocument>(
 
         body: { 
             type: String, 
-            required: false 
+            required: false,
+            default: ''
         }
     },
     

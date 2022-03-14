@@ -63,7 +63,21 @@ const getMyNotesFromJWT = async (req: Request, res: Response, next: NextFunction
 */
 
 const updateNote = async (req: Request, res: Response, next: NextFunction) => {
-    modelsController.updateModel(Note, req, res, next);
+    //modelsController.updateModel(Note, req, res, next);
+    let { id, body, title } = req.body;
+    let doc = await Query
+        .getOneById(Note, id)
+        .catch( error => next(error));
+    if (doc) {
+        doc.body = body;
+        doc.title = title;
+        await doc.save();
+        res.locals.result = {
+            message: `Updated model sucsessfully`,
+            updated: doc
+        }
+        next();
+    }
 };
 
 
