@@ -16,7 +16,6 @@ const NAMESPACE = 'SignJWT';
 const signJWT = (user: UserDocument, callback: (error: Error | null, token: string | null) => void): void => {
 
     logging.info(NAMESPACE, `Attempting to sign token for user ${user.username}`);
-    
     try {
         jwt.sign(
             {

@@ -12,7 +12,7 @@ const ResultHandler = (req: Request, res: Response, next: NextFunction) => {
     logging.info(NAMESPACE, "", result);
     let statusCode = (result? result.statusCode : 200) | 200;
     return res.status(statusCode).json({
-        result: result
+        ...result
     });
 
 }
