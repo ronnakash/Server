@@ -101,7 +101,7 @@ const getMyModelsFromJWT = async <T extends Document>(model: Model<T>, req: Requ
 
 const updateModel = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
     let { id, body, title, color } = req.body;
-    console.log(req.body);
+    logging.debug(NAMESPACE, "body", req.body)
     const updated = await Query.updateOneById(model,{
         _id: id, 
         toUpdate: {body, title, color}
