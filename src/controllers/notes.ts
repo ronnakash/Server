@@ -5,7 +5,7 @@ import AppError from '../utils/appError';
 import Query from '../utils/query';
 import logging from '../config/logging';
 import modelsController from '../controllers/models';
-import NoteDocument from '../interfaces/notes';
+import NoteDocument, { INote } from '../interfaces/notes';
 
 
 const NAMESPACE = 'Notes Controller';
@@ -64,13 +64,14 @@ const getMyNotesFromJWT = async (req: Request, res: Response, next: NextFunction
 
 const updateNote = async (req: Request, res: Response, next: NextFunction) => {
     //modelsController.updateModel(Note, req, res, next);
-    let { id, body, title } = req.body;
+    let { id, body, title, color } = req.body;
     let doc = await Query
         .getOneById(Note, id)
         .catch( error => next(error));
     if (doc) {
-        doc.body = body;
-        doc.title = title;
+        doc.body = body || doc.body;
+        doc.title = title || doc.title;
+        doc.color = color || doc.color;
         await doc.save();
         res.locals.result = {
             message: `Updated model sucsessfully`,
@@ -115,14 +116,15 @@ const deleteNoteById = async (req: Request, res: Response, next: NextFunction) =
 */
 
 const createNote = async (req: Request, res: Response, next: NextFunction) => {
-    let { author, title, body} = req.body;
+    let { author, title, body, color} = req.body;
     if (!author || (!title && !body))
         next(new AppError(`not all required args were provided`,400));
     else {
         const note = new Note({
             author,
             title, 
-            body
+            body,
+            color
         })
         const newNote = await Query.createOne(Note, note);
         res.locals.result = {
@@ -148,12 +150,13 @@ const createNote = async (req: Request, res: Response, next: NextFunction) => {
 const createNotes = async (req: Request, res: Response, next: NextFunction) => {
     let {notes} = req.body;
     let newNotes: NoteDocument[] = [];
-    notes.forEach((note: { _id: any; author: string; title: string; body: string; }) => {
-        let { author, title, body } = note;
+    notes.forEach((note: INote) => {
+        let { author, title, body, color } = note;
         newNotes.push(new Note({
             author,
             title, 
-            body
+            body,
+            color
         }));
     });
     const CreatedNotes = await Query.createMany(Note, newNotes);

@@ -20,6 +20,11 @@ const NoteSchema: Schema = new Schema<NoteDocument>(
             type: String, 
             required: false,
             default: ''
+        },
+        color: { 
+            type: String, 
+            required: false,
+            default: '#fcf483'
         }
     },
     

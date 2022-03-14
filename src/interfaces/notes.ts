@@ -5,6 +5,7 @@ export interface INote {
     title: string;
     author: string;
     body: string;
+    color: string;
 }
 
 interface NoteBaseDocument extends INote, Document {
