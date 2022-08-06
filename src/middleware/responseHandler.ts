@@ -11,7 +11,7 @@ const ResultHandler = (req: Request, res: Response, next: NextFunction) => {
     let result = res.locals.result;
     logging.info(NAMESPACE, "", result);
     let statusCode = (result? result.statusCode : 200) | 200;
-    res.locals.span.end();
+    //res.locals.span.end();
     return res.status(statusCode).json({
         ...result
     });

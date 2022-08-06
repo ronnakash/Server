@@ -12,11 +12,11 @@ import * as dotenv from 'dotenv';
 
 dotenv.config({path:`${__dirname}/.env`});
 
+
 //require('dotenv').config();
 
 const NAMESPACE = 'Server';
 const app = express();
-
 
 /** logging request */
 app.use((req, res, next) => {
@@ -82,6 +82,9 @@ process.on('unhandledRejection', (error) => {
 process.on('uncaughtException', (error) => {
     logging.error(NAMESPACE,`Uncaught exception ${error}`)
 });
+
+//tracing boilerplate
+
 
 
 export default app ;
