@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import mongoose from 'mongoose';
 import Note from '../models/notes';
 import AppError from '../utils/appError';
 import Query from '../utils/query';
@@ -69,7 +70,7 @@ const updateNote = async (req: Request, res: Response, next: NextFunction) => {
         .getOneById(Note, id)
         .catch( error => next(error));
     if (doc) {
-        logging.debug(NAMESPACE, "doc: ", doc)
+        logging.debug(NAMESPACE, "doc: ", req.body)
         doc.body = body;
         doc.title = title;
         doc.color = color;
