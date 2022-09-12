@@ -8,7 +8,7 @@ import adminRouter from './routes/authAdmin';
 import userRouter from './routes/authUser'
 import errorHandler from './middleware/errorHandler';
 import * as dotenv from 'dotenv';
-
+import * as fs from 'fs';
 
 dotenv.config({path:`${__dirname}/.env`});
 
@@ -69,6 +69,12 @@ app.use(errorHandler.errorResponder);
 app.use(errorHandler.uncaughtErrorHandler);
 
 
+// const options = {
+//     cert: fs.readFileSync("ssl/cert.pem"),
+//     key: fs.readFileSync("ssl/key.pem"),
+// };
+
+
 /** Server */
 const httpServer = http.createServer(app);
 httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server running on ${config.server.hostname}:${config.server.port}`));
@@ -83,7 +89,6 @@ process.on('uncaughtException', (error) => {
     logging.error(NAMESPACE,`Uncaught exception ${error}`)
 });
 
-//tracing boilerplate
 
 
 

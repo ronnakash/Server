@@ -6,3 +6,5 @@ docker.sh
 push.sh
 .env
 build/
+*vercel*
+ssl/
