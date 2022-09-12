@@ -10,63 +10,76 @@ import errorHandler from './middleware/errorHandler';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './AppModule';
+
+
 dotenv.config({path:`${__dirname}/.env`});
 
 
-//require('dotenv').config();
+require('dotenv').config();
 
 const NAMESPACE = 'Server';
-const app = express();
 
-/** logging request */
-app.use((req, res, next) => {
-    /** Log the req */
-    logging.info(NAMESPACE, `METHOD: [${req.method}] - URL: [${req.url}] - IP: [${req.socket.remoteAddress}]`);
-    res.on('finish', () => {
-        /** Log the res */
-        logging.info(NAMESPACE, `METHOD: [${req.method}] - URL: [${req.url}] - STATUS: [${res.statusCode}] - IP: [${req.socket.remoteAddress}]`);
-    })
-    next();
-});
+const bootstrap = async () => {
+    const app = await NestFactory.create(AppModule);
+    app.listen(5000);
+}
+
+bootstrap();
 
 
-/** Parse the body of the request */
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+// const app = express();
+
+// /** logging request */
+// app.use((req, res, next) => {
+//     /** Log the req */
+//     logging.info(NAMESPACE, `METHOD: [${req.method}] - URL: [${req.url}] - IP: [${req.socket.remoteAddress}]`);
+//     res.on('finish', () => {
+//         /** Log the res */
+//         logging.info(NAMESPACE, `METHOD: [${req.method}] - URL: [${req.url}] - STATUS: [${res.statusCode}] - IP: [${req.socket.remoteAddress}]`);
+//     })
+//     next();
+// });
 
 
-/** Rules of our API */
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-
-    if (req.method == 'OPTIONS') {
-        res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
-        return res.status(200).json({});
-    }
-
-    next();
-});
+// /** Parse the body of the request */
+// app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.json());
 
 
-/** Routes */
+// /** Rules of our API */
+// app.use((req, res, next) => {
+//     res.header('Access-Control-Allow-Origin', '*');
+//     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
 
-app.use('/Admin', adminRouter.router);
-app.use('/User', userRouter.router);
+//     if (req.method == 'OPTIONS') {
+//         res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+//         return res.status(200).json({});
+//     }
+
+//     next();
+// });
+
+
+// /** Routes */
+
+// app.use('/Admin', adminRouter.router);
+// app.use('/User', userRouter.router);
 
 
 
-/** Error logging */
-app.use((req, res, next) => {
-    const appError = new AppError('not found', 404);
-    return res.status(appError.statusCode).json({
-        appError
-    });
-})
+// /** Error logging */
+// app.use((req, res, next) => {
+//     const appError = new AppError('not found', 404);
+//     return res.status(appError.statusCode).json({
+//         appError
+//     });
+// })
 
-app.use(errorHandler.errorLogger);
-app.use(errorHandler.errorResponder);
-app.use(errorHandler.uncaughtErrorHandler);
+// app.use(errorHandler.errorLogger);
+// app.use(errorHandler.errorResponder);
+// app.use(errorHandler.uncaughtErrorHandler);
 
 
 // const options = {
@@ -75,9 +88,9 @@ app.use(errorHandler.uncaughtErrorHandler);
 // };
 
 
-/** Server */
-const httpServer = http.createServer(app);
-httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server running on ${config.server.hostname}:${config.server.port}`));
+// /** Server */
+// const httpServer = http.createServer(app);
+// httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server running on ${config.server.hostname}:${config.server.port}`));
 
 
 process.on('unhandledRejection', (error) => {
@@ -91,5 +104,4 @@ process.on('uncaughtException', (error) => {
 
 
 
-
-export default app ;
+// export default app ;

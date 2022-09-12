@@ -1,8 +1,9 @@
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 import config from '../config/config';
 import logging from '../config/logging';
 import { Request, Response, NextFunction } from 'express';
 import AppError from '../utils/appError';
+import { NestMiddleware } from '@nestjs/common';
 
 
 const NAMESPACE = 'Auth';
@@ -16,13 +17,17 @@ const NAMESPACE = 'Auth';
 */
 
 
-const existsJWT = (req: Request, res: Response, next: NextFunction) => {
-    let token = res.locals.jwt;
-    if (token) 
-        next();
-     else 
-        next(new AppError(`no token provided`,400));
+export class ExistsJWTMiddleware implements NestMiddleware {
+    use(req: Request, res: Response, next: NextFunction) {
+        let token = res.locals.jwt;
+        //TODO: make sure next with error works
+        if (token) 
+            next();
+        else 
+            next(new AppError(`no token provided`,400));
+    }
 };
+
 
 
 /** getJWT 
@@ -32,21 +37,27 @@ const existsJWT = (req: Request, res: Response, next: NextFunction) => {
  * 
 */
 
-
-const getJWT = (req: Request, res: Response, next: NextFunction) => {
-    let token = req.headers.authorization?.split(' ')[1];
-    if (token) {
-        jwt.verify(token, config.server.token.secret, (error, decoded) => {
-            if (error) {
-                next(error);
-            } else {
-                res.locals.jwt = decoded;
-                next();
-            }
-        });
-    }
-    else next(new AppError('No token provided', 400));
+export class GetJWTMiddleware implements NestMiddleware {
+    use(req: Request, res: Response, next: NextFunction) {
+        let token = req.headers.authorization?.split(' ')[1];
+        if (token) {
+            jwt.verify(token, config.server.token.secret,
+                (error: VerifyErrors | null, decoded: JwtPayload | undefined) => {
+                    if (error) {
+                        next(error);
+                    } else {
+                        res.locals.jwt = decoded;
+                        next();
+                    }
+            });
+        }
+        else next(new AppError('No token provided', 400));
+    }    
 };
+
+
+
+
 
 
 /** validateAdminToken 
@@ -57,15 +68,17 @@ const getJWT = (req: Request, res: Response, next: NextFunction) => {
 */
 
 
-const validateAdminToken = (req: Request, res: Response, next: NextFunction) => {
-    let token = res.locals.jwt;
-    let {username, email, permissions} = token;
-    if (permissions !== 'Admin')
-        next(new AppError(`User ${username} does not have admin permissions`,400));           
-    logging.info(NAMESPACE, `validated Admin Token for user ${username} with permissions ${permissions}`);
-    next();
-
+export class ValidateAdminTokenMiddleware implements NestMiddleware{
+    use(req: Request, res: Response, next: NextFunction) {
+        let token = res.locals.jwt;
+        let {username, email, permissions} = token;
+        if (permissions !== 'Admin')
+            next(new AppError(`User ${username} does not have admin permissions`,400));           
+        logging.info(NAMESPACE, `validated Admin Token for user ${username} with permissions ${permissions}`);
+        next();
+    }
 };
+
 
 
 /** validateUserOrAdmin 
@@ -76,17 +89,19 @@ const validateAdminToken = (req: Request, res: Response, next: NextFunction) => 
  * 
 */
 
-
-const validateUserOrAdmin = (req: Request, res: Response, next: NextFunction) => {
-    let token = res.locals.jwt;
-    let { permissions } = token;
-    if (permissions == 'Admin' || permissions == 'user')
-        next();
-    else
-        next(new AppError('No token provided',400)); 
-
+export class ValidateUserOrAdminMiddleware implements NestMiddleware{
+    use(req: Request, res: Response, next: NextFunction) {
+        let token = res.locals.jwt;
+        let { permissions } = token;
+        if (permissions == 'Admin' || permissions == 'user')
+            next();
+        else
+            next(new AppError('No token provided',400)); 
+    }
 };
 
 
 
-export default { existsJWT, getJWT, validateAdminToken, validateUserOrAdmin };
+
+
+// export default { existsJWT, getJWT, validateAdminToken, validateUserOrAdmin };
