@@ -1,7 +1,10 @@
 import { Body, Controller, Get, Next, Put, Req, Res } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import { NextFunction, Request, Response} from 'express';
+import { Model } from 'mongoose';
 import { ModelsController } from '../generic/models.controller';
-import NoteDocument, { INote, NoteDto } from '../interfaces/notes';
+import { INote, NoteDto, NoteDocument} from '../interfaces/notes';
+import NoteModel from '../models/notes';
 import Note from '../models/notes';
 import Query from '../utils/query';
 
@@ -9,8 +12,8 @@ import Query from '../utils/query';
 @Controller('notes')
 export class NotesController extends ModelsController<NoteDocument>{
 
-    constructor() {
-        super(Note)
+    constructor(@InjectModel("Note") private noteModel : Model<NoteDocument>) {
+        super(noteModel)
     }
 
     @Put()

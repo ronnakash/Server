@@ -8,16 +8,16 @@ const router = express.Router();
 
 
 /** create */
-router.post('/post/note', controller.createNote);
-router.post('/post/createNotes', controller.createNotes);
+router.post('/note', controller.createNote);
+// router.post('/createNotes', controller.createNotes);
 /** read */
-router.get('/Admin/get/allNotes' ,controller.getAllNotes);
+router.get('/Admin/allNotes' ,controller.getAllNotes);
 //router.get('/get/myNotes', controller.getMyNotesFromJWT);
-router.get('/get/usersNotes', controller.getMyNotes);
+router.get('/usersNotes', controller.getMyNotes);
 /** update */
-router.put('/put/updateNote', controller.updateNote);
+router.put('/updateNote', controller.updateNote);
 /** delete */
-router.delete('/delete/deleteNote', controller.deleteNoteById);
+router.delete('/deleteNote', controller.deleteNoteById);
 
 
 router.use(handler);

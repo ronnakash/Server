@@ -1,6 +1,6 @@
 import express from 'express';
 import controller from '../controllers/user';
-import JWT from '../middleware/authJWT';
+// import {ValidateAdminToken} from '../middleware/authJWT';
 import handler from '../middleware/responseHandler';
 
 
@@ -13,7 +13,7 @@ router.post('/registerAndLogin', controller.register, controller.safeLogin);
 router.post('/login', controller.login);
 router.post('/google/login', controller.googleCodeExchage, controller.googleRegister, controller.safeLogin)
 /** read */
-router.get('/get/all',JWT.validateAdminToken, controller.getAllUsers);
+// router.get('/get/all',JWT.validateAdminToken, controller.getAllUsers);
 /** update */
 router.patch('/changePassword', controller.changePassword);
 router.post('/updateUser', controller.updateUserInfo);

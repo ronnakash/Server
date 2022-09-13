@@ -4,7 +4,7 @@ import Note from '../models/notes';
 import AppError from '../utils/appError';
 import Query from '../utils/query';
 import logging from '../config/logging';
-import modelsController from '../controllers/models';
+// import modelsController from '../controllers/models';
 import NoteDocument, { INote } from '../interfaces/notes';
 
 
@@ -23,13 +23,13 @@ const NAMESPACE = 'Notes Controller';
  * 
 */
 
-const getAllNotes = async (req: Request, res: Response, next: NextFunction) => {
-    modelsController.getAllModels(Note, req, res, next);
-};
+// const getAllNotes = async (req: Request, res: Response, next: NextFunction) => {
+//     modelsController.getAllModels(Note, req, res, next);
+// };
 
-const getNoteById = async (req: Request, res: Response, next: NextFunction) => {
-    modelsController.getModelById(Note, req, res, next);
-}; 
+// const getNoteById = async (req: Request, res: Response, next: NextFunction) => {
+//     modelsController.getModelById(Note, req, res, next);
+// }; 
 
 
 /**  getMyNotes
@@ -39,13 +39,13 @@ const getNoteById = async (req: Request, res: Response, next: NextFunction) => {
  * 
 */
 
-const getMyNotes = async (req: Request, res: Response, next: NextFunction) => {
-    modelsController.getMyModels(Note, req, res, next);
-};
+// const getMyNotes = async (req: Request, res: Response, next: NextFunction) => {
+//     modelsController.getMyModels(Note, req, res, next);
+// };
 
-const getMyNotesFromJWT = async (req: Request, res: Response, next: NextFunction) => {
-    modelsController.getMyModelsFromJWT(Note, req, res, next);
-};
+// const getMyNotesFromJWT = async (req: Request, res: Response, next: NextFunction) => {
+//     modelsController.getMyModelsFromJWT(Note, req, res, next);
+// };
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,26 +62,26 @@ const getMyNotesFromJWT = async (req: Request, res: Response, next: NextFunction
  * res.body contains the original note before edits
 */
 
-const updateNote = async (req: Request, res: Response, next: NextFunction) => {
-    //modelsController.updateModel(Note, req, res, next);
-    let { id, body, title, color } = req.body;
-    logging.debug(NAMESPACE, "body:", req.body)
-    let doc = await Query
-        .getOneById(Note, id)
-        .catch( error => next(error));
-    if (doc) {
-        logging.debug(NAMESPACE, "doc: ", req.body)
-        doc.body = body;
-        doc.title = title;
-        doc.color = color;
-        await doc.save();
-        res.locals.result = {
-            message: `Updated model sucsessfully`,
-            updated: doc
-        }
-        next();
-    }
-};
+// const updateNote = async (req: Request, res: Response, next: NextFunction) => {
+//     //modelsController.updateModel(Note, req, res, next);
+//     let { id, body, title, color } = req.body;
+//     logging.debug(NAMESPACE, "body:", req.body)
+//     let doc = await Query
+//         .getOneById(Note, id)
+//         .catch( error => next(error));
+//     if (doc) {
+//         logging.debug(NAMESPACE, "doc: ", req.body)
+//         doc.body = body;
+//         doc.title = title;
+//         doc.color = color;
+//         await doc.save();
+//         res.locals.result = {
+//             message: `Updated model sucsessfully`,
+//             updated: doc
+//         }
+//         next();
+//     }
+// };
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,9 +97,9 @@ const updateNote = async (req: Request, res: Response, next: NextFunction) => {
  * 
 */
 
-const deleteNoteById = async (req: Request, res: Response, next: NextFunction) => {
-    modelsController.deleteModelById(Note, req, res, next);
-};
+// const deleteNoteById = async (req: Request, res: Response, next: NextFunction) => {
+//     modelsController.deleteModelById(Note, req, res, next);
+// };
 
 
 
@@ -149,25 +149,25 @@ const createNote = async (req: Request, res: Response, next: NextFunction) => {
  * 
 */
 
-const createNotes = async (req: Request, res: Response, next: NextFunction) => {
-    let {notes} = req.body;
-    let newNotes: NoteDocument[] = [];
-    notes.forEach((note: INote) => {
-        let { author, title, body, color } = note;
-        newNotes.push(new Note({
-            author,
-            title, 
-            body,
-            color
-        }));
-    });
-    const CreatedNotes = await Query.createMany(Note, newNotes);
-    res.locals.result = {
-        message: `Created ${CreatedNotes.length} new notes`,
-        CreatedNotes
-    }
-    next();
-};
+// const createNotes = async (req: Request, res: Response, next: NextFunction) => {
+//     let {notes} = req.body;
+//     let newNotes: NoteDocument[] = [];
+//     notes.forEach((note: INote) => {
+//         let { author, title, body, color } = note;
+//         newNotes.push(new Note({
+//             author,
+//             title, 
+//             body,
+//             color
+//         }));
+//     });
+//     const CreatedNotes = await Query.createMany(Note, newNotes);
+//     res.locals.result = {
+//         message: `Created ${CreatedNotes.length} new notes`,
+//         CreatedNotes
+//     }
+//     next();
+// };
 
 
-export default { getNoteById, createNote, getAllNotes, updateNote, getMyNotes, getMyNotesFromJWT, deleteNoteById, createNotes};
+// export default { getNoteById, createNote, getAllNotes, updateNote, getMyNotes, getMyNotesFromJWT, deleteNoteById, createNotes};

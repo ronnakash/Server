@@ -20,29 +20,29 @@ const NAMESPACE = 'Models Controller';
  * 
 */
 
-const getAllModels = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
-    let params = urlParser(req.url);
-    let docs = await Query
-        .getMany(model, {find: params})
-        .catch( error => next(error));
-    res.locals.result = {
-        message: docs ? `Got ${docs.length} results` : `Got no results`,
-        docs
-    };
-    next();
-};
+// const getAllModels = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
+//     let params = urlParser(req.url);
+//     let docs = await Query
+//         .getMany(model, {find: params})
+//         .catch( error => next(error));
+//     res.locals.result = {
+//         message: docs ? `Got ${docs.length} results` : `Got no results`,
+//         docs
+//     };
+//     next();
+// };
 
-const getModelById = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
-    let { _id } = req.body;
-    let doc = await Query
-        .getOneById(model, _id)
-        .catch( error => next(error));
-    res.locals.result = {
-        message: `Got doc sucsessfuly`,
-        doc
-    };
-    next();
-}; 
+// const getModelById = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
+//     let { _id } = req.body;
+//     let doc = await Query
+//         .getOneById(model, _id)
+//         .catch( error => next(error));
+//     res.locals.result = {
+//         message: `Got doc sucsessfuly`,
+//         doc
+//     };
+//     next();
+// }; 
 
 
 
@@ -53,17 +53,17 @@ const getModelById = async <T extends Document>(model: Model<T>, req: Request, r
  * 
 */
 
-const getMyModels = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
-    let params = urlParser(req.url);
-    const models = await Query
-        .getMany(model, params)
-        .catch( error => next(error));
-    res.locals.result = {
-        message: models ? `Got ${models.length} results` : `Got no results`,
-        models
-    };
-    next();
-};
+// const getMyModels = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
+//     let params = urlParser(req.url);
+//     const models = await Query
+//         .getMany(model, params)
+//         .catch( error => next(error));
+//     res.locals.result = {
+//         message: models ? `Got ${models.length} results` : `Got no results`,
+//         models
+//     };
+//     next();
+// };
 
 /**  getMyModelsFromJWT
  * 
@@ -73,16 +73,16 @@ const getMyModels = async <T extends Document>(model: Model<T>, req: Request, re
 */
 
 
-const getMyModelsFromJWT = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
-    const models = await Query
-        .getMany(model, {find: {uid: res.locals.token.uid}})
-        .catch(error => next(error));
-    res.locals.result = {
-        message: models ? `Got ${models.length} results` : `Got no results`,
-        models
-    };
-    next();
-};
+// const getMyModelsFromJWT = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
+//     const models = await Query
+//         .getMany(model, {find: {uid: res.locals.token.uid}})
+//         .catch(error => next(error));
+//     res.locals.result = {
+//         message: models ? `Got ${models.length} results` : `Got no results`,
+//         models
+//     };
+//     next();
+// };
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -99,20 +99,19 @@ const getMyModelsFromJWT = async <T extends Document>(model: Model<T>, req: Requ
  * res.body contains the original model before edits
 */
 
-const updateModel = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
-    let { id, body, title, color } = req.body;
-    logging.debug(NAMESPACE, "body", req.body)
-    const updated = await Query.updateOneById(model,{
-        _id: id, 
-        toUpdate: {body, title, color}
-    }).catch( error => next(error));
-    res.locals.result = {
-        message: `Updated model sucsessfully`,
-        updated
-    }
-    next();
-
-};
+// const updateModel = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
+//     let { id, body, title, color } = req.body;
+//     logging.debug(NAMESPACE, "body", req.body)
+//     const updated = await Query.updateOneById(model,{
+//         _id: id, 
+//         toUpdate: {body, title, color}
+//     }).catch( error => next(error));
+//     res.locals.result = {
+//         message: `Updated model sucsessfully`,
+//         updated
+//     }
+//     next();
+// };
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -128,19 +127,19 @@ const updateModel = async <T extends Document>(model: Model<T>, req: Request, re
  * 
 */
 
-const deleteModelById = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
-    let { _id } = req.body;
-    let deleted = await Query
-        .deleteOneById(model, _id)
-        .catch( error => next(error));
-    res.locals.result = {
-        message: deleted? `Deleted model sucsessfuly` : `model not found`,
-        model: deleted,
-        statusCode: deleted? 200 : 400
-    };
-    next();
-};
+// const deleteModelById = async <T extends Document>(model: Model<T>, req: Request, res: Response, next: NextFunction) => {
+//     let { _id } = req.body;
+//     let deleted = await Query
+//         .deleteOneById(model, _id)
+//         .catch( error => next(error));
+//     res.locals.result = {
+//         message: deleted? `Deleted model sucsessfuly` : `model not found`,
+//         model: deleted,
+//         statusCode: deleted? 200 : 400
+//     };
+//     next();
+// };
 
 
 
-export default { getAllModels, getModelById, getMyModelsFromJWT, deleteModelById, getMyModels, updateModel};
+// export default { getAllModels, getModelById, getMyModelsFromJWT, deleteModelById, getMyModels, updateModel};

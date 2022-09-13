@@ -1,11 +1,11 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
 import logging from '../config/logging';
-import NoteDocument, {INote} from '../interfaces/notes';
+import {NoteDocument} from '../interfaces/notes';
 import UserDocument from '../interfaces/user';
 
-const NoteSchema: Schema = new Schema<NoteDocument>(
+const NoteSchema: Schema<NoteDocument> = new Schema<NoteDocument>(
     {
-        title: { 
+        title: {
             type: String, 
             required: false,
             default: ''

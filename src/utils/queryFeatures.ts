@@ -1,4 +1,4 @@
-import mongoose, { Document, Query, HydratedDocument, Model } from "mongoose";
+import mongoose, { Document, Query, Model } from "mongoose";
 import logging from "../config/logging";
 import AppError from "./appError";
 //import catchAsync from './catchAsync';
@@ -8,13 +8,13 @@ const NAMESPACE = "QueryFeatures";
 
 class QueryFeatures<T extends Document> {
     params: any;
-    schema: Model<T, {}, {}, {}>;
+    schema: Model<T, any, any>;
     find: any;
     select: any;
     sort: any;
     doc: T[] = [];
 
-    constructor(schema : Model<T,{}, {}, {}>, params : any) {
+    constructor(schema : Model<T, any, any>, params : any) {
     this.schema = schema;
     if (params){
         this.params = params;
@@ -52,7 +52,7 @@ class QueryFeatures<T extends Document> {
             .select(this.select)
             .sort(this.sort)
             .exec()
-            .catch( error => {throw new AppError(`error in mongoose: ${error.message}`,500)});
+            .catch( (error: { message: any; }) => {throw new AppError(`error in mongoose: ${error.message}`,500)});
         return this.doc;
     }
 
