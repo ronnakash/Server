@@ -6,7 +6,7 @@ import logging from '../config/logging';
 import urlParser from '../utils/urlParser';
 import { ModelsService } from './models.service';
 
-// @Controller('models')
+@Controller()
 export abstract class ModelsController<T extends mongoose.Document> {
     service : ModelsService<T>;
 
@@ -68,20 +68,7 @@ export abstract class ModelsController<T extends mongoose.Document> {
     }
 
 
-    @Put()
-    async updateModel(@Req() req : Request, @Res() res : Response, @Next() next: NextFunction) {
-        let { id, body, title, color } = req.body;
-        const updated = await this.service.updateOneById({
-            _id: id, 
-            toUpdate: {body, title, color}
-        }).catch( error => next(error));
-        res.locals.result = {
-            message: `Updated model sucsessfully`,
-            updated
-        }
-        next();
-    }
-
+    abstract updateModel(req : Request, res : Response, next: NextFunction) : Promise<void>;
     
     
     @Delete()
