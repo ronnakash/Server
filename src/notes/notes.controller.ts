@@ -2,7 +2,7 @@ import { Body, Controller, Get, Next, Put, Req, Res } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { NextFunction, Request, Response} from 'express';
 import { Model } from 'mongoose';
-import { ModelsController } from '../generic/models.controller';
+import { ModelsController } from '../models/models.controller';
 import { INote, NoteDto, NoteDocument} from '../interfaces/notes';
 import NoteModel from '../models/notes';
 import Note from '../models/notes';

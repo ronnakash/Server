@@ -6,8 +6,7 @@ import Query from '../utils/query';
 import logging from '../config/logging';
 import urlParser from '../utils/urlParser';
 
-
-
+// @Controller('models')
 export abstract class ModelsController<T extends mongoose.Document> {
     model: Model<T>;
 
