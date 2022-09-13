@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import logging from '../config/logging';
 import JWT from '../functions/signJWT';
-import User from '../models/user';
+import User from '../schemas/user';
 import Query from '../utils/query';
 import AppError from '../utils/appError';
 import validator from 'validator';

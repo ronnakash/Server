@@ -4,7 +4,7 @@ import { NextFunction, Request, Response} from 'express';
 import { Model } from 'mongoose';
 import { ModelsController } from '../models/models.controller';
 import { INote, NoteDocument} from '../interfaces/notes';
-import Note from '../models/notes';
+import Note from '../schemas/notes';
 // import Query from '../utils/query';
 import { NotesService } from './notes.service';
 

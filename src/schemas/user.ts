@@ -3,7 +3,6 @@ import UserDocument from '../interfaces/user';
 import validator from 'validator';
 import bcryptjs from 'bcryptjs';
 import logging from '../config/logging';
-import Query from '../utils/query'
 import AppError from '../utils/appError';
 
 const NAMESPACE = 'UserValidation'
@@ -77,7 +76,6 @@ UserSchema.pre("save", async function(next) {
         this.password = await bcryptjs
             .hash(this.password, 11)
     }
-    
 });  
 
 

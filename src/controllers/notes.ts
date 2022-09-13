@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
-import Note from '../models/notes';
+import Note from '../schemas/notes';
 import AppError from '../utils/appError';
 import Query from '../utils/query';
 import logging from '../config/logging';
