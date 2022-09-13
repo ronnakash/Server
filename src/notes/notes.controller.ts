@@ -5,21 +5,23 @@ import { Model } from 'mongoose';
 import { ModelsController } from '../models/models.controller';
 import { INote, NoteDocument} from '../interfaces/notes';
 import Note from '../models/notes';
-import Query from '../utils/query';
+// import Query from '../utils/query';
+import { NotesService } from './notes.service';
 
 
 @Controller('notes')
 export class NotesController extends ModelsController<NoteDocument>{
 
-    constructor(@InjectModel("Note") private noteModel : Model<NoteDocument>) {
-        super(noteModel)
+    constructor( //@InjectModel("Note") private noteModel : Model<NoteDocument>,
+            private notesService : NotesService) {
+        super(notesService)
     }
 
     @Put()
     async updateModel(@Req() req : Request, @Res() res : Response, @Next() next: NextFunction) {
         let { id, body, title, color } = req.body;
-        let doc = await Query
-            .getOneById(Note, id)
+        let doc = await this.notesService
+            .getOneById(id)
             .catch( error => next(error));
         if (doc) {
             doc.body = body;
@@ -47,7 +49,7 @@ export class NotesController extends ModelsController<NoteDocument>{
                 color
             }));
         });
-        const CreatedNotes = await Query.createMany(Note, newNotes);
+        const CreatedNotes = await this.notesService.createMany(newNotes);
         res.locals.result = {
             message: `Created ${CreatedNotes.length} new notes`,
             CreatedNotes
