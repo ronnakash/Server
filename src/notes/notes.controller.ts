@@ -3,8 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { NextFunction, Request, Response} from 'express';
 import { Model } from 'mongoose';
 import { ModelsController } from '../models/models.controller';
-import { INote, NoteDto, NoteDocument} from '../interfaces/notes';
-import NoteModel from '../models/notes';
+import { INote, NoteDocument} from '../interfaces/notes';
 import Note from '../models/notes';
 import Query from '../utils/query';
 

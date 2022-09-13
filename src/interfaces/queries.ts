@@ -12,6 +12,6 @@ export interface UpdateQueryParams {
 }
 
 export interface UpdateByIdQueryParams {
-    _id: string;
+    _id: any;
     toUpdate: any;
 }
