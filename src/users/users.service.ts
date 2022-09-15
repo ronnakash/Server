@@ -2,22 +2,29 @@ import { Injectable } from '@nestjs/common';
 import { IUserProps, UserDocument } from '../interfaces/user';
 import { ModelsService } from '../models/models.service';
 import {UserModel as User} from '../schemas/user';
+import { UsersRepository } from './users.repository';
 
 
 @Injectable()
 export class UsersService extends ModelsService<UserDocument>{
 
-    constructor(private notesRepository : NotesRepository){
+    constructor(private usersRepository : UsersRepository){
         super();
-        super.repository = User;
+        super.repository = usersRepository;
     }
 
     async newUser(user : IUserProps) : Promise<UserDocument>{
-        return super.createOne(new User(user))
+        return this.usersRepository.createOne(new User(user))
     }
 
-    updateModel(model: UserDocument): Promise<UserDocument> {
-        throw new Error('Method not implemented.');
+    async updateModel(model: UserDocument): Promise<UserDocument> {
+        let {id, username ,picture} = model;
+        const user = await this.repository
+            .getOneById(id);
+        if (picture) user.picture = picture;
+        if (username) user.username = username;
+        await this.repository.updateDoc(user);
+        return user;
     }
 
 }

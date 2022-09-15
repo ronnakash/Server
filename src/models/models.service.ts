@@ -35,6 +35,11 @@ export abstract class ModelsService<T extends mongoose.Document> {
 
     abstract updateModel(model : T) : Promise<T>;
 
-
+    async deleteOne( params : any): Promise<T> {
+        const deletedModel = await this.repository.deleteOne(params);
+        if (deletedModel == null)
+            throw new AppError('Document not found', 500);
+        return deletedModel;
+    }
 
 }
