@@ -21,20 +21,11 @@ export class NotesController extends ModelsController<NoteDocument>{
 
     @Put()
     async updateModel(@Body() reqBody : NoteDocument) {
-        let { id, body, title, color } = reqBody;
-        let doc = await this.notesService
-            .getById(id);
-        if (doc) {
-            doc.body = body;
-            doc.title = title;
-            doc.color = color;
-            await doc.save();
-            return {
-                message: `Updated model sucsessfully`,
-                updated: doc
-            }
+        let doc = await this.notesService.updateModel(reqBody);
+        return {
+            message: `Updated model sucsessfully`,
+            updated: doc
         }
-        return { message: "Error!!"};
     }
 
     // @Put()

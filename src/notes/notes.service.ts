@@ -13,8 +13,15 @@ export class NotesService extends ModelsService<NoteDocument>{
         super.repository = notesRepository;
     }
 
-    updateModel(model: NoteDocument): Promise<NoteDocument> {
-        throw new Error('Method not implemented.');
+    async updateModel(doc: NoteDocument): Promise<NoteDocument> {
+        let { id, body, title, color } = doc;
+        let note = await this.notesRepository
+            .getOneById(id);
+        note.body = body;
+        note.title = title;
+        note.color = color;
+        await note.save();
+        return note;
     }
 
 }
