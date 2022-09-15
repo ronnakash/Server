@@ -12,7 +12,7 @@ import { NotesService } from './notes.service';
 @Controller('notes')
 export class NotesController extends ModelsController<NoteDocument>{
 
-    constructor( //@InjectModel("Note") private noteModel : Model<NoteDocument>,
+    constructor( @InjectModel("Note") private noteModel : Model<NoteDocument>,
             private notesService : NotesService) {
         super(notesService)
     }

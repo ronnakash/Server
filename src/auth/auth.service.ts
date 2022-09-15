@@ -6,8 +6,4 @@ import JWT from '../functions/signJWT';
 @Injectable()
 export class AuthService {
 
-
-
-
-
 }

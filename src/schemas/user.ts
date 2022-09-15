@@ -1,5 +1,5 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
-import UserDocument from '../interfaces/user';
+import { UserDocument } from '../interfaces/user';
 import validator from 'validator';
 import bcryptjs from 'bcryptjs';
 import logging from '../config/logging';

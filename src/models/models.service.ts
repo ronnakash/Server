@@ -5,13 +5,13 @@ import AppError from '../utils/appError';
 import QueryFeatures from '../utils/queryFeatures';
 
 
-// @Injectable()
+@Injectable()
 export abstract class ModelsService<T extends mongoose.Document> {
-    model : Model<T>
+    model! : Model<T>
 
-    constructor(model : Model<T>){
-        this.model = model;
-    }
+    // constructor(model : Model<T>){
+    //     this.model = model;
+    // }
 
     async getOne(params : QueryFeaturesParams): Promise<T> {
         return await new QueryFeatures(this.model,params).one();

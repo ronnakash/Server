@@ -4,7 +4,7 @@ import urlParser from '../utils/urlParser';
 import { NextFunction, Request, Response} from 'express';
 import AppError from '../utils/appError';
 import validator from 'validator';
-import { IUserProps } from '../interfaces/user';
+import { IUserProps, UserChangePasswordProps, UserLoginProps, UserRegisterProps } from '../interfaces/user';
 import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import JWT from '../functions/signJWT';
@@ -15,25 +15,25 @@ import getGoogleTokens from '../functions/googleCodeExchange';
 @Controller('auth')
 export class AuthController {
 
-    constructor( //@InjectModel("User") private userModel : Model<UserDocument>,
-            private usersService : UsersService, private authService : AuthService) {}
+    constructor(private usersService : UsersService) {
+    }
 
-    @Put()
-    async register(@Req() req : Request, @Res() res : Response, @Next() next: NextFunction) {
-        let { username, email, password, permissions } = req.body;
-        let token = res.locals.jwt;
+    @Put("/register")
+    async register(@Body() body : UserRegisterProps) {
+        let { username, email, password, permissions } = body;
+        let token = body.token;
         //check if user exists
         let users = await this.usersService
             .getMany({find: {email}})
-            .catch( error => next(error));
+            // .catch( error => next(error));
         if (users && users.length > 0)
-            next(new AppError(`User already exists: ${users[0]}`,400));
+            throw new AppError(`User already exists: ${users[0]}`,400);
         // check that password is strong
-        else if (!validator.isStrongPassword(password))
-            next(new AppError(`Provided password for user ${username} is too weak`, 400));
+        else if (!validator.isStrongPassword(password || ""))
+        throw new AppError(`Provided password for user ${username} is too weak`, 400);
         //check token user permission
-        else if (permissions === 'Admin' && !(token.permissions === 'Admin'))
-            next(new AppError(`You are not authorised to create Admin users!`,400));
+        else if (permissions === 'Admin' && token && !(token.permissions === 'Admin'))
+            throw new AppError(`You are not authorised to create Admin users!`,400);
         else {
             const userProps : IUserProps = {
                 username,
@@ -42,70 +42,64 @@ export class AuthController {
                 permissions
                 };
             const user = await this.usersService.newUser(userProps)
-                .catch( error => next(error));
-            res.locals.result = {
+                // .catch( error => next(error));
+            return {
                 message: `Created new user ${username} sucsessfuly`,
                 user: user
             }
-            next();
         }
     }
 
-    @Post()
-    async login(@Req() req : Request, @Res() res : Response, @Next() next: NextFunction) {
-        let { username, email, password } = req.body;
+    @Post('/login')
+    async login(@Body() body : UserLoginProps) {
+        let { username, email, password } = body;
         const user = await this.usersService
             .getOne({find: {username: username, email: email}, select: '+password'})
-            .catch( error => next(error));
-        if (user){
+            // .catch( error => next(error));
+        if (user && password){
             if (!await bcryptjs.compare(password, user.password))
-                next(new AppError(`password mismatch for user ${username}`, 400));
-            JWT.signJWT(user, (error, token) => {
-                if (error) next(error);
-                else if (token) {
-                    // logging.info(NAMESPACE,`Auth successful for ${username}`);
-                    user.password = "";
-                    res.locals.result = {
-                        message: `Auth successful for ${username}`,
-                        token: token,
-                        user: user
-                    };
-                    next();
-                }
-            });
+                // next(new AppError(`password mismatch for user ${username}`, 400));
+                throw new AppError(`password mismatch for user ${username}`, 400);
+            const token = JWT.signJWT(user);
+            user.password = "";
+            return {
+                message: `Auth successful for ${username}`,
+                token: token,
+                user: user
+            };
         }
+        return { message: "Error!!!!"};
     }
 
-    @Patch()
-    async changePassword(@Req() req : Request, @Res() res : Response, @Next() next: NextFunction) {
-        let { username, email, oldPassword, newPassword } = req.body;
+    @Patch("/changePassword")
+    async changePassword(@Body() body : UserChangePasswordProps) {
+        let { username, email, oldPassword, newPassword } = body;
         //get user from database
         const user = await this.usersService
             .getOne({find: {username: username, email: email}, select: '+passwordChangedAt, +password'})
-            .catch( error => next(error));;
+            // .catch( error => next(error));;
         if (user) {
             //compare passwords
             if (!(await bcryptjs.compare(oldPassword, user.password))) 
-                next(new AppError(`Password mismatch for ${username}`,400));
+                throw new AppError(`Password mismatch for ${username}`,400);
             else if (oldPassword !== newPassword)
-                next(new AppError(`Can't change password to the current one`,400));
+                throw new AppError(`Can't change password to the current one`,400);
             // validate new password strength
             else if (!validator.isStrongPassword(newPassword))
-                next(new AppError(`New password for user ${username} is too weak`, 400));
+                throw new AppError(`New password for user ${username} is too weak`, 400);
             else {
                 user.password = newPassword;
                 user.passwordChangedAt = Date.now();
                 await user
                     .save()
-                    .catch( error => next(error));
+                    // .catch( error => next(error));
                 user.password = ""; // hide password hash
-                res.locals.result = {
+                return {
                     message: `Changed password successfuly for user ${username}`,
                     user: user
                 };
             }
         }
-        next();
     }
 
     @Post()

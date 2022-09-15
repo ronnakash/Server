@@ -19,7 +19,7 @@ const NAMESPACE = 'Auth';
 
 export class ExistsJWTMiddleware implements NestMiddleware {
     use(req: Request, res: Response, next: NextFunction) {
-        let token = res.locals.jwt;
+        let token = req.body.jwt;
         //TODO: make sure next with error works
         if (token) 
             next();
@@ -46,7 +46,7 @@ export class GetJWTMiddleware implements NestMiddleware {
                     if (error) {
                         next(error);
                     } else {
-                        res.locals.jwt = decoded;
+                        req.body.jwt = decoded;
                         next();
                     }
             });
@@ -70,8 +70,8 @@ export class GetJWTMiddleware implements NestMiddleware {
 
 export class ValidateAdminTokenMiddleware implements NestMiddleware{
     use(req: Request, res: Response, next: NextFunction) {
-        let token = res.locals.jwt;
-        let {username, email, permissions} = token;
+        let token = req.body.jwt;
+        let {username, permissions} = token;
         if (permissions !== 'Admin')
             next(new AppError(`User ${username} does not have admin permissions`,400));           
         logging.info(NAMESPACE, `validated Admin Token for user ${username} with permissions ${permissions}`);
@@ -91,7 +91,7 @@ export class ValidateAdminTokenMiddleware implements NestMiddleware{
 
 export class ValidateUserOrAdminMiddleware implements NestMiddleware{
     use(req: Request, res: Response, next: NextFunction) {
-        let token = res.locals.jwt;
+        let token = req.body.jwt;
         let { permissions } = token;
         if (permissions == 'Admin' || permissions == 'user')
             next();

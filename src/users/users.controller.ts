@@ -1,6 +1,6 @@
 import { Controller, Delete, Next, Put, Req, Res } from '@nestjs/common';
 import { NextFunction, Request, Response} from 'express';
-import UserDocument from '../interfaces/user';
+import {UserDocument} from '../interfaces/user';
 import { ModelsController } from '../models/models.controller';
 import { UsersService } from './users.service';
 

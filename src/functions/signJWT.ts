@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import config from '../config/config';
 import logging from '../config/logging';
-import UserDocument from '../interfaces/user';
+import {UserDocument} from '../interfaces/user';
 import AppError from '../utils/appError';
 
 
@@ -13,11 +13,11 @@ const NAMESPACE = 'SignJWT';
  * 
  */
 
-const signJWT = (user: UserDocument, callback: (error: Error | null, token: string | null) => void): void => {
+const signJWT = (user: UserDocument): String => {
 
-    logging.info(NAMESPACE, `Attempting to sign token for user ${user.username}`);
+    // logging.info(NAMESPACE, `Attempting to sign token for user ${user.username}`);
     try {
-        jwt.sign(
+        const tokenString = jwt.sign(
             {
                 _id: user._id,
                 username: user.username,
@@ -30,16 +30,18 @@ const signJWT = (user: UserDocument, callback: (error: Error | null, token: stri
                 algorithm: 'HS256',
                 expiresIn: "30 days"
             },
-            (error, token) => {
-                if (error) {
-                    callback(new AppError(`error in signJWT: ${error.message}`, 500), null)
-                } else if (token) {
-                    callback(null, token);
-                }
-            }
+            // (error, token) => {
+            //     if (error) {
+            //         throw new AppError(`error in signJWT: ${error.message}`, 500)
+            //     } else if (token) {
+            //         return token;
+            //     }
+            // }
         );
+        return tokenString;
     } catch (error : any) {
-        callback(error, null);
+        logging.error(NAMESPACE, `Attempting to sign token for user ${user.username} failed`);
+        throw error;
     }
 };
 
