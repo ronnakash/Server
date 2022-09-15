@@ -42,7 +42,7 @@ export class NotesController extends ModelsController<NoteDocument>{
         let newNotes: NoteDocument[] = [];
         notes.forEach((note: INote) => {
             let { author, title, body, color } = note;
-            newNotes.push(new Note({
+            newNotes.push(new Note.NoteModel({
                 author,
                 title, 
                 body,

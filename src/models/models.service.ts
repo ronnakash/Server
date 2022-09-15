@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import mongoose, { Document, Model, EnforceDocument } from 'mongoose';
+import mongoose, { Document, Model } from 'mongoose';
 import { QueryFeaturesParams, UpdateByIdQueryParams, UpdateQueryParams } from '../interfaces/queries';
 import AppError from '../utils/appError';
 import QueryFeatures from '../utils/queryFeatures';

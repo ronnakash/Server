@@ -20,7 +20,7 @@ export const MONGO_OPTIONS = {
     retryWrites: false
 };
 
-export const mongoUri = process.env.MONGO_URI;
+export const mongoUri = process.env.MONGO_URI || '';
 
 // Firebase Admin SDK
 export const AdminSDKRoute = process.env.AdminSDKRoute;
