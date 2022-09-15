@@ -7,7 +7,7 @@ import AppError from '../utils/appError';
 
 const NAMESPACE = 'UserValidation'
 
-const UserSchema = new Schema<UserDocument>({
+export const UserSchema = new Schema<UserDocument>({
     username: { 
         type: String,
         required: [true, 'user must have a username'],
@@ -77,6 +77,4 @@ const UserSchema = new Schema<UserDocument>({
 // });  
 
 
-const UserModel = mongoose.model('User', UserSchema);
-
-export default UserModel;
+export const UserModel = mongoose.model('User', UserSchema);

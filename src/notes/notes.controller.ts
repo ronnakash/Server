@@ -4,7 +4,7 @@ import { NextFunction, Request, Response} from 'express';
 import { Model } from 'mongoose';
 import { ModelsController } from '../models/models.controller';
 import { INote, NoteDocument} from '../interfaces/notes';
-import Note from '../schemas/notes';
+import {NoteModel as Note} from '../schemas/notes';
 // import Query from '../utils/query';
 import { NotesService } from './notes.service';
 
@@ -42,7 +42,7 @@ export class NotesController extends ModelsController<NoteDocument>{
         let newNotes: NoteDocument[] = [];
         notes.forEach((note: INote) => {
             let { author, title, body, color } = note;
-            newNotes.push(new Note.NoteModel({
+            newNotes.push(new Note({
                 author,
                 title, 
                 body,

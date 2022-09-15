@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import UserDocument, { IUserProps } from '../interfaces/user';
 import { ModelsService } from '../models/models.service';
-import User from '../schemas/user';
+import {UserModel as User} from '../schemas/user';
 
 
 @Injectable()

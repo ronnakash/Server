@@ -3,13 +3,13 @@ import { NotesController } from './notes.controller';
 import { NotesService } from './notes.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { NoteDocument } from '../interfaces/notes';
-import noteSchema from '../schemas/notes';
+import {NoteSchema} from '../schemas/notes';
 
 @Module({
     imports: [MongooseModule.forFeature([
         {
             name: "Note",
-            schema: noteSchema.NoteSchema
+            schema: NoteSchema
         }
     ])],
     controllers: [NotesController],

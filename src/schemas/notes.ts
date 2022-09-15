@@ -3,7 +3,7 @@ import logging from '../config/logging';
 import {NoteDocument} from '../interfaces/notes';
 import UserDocument from '../interfaces/user';
 
-const NoteSchema: Schema<NoteDocument> = new Schema<NoteDocument>(
+export const NoteSchema: Schema<NoteDocument> = new Schema<NoteDocument>(
     // {
     //     title: {
     //         type: String, 
@@ -59,7 +59,6 @@ const NoteSchema: Schema<NoteDocument> = new Schema<NoteDocument>(
 
 // const NoteModel = mongoose.model<NoteDocument, Model<NoteDocument>>('Note', NoteSchema)
 
-const NoteModel = model('Note', NoteSchema)
+export const NoteModel = model('Note', NoteSchema)
 
 
-export default {NoteModel, NoteSchema};
