@@ -62,7 +62,14 @@ export abstract class ModelsController<T extends mongoose.Document> {
     // }
 
     
-    abstract updateModel(body : T) : Promise<{message: string, updated?: T}>;
+    @Put()
+    async updateModel(@Body() reqBody : T) {
+        let doc = await this.service.updateModel(reqBody);
+        return {
+            message: `Updated model sucsessfully`,
+            updated: doc
+        }
+    }
     
     
     @Delete()

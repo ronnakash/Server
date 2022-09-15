@@ -1,4 +1,4 @@
-import { Controller, Delete, Next, Put, Req, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Next, Put, Req, Res } from '@nestjs/common';
 import { NextFunction, Request, Response} from 'express';
 import {UserDocument} from '../interfaces/user';
 import { ModelsController } from '../models/models.controller';
@@ -13,8 +13,8 @@ export class UsersController extends ModelsController<UserDocument>{
     }   
 
     @Put()
-    async updateModel(@Req() req : Request, @Res() res : Response, @Next() next: NextFunction) {
-        let {id, username ,picture} = req.body;
+    async updateModel(@Body() reqBody : UserDocument) {
+        let {id, username ,picture} = reqBody;
         const user = await this.usersService
             .getOneById(id)
             .catch( error => next(error));
@@ -22,12 +22,11 @@ export class UsersController extends ModelsController<UserDocument>{
             if (picture) user.picture = picture;
             if (username) user.username = username;
             await this.usersService.updateDoc(user).catch( error => next(error));
-            res.locals.result = {
+            return {
                 message: user? `Updated user ${username}` : `Can't find user to update`,
                 user: user,
                 statusCode: user? 200 : 500
             };
-            next();
         }
     }
     

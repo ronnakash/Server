@@ -19,14 +19,14 @@ export class NotesController extends ModelsController<NoteDocument>{
         super(notesService)
     }
 
-    @Put()
-    async updateModel(@Body() reqBody : NoteDocument) {
-        let doc = await this.notesService.updateModel(reqBody);
-        return {
-            message: `Updated model sucsessfully`,
-            updated: doc
-        }
-    }
+    // @Put()
+    // async updateModel(@Body() reqBody : NoteDocument) {
+    //     let doc = await this.notesService.updateModel(reqBody);
+    //     return {
+    //         message: `Updated model sucsessfully`,
+    //         updated: doc
+    //     }
+    // }
 
     // @Put()
     // async createNotes(@Req() req : Request, @Res() res : Response, @Next() next: NextFunction) {
