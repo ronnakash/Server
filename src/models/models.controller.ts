@@ -15,74 +15,66 @@ export abstract class ModelsController<T extends mongoose.Document> {
     }
 
     @Get()
-    async getAll(@Req() req : Request, @Res() res : Response, @Next() next: NextFunction) {
+    async getAll(@Req() req : Request) {
         let params = urlParser(req.url);
         let docs = await this.service
-            .getMany({find: params})
-            .catch( error => next(error));
-        res.locals.result = {
+            .getAll({find: params})
+        return {
             message: docs ? `Got ${docs.length} results` : `Got no results`,
             docs
         };
-        next();
     }
 
 
     @Get('/:id')
-    async getById(@Param('id') id : string, @Res() res : Response, @Next() next: NextFunction) {
+    async getById(@Param('id') id : string) {
         let doc = await this.service
-            .getOneById(id)
-            .catch( error => next(error));
-        res.locals.result = {
+            .getById(id);
+        return {
             message: `Got doc sucsessfuly`,
             doc
         };
-        next();
     }
 
 
     @Get('/my')
-    async getMyModels(@Req() req : Request, @Res() res : Response, @Next() next: NextFunction) {
+    async getMyModels(@Req() req : Request) {
         let params = urlParser(req.url);
         const models = await this.service
             .getMany(params)
-            .catch( error => next(error));
-        res.locals.result = {
+        return {
             message: models ? `Got ${models.length} results` : `Got no results`,
             models
         };
-        next();
     }
 
 
-    @Get('/my')
-    async getMyModelsFromJWT(@Req() req : Request, @Res() res : Response, @Next() next: NextFunction) {
-        const models = await this.service
-            .getMany({find: {uid: res.locals.token.uid}})
-            .catch(error => next(error));
-        res.locals.result = {
-            message: models ? `Got ${models.length} results` : `Got no results`,
-            models
-        };
-        next();
-    }
+    // @Get('/my')
+    // async getMyModelsFromJWT(@Req() req : Request, @Res() res : Response, @Next() next: NextFunction) {
+    //     const models = await this.service
+    //         .getMany({find: {uid: res.locals.token.uid}})
+    //         .catch(error => next(error));
+    //     res.locals.result = {
+    //         message: models ? `Got ${models.length} results` : `Got no results`,
+    //         models
+    //     };
+    //     next();
+    // }
 
-
-    abstract updateModel(req : Request, res : Response, next: NextFunction) : Promise<void>;
+    
+    abstract updateModel(body : T) : Promise<{message: string, updated?: T}>;
     
     
     @Delete()
     async deleteModelById(@Req() req : Request, @Res() res : Response, @Next() next: NextFunction) {
         let { _id } = req.body;
         let deleted = await this.service
-            .deleteOneById(_id)
-            .catch( error => next(error));
-        res.locals.result = {
+            .deleteModelById(_id);
+        return {
             message: deleted? `Deleted model sucsessfuly` : `model not found`,
             model: deleted,
             statusCode: deleted? 200 : 400
         };
-        next();
-        }
+    }
 
 }

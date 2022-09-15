@@ -1,5 +1,5 @@
 import mongoose, { Document } from 'mongoose';
-import UserDocument from './user';
+import {UserDocument} from './user';
 
 export interface INote {
     title: string;
