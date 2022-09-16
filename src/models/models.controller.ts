@@ -26,7 +26,7 @@ export abstract class ModelsController<T extends mongoose.Document> {
     }
 
 
-    @Get('/:id')
+    @Get('/id/:id')
     async getById(@Param('id') id : string) {
         let doc = await this.service
             .getById(id);
@@ -62,7 +62,7 @@ export abstract class ModelsController<T extends mongoose.Document> {
     // }
 
     
-    @Put()
+    @Post()
     async updateModel(@Body() reqBody : T) {
         let doc = await this.service.updateModel(reqBody);
         return {
@@ -83,5 +83,8 @@ export abstract class ModelsController<T extends mongoose.Document> {
             statusCode: deleted? 200 : 400
         };
     }
+
+    // @Put()
+
 
 }

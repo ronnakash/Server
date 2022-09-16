@@ -30,31 +30,12 @@ export class UsersController extends ModelsController<UserDocument>{
 
     @Patch("/changePassword")
     async changePassword(@Body() body : UserChangePasswordProps) {
-        let { username, email, oldPassword, newPassword } = body;
-        //get user from database
-        const user = await this.usersService
-            .getOne({find: {username: username, email: email}, select: '+passwordChangedAt, +password'})
-            // .catch( error => next(error));;
-        if (user) {
-            //compare passwords
-            if (!(await bcryptjs.compare(oldPassword, user.password))) 
-                throw new AppError(`Password mismatch for ${username}`,400);
-            else if (oldPassword !== newPassword)
-                throw new AppError(`Can't change password to the current one`,400);
-            // validate new password strength
-            else if (!validator.isStrongPassword(newPassword))
-                throw new AppError(`New password for user ${username} is too weak`, 400);
-            else {
-                user.password = newPassword;
-                user.passwordChangedAt = Date.now();
-                await user.save()
-                user.password = ""; // hide password hash
-                return {
-                    message: `Changed password successfuly for user ${username}`,
-                    user: user
-                };
-            }
-        }
+        let user = await this.usersService.changePassword(body)
+        return {
+            message: `Changed password successfuly for user ${user.username}`,
+            user: user
+        };
+
     }
 
 }

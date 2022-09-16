@@ -117,26 +117,26 @@ const NAMESPACE = 'Notes Controller';
  * 
 */
 
-const createNote = async (req: Request, res: Response, next: NextFunction) => {
-    let { author, title, body, color} = req.body;
-    if (!author || (!title && !body))
-        next(new AppError(`not all required args were provided`,400));
-    else {
-        const note = new Note({
-            author,
-            title, 
-            body,
-            color
-        })
-        const newNote = await Query.createOne(Note, note);
-        res.locals.result = {
-            message: `Created new note for ${author}`, 
-            newNote
-        }
-        next();
-    }
+// const createNote = async (req: Request, res: Response, next: NextFunction) => {
+//     let { author, title, body, color} = req.body;
+//     if (!author || (!title && !body))
+//         next(new AppError(`not all required args were provided`,400));
+//     else {
+//         const note = new Note({
+//             author,
+//             title, 
+//             body,
+//             color
+//         })
+//         const newNote = await Query.createOne(Note, note);
+//         res.locals.result = {
+//             message: `Created new note for ${author}`, 
+//             newNote
+//         }
+//         next();
+//     }
 
-};
+// };
 
 
 /** createNotes 

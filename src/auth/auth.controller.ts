@@ -73,7 +73,7 @@ export class AuthController {
 
 
 
-    @Post()
+    @Post("/google")
     async googleRegister(@Body() body : {code : string}){
         let {token} = await this.authService.googleCodeExchage(body.code);
         let user = await this.authService.signInWithGoogle(token);

@@ -8,7 +8,7 @@ import { UsersService } from './users.service';
 @Module({
   imports: [MongooseModule.forFeature([
     {
-        name: "Note",
+        name: "User",
         schema: UserSchema
     }
 ])],
