@@ -16,23 +16,6 @@ export class UsersController extends ModelsController<UserDocument>{
         super(usersService)
     }   
 
-    // @Put()
-    // async updateModel(@Body() reqBody : UserDocument) {
-    //     let {id, username ,picture} = reqBody;
-    //     const user = await this.usersService
-    //         .getOneById(id)
-    //         .catch( error => next(error));
-    //     if (user) {
-    //         if (picture) user.picture = picture;
-    //         if (username) user.username = username;
-    //         await this.usersService.updateDoc(user).catch( error => next(error));
-    //         return {
-    //             message: user? `Updated user ${username}` : `Can't find user to update`,
-    //             user: user,
-    //             statusCode: user? 200 : 500
-    //         };
-    //     }
-    // }
     
     @Delete()
     async deleteByUsername(@Body() body: UserDocument) {

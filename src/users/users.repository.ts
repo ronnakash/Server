@@ -8,9 +8,9 @@ import { UserModel } from "../schemas/user";
 @Injectable()
 export class UsersRepository extends ModelsRepository<UserDocument> {
 
-    constructor(//@InjectModel(UserModel.name) private userModel: Model<UserDocument>
+    constructor(@InjectModel("User") private userModel: Model<UserDocument>
     ) {
-        super(UserModel);
+        super(userModel);
     }
 
 }

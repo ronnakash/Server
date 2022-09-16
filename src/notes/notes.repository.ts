@@ -12,9 +12,9 @@ import QueryFeatures from '../utils/queryFeatures';
 @Injectable()
 export class NotesRepository extends ModelsRepository<NoteDocument> {
 
-    constructor(//@InjectModel(NoteModel.name) private noteModel: Model<NoteDocument>
+    constructor(@InjectModel("Note") private noteModel: Model<NoteDocument>
     ) {
-        super(NoteModel);
+        super(noteModel);
     }
 
 }
