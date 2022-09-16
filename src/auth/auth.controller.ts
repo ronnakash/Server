@@ -15,7 +15,7 @@ import getGoogleTokens from '../functions/googleCodeExchange';
 @Controller('auth')
 export class AuthController {
 
-    constructor(private usersService : UsersService) {
+    constructor(private authService: AuthService, private usersService : UsersService) {
     }
 
     @Put("/register")
@@ -71,90 +71,20 @@ export class AuthController {
         return { message: "Error!!!!"};
     }
 
-    @Patch("/changePassword")
-    async changePassword(@Body() body : UserChangePasswordProps) {
-        let { username, email, oldPassword, newPassword } = body;
-        //get user from database
-        const user = await this.usersService
-            .getOne({find: {username: username, email: email}, select: '+passwordChangedAt, +password'})
-            // .catch( error => next(error));;
-        if (user) {
-            //compare passwords
-            if (!(await bcryptjs.compare(oldPassword, user.password))) 
-                throw new AppError(`Password mismatch for ${username}`,400);
-            else if (oldPassword !== newPassword)
-                throw new AppError(`Can't change password to the current one`,400);
-            // validate new password strength
-            else if (!validator.isStrongPassword(newPassword))
-                throw new AppError(`New password for user ${username} is too weak`, 400);
-            else {
-                user.password = newPassword;
-                user.passwordChangedAt = Date.now();
-                await user
-                    .save()
-                    // .catch( error => next(error));
-                user.password = ""; // hide password hash
-                return {
-                    message: `Changed password successfuly for user ${username}`,
-                    user: user
-                };
-            }
-        }
-    }
+
 
     @Post()
-    async googleCodeExchage(@Req() req : Request, @Res() res : Response, @Next() next: NextFunction) {
-        let {code} = req.body;
-        //code exchange request
-        const googleResponse = await getGoogleTokens(code)
-            .catch( error => next(error));
-        //if exchange successful
-        if (googleResponse){
-            let {access_token, id_token} = googleResponse;
-            const decodedIdToken : any = jwt.decode(id_token);
-            res.locals.result = {
-                token: decodedIdToken,
-                access_token
-            };
-            next();
-        }
+    async googleRegister(@Body() body : {code : string}){
+        let {token} = await this.authService.googleCodeExchage(body.code);
+        let user = await this.authService.signInWithGoogle(token);
+        let jwtToken = await this.authService.safeLogin(user);
+        return {
+            loginMessage: `Auth successful for ${user.username}`,
+            token: jwtToken,
+            user
+        };    
     }
 
-    @Post()
-    async googleRegister(@Req() req : Request, @Res() res : Response, @Next() next: NextFunction) {
-        let {name, email, picture} = res.locals.result.token;
-        let users = await this.usersService
-            .getMany({find: {email}})
-            .catch( error => next(error));
-        if (users){
-            let user = users[0];
-            if (!user.googleLogin){
-                user.googleLogin = true;
-                user.picture = picture;
-                await this.usersService.updateDoc(user);
-            }
-            res.locals.result = {
-                message: `Found google user ${name} sucsessfuly`,
-                user: user, 
-                new: false
-            };
-        }
-        else{
-            const userProps : IUserProps = {
-                username: name,
-                email,
-                permissions: 'user',
-                picture,
-                googleLogin: true,
-                };
-            const user = await this.usersService.newUser(userProps).catch(err=>next(err));
-            res.locals.result = {
-                message: `Created new user ${name} sucsessfuly`,
-                user: user, 
-                new: true
-            };
-        }
-        next();
-    }
 
 }
+

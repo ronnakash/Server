@@ -73,8 +73,8 @@ export abstract class ModelsController<T extends mongoose.Document> {
     
     
     @Delete()
-    async deleteModelById(@Req() req : Request, @Res() res : Response, @Next() next: NextFunction) {
-        let { _id } = req.body;
+    async deleteModelById(@Body() body: T) {
+        let { _id } = body;
         let deleted = await this.service
             .deleteModelById(_id);
         return {

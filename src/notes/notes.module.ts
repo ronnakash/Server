@@ -4,6 +4,7 @@ import { NotesService } from './notes.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { NoteDocument } from '../interfaces/notes';
 import {NoteSchema} from '../schemas/notes';
+import { NotesRepository } from './notes.repository';
 
 @Module({
     imports: [MongooseModule.forFeature([
@@ -13,6 +14,6 @@ import {NoteSchema} from '../schemas/notes';
         }
     ])],
     controllers: [NotesController],
-    providers: [NotesService]
+    providers: [NotesService, NotesRepository]
 })
 export class NotesModule {}

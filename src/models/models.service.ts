@@ -6,7 +6,7 @@ import QueryFeatures from '../utils/queryFeatures';
 import { ModelsRepository } from './models.repository';
 
 
-@Injectable()
+// @Injectable()
 export abstract class ModelsService<T extends mongoose.Document> {
     repository!: ModelsRepository<T>
 
@@ -21,6 +21,14 @@ export abstract class ModelsService<T extends mongoose.Document> {
     async getById(id : string) : Promise<T> {
         return await this.repository
             .getOneById(id);
+    }
+
+    async getOne(params : any) : Promise<T> {
+        const docs = await this.repository
+            .getMany(params);
+        if (docs.length == 1)
+            return docs[0];
+        throw new AppError("Document not found", 400);
     }
 
     async getMany(params : any) : Promise<T[]> {

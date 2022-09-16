@@ -4,11 +4,11 @@ import { QueryFeaturesParams, UpdateByIdQueryParams, UpdateQueryParams } from '.
 import AppError from '../utils/appError';
 import QueryFeatures from '../utils/queryFeatures';
 
-@Injectable()
+// @Injectable()
 export abstract class ModelsRepository<T extends Document> {
-    model : Model<T>
+    model! : Model<T>
 
-    protected constructor(model : Model<T>){
+    constructor(model : Model<T>){
         this.model = model;
     }
 
