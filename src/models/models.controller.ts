@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, Next, Param, Post, Put, Req, Res } from 
 import { NextFunction, Request, Response} from 'express';
 import { NoteDto } from '../interfaces/notes';
 import mongoose, { Model } from 'mongoose';
-import logging from '../config/logging';
 import urlParser from '../utils/urlParser';
 import { ModelsService } from './models.service';
 
@@ -75,8 +74,7 @@ export abstract class ModelsController<T extends mongoose.Document> {
     @Delete()
     async deleteModelById(@Body() body: T) {
         let { _id } = body;
-        let deleted = await this.service
-            .deleteModelById(_id);
+        let deleted = await this.service.deleteModelById(_id);
         return {
             message: deleted? `Deleted model sucsessfuly` : `model not found`,
             model: deleted,

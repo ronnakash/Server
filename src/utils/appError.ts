@@ -1,4 +1,3 @@
-import logging from '../config/logging';
 
 const NAMESPACE = 'AppError Constructor'
 

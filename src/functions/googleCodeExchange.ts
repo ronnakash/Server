@@ -1,5 +1,4 @@
 import axios from 'axios'
-import logging from '../config/logging';
 import {googleTokenUri, googleLoginConfig} from '../config/secret';
 
 const NAMESPACE = 'GoogleCodeExchange'

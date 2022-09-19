@@ -1,6 +1,5 @@
 import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 import config from '../config/config';
-import logging from '../config/logging';
 import { Request, Response, NextFunction } from 'express';
 import AppError from '../utils/appError';
 import { NestMiddleware } from '@nestjs/common';
@@ -74,7 +73,6 @@ export class ValidateAdminTokenMiddleware implements NestMiddleware{
         let {username, permissions} = token;
         if (permissions !== 'Admin')
             next(new AppError(`User ${username} does not have admin permissions`,400));           
-        logging.info(NAMESPACE, `validated Admin Token for user ${username} with permissions ${permissions}`);
         next();
     }
 };

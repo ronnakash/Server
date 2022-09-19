@@ -1,5 +1,4 @@
 import mongoose, { Document, Query, Model } from "mongoose";
-import logging from "../config/logging";
 import AppError from "./appError";
 //import catchAsync from './catchAsync';
 

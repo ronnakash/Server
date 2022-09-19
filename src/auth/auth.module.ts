@@ -1,5 +1,7 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import { RouteInfo } from '@nestjs/common/interfaces';
 import { MongooseModule } from '@nestjs/mongoose';
+import { GetJWTMiddleware } from '../middleware/authJWT';
 import { UserSchema } from '../schemas/user';
 import { UsersRepository } from '../users/users.repository';
 import { UsersService } from '../users/users.service';
@@ -17,4 +19,13 @@ import { AuthService } from './auth.service';
   providers: [AuthService, UsersService, UsersRepository],
   // exports: [AuthController]
 })
-export class AuthModule {}
+
+export class AuthModule implements NestModule{
+  configure(consumer: MiddlewareConsumer) {
+    const nri1 : RouteInfo = {
+      path: "auth/register",
+      method: RequestMethod.PUT
+    };
+    consumer.apply(GetJWTMiddleware).forRoutes(nri1);
+  }
+}

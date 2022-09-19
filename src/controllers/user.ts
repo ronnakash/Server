@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import logging from '../config/logging';
 import JWT from '../functions/signJWT';
 import {UserModel as User} from '../schemas/user';
 // import Query from '../utils/query';

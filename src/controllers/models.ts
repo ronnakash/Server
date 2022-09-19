@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import mongoose, { Model, Document, ObjectId } from 'mongoose';
 import AppError from '../utils/appError';
-import Query from '../utils/query';
-import logging from '../config/logging';
 import urlParser from '../utils/urlParser';
 
 const NAMESPACE = 'Models Controller';

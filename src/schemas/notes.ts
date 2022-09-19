@@ -1,5 +1,4 @@
 import mongoose, { Schema, Model, model, Document } from 'mongoose';
-import logging from '../config/logging';
 import {NoteDocument} from '../interfaces/notes';
 import {UserDocument} from '../interfaces/user';
 
