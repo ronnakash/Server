@@ -14,6 +14,7 @@ import { NotesRepository } from './notes.repository';
         }
     ])],
     controllers: [NotesController],
-    providers: [NotesService, NotesRepository]
+    providers: [NotesService, NotesRepository],
+    // exports: [NotesController]
 })
 export class NotesModule {}
