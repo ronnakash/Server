@@ -7,6 +7,7 @@ import {NoteSchema} from '../schemas/notes';
 import { NotesRepository } from './notes.repository';
 import { RouteInfo } from '@nestjs/common/interfaces';
 import { ExistsJWTMiddleware, GetJWTMiddleware, ValidateUserOrAdminMiddleware } from '../middleware/authJWT';
+import { ModelsModule } from '../models/models.module';
 
 @Module({
     imports: [MongooseModule.forFeature([
@@ -19,13 +20,6 @@ import { ExistsJWTMiddleware, GetJWTMiddleware, ValidateUserOrAdminMiddleware } 
     providers: [NotesService, NotesRepository],
     // exports: [NotesController]
 })
-export class NotesModule implements NestModule{
-    configure(consumer: MiddlewareConsumer) {
-        const nri1 : RouteInfo = {
-            path: "auth/.*",
-            method: RequestMethod.ALL
-        };
-        consumer.apply(GetJWTMiddleware, ExistsJWTMiddleware, ValidateUserOrAdminMiddleware).forRoutes(nri1);
-    }
+export class NotesModule extends ModelsModule{
 }
 

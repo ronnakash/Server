@@ -11,7 +11,7 @@
 
 //         title: {
 //             type: String,
-//             required: [true, 'todo list must have a title']
+//             default: ''
 //         },
 
 //         list: { 
