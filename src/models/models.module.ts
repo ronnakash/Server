@@ -10,9 +10,9 @@ import { ExistsJWTMiddleware, GetJWTMiddleware, ValidateUserOrAdminMiddleware } 
 export abstract class ModelsModule implements NestModule{
     route : RouteInfo;
 
-    constructor(){
+    constructor(path : string){
         this.route = {
-            path: "*",
+            path: path+"*",
             method: RequestMethod.ALL
         }
     }

@@ -17,12 +17,13 @@ const googleCodeExchangeRequest = axios.create({
 });
 
 const getGoogleTokens = async (code : any) : Promise<{ access_token: any; id_token: any; }> => {
+    const config = googleLoginConfig;
     const googleResponse = await googleCodeExchangeRequest
     .post('', {
         code,
-        ...googleLoginConfig
-    });
-    return googleResponse.data;
+        ...config
+    }).catch(err => {console.log(err)});
+    return googleResponse? googleResponse.data : {};
 }
 
 export default getGoogleTokens;

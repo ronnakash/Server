@@ -20,5 +20,12 @@ const config = {
     }
 }
 
+//mongoose connect
+const mongoose = require('mongoose');
+mongoose.connect(mongoUri, MONGO_OPTIONS)
+.then(console.log('Connected to Database'))
+.catch((error: any) => {
+    console.log('Error connecting to Database', error);
+})
 
 export default config;

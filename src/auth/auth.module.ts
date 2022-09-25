@@ -26,6 +26,6 @@ export class AuthModule implements NestModule{
       path: "auth/register",
       method: RequestMethod.PUT
     };
-    consumer.apply(GetJWTMiddleware).forRoutes(nri1);
+    // consumer.apply(GetJWTMiddleware).forRoutes(nri1);
   }
 }

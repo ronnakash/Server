@@ -20,4 +20,9 @@ providers: [UsersService, UsersRepository],
 exports: [UsersService]
 })
 export class UsersModule extends ModelsModule {
+
+  constructor(){
+    super("user");
+  }
+
 }

@@ -35,9 +35,12 @@ export class NotesService extends ModelsService<NoteDocument>{
             author,
             title, 
             body,
-            color
+            color: color || '#fcf483'
         })
         return await this.notesRepository.createOne(note);
+        // const saved = await note.save();
+        // if (saved) return saved;
+        // else throw new AppError("wtf", 500);
     };
 
 }

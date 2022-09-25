@@ -21,5 +21,10 @@ import { ModelsModule } from '../models/models.module';
     // exports: [NotesController]
 })
 export class NotesModule extends ModelsModule{
+
+    constructor(){
+        super("notes");
+    }
+
 }
 
