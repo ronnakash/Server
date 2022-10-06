@@ -4,7 +4,7 @@ import { ModelsService } from '../models/models.service';
 import {UserModel as User} from '../schemas/user';
 import { UsersRepository } from './users.repository';
 import bcryptjs from 'bcryptjs';
-import AppError from '../utils/appError';
+import AppError from '../utils/AppError';
 import validator from 'validator';
 
 

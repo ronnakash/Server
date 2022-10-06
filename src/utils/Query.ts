@@ -1,11 +1,9 @@
-import mongoose, { Document, Query, Model } from "mongoose";
-import AppError from "./appError";
+import mongoose, { Document, Model } from "mongoose";
+import AppError from "./AppError";
 //import catchAsync from './catchAsync';
 
 
-const NAMESPACE = "QueryFeatures";
-
-class QueryFeatures<T extends Document> {
+class Query<T extends Document> {
     params: any;
     schema: Model<T, any, any>;
     find: any;
@@ -58,10 +56,10 @@ class QueryFeatures<T extends Document> {
     async one() : Promise<T> {
         this.doc = await this.many();
         if (this.doc.length !== 1)
-            throw new AppError(`Error in QueryFeatures.one(): got ${this.doc.length} results`,400);
+            throw new AppError(`Error in Query.one(): got ${this.doc.length} results`,400);
         return this.doc[0];
     }
 
 }
 
-export default QueryFeatures;
+export default Query;

@@ -6,8 +6,7 @@ import { QueryFeaturesParams, UpdateByIdQueryParams, UpdateQueryParams } from '.
 import { UserDocument } from '../interfaces/user';
 import { ModelsRepository } from '../models/models.repository';
 import { NoteModel } from '../schemas/notes';
-import AppError from '../utils/appError';
-import QueryFeatures from '../utils/queryFeatures';
+import AppError from '../utils/AppError';
 
 @Injectable()
 export class NotesRepository extends ModelsRepository<NoteDocument> {

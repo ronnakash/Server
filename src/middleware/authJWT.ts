@@ -1,7 +1,7 @@
 import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 import config from '../config/config';
 import { Request, Response, NextFunction } from 'express';
-import AppError from '../utils/appError';
+import AppError from '../utils/AppError';
 import { NestMiddleware } from '@nestjs/common';
 
 

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { NoteDocument } from '../interfaces/notes';
 import { ModelsService } from '../models/models.service';
 import { NoteModel } from '../schemas/notes';
-import AppError from '../utils/appError';
+import AppError from '../utils/AppError';
 import { NotesRepository } from './notes.repository';
 import {NoteModel as Note} from '../schemas/notes';
 

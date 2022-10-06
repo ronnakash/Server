@@ -2,7 +2,7 @@ import mongoose, { Schema, Model, Document } from 'mongoose';
 import { UserDocument } from '../interfaces/user';
 import validator from 'validator';
 import bcryptjs from 'bcryptjs';
-import AppError from '../utils/appError';
+import AppError from '../utils/AppError';
 
 const NAMESPACE = 'UserValidation'
 

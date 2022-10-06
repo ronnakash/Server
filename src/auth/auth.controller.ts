@@ -2,12 +2,11 @@ import { UsersService } from '../users/users.service';
 import { Body, Controller, Delete, Get, Next, Param, Patch, Post, Put, Req, Res } from '@nestjs/common';
 import urlParser from '../utils/urlParser';
 import { NextFunction, Request, Response} from 'express';
-import AppError from '../utils/appError';
+import AppError from '../utils/AppError';
 import validator from 'validator';
 import { IUserProps, UserChangePasswordProps, UserLoginProps, UserRegisterProps } from '../interfaces/user';
 import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import JWT from '../functions/signJWT';
 import { AuthService } from './auth.service';
 import getGoogleTokens from '../functions/googleCodeExchange';
 
@@ -60,7 +59,7 @@ export class AuthController {
             if (!await bcryptjs.compare(password, user.password))
                 // next(new AppError(`password mismatch for user ${username}`, 400));
                 throw new AppError(`password mismatch for user ${username}`, 400);
-            const token = JWT.signJWT(user);
+            const token = this.authService.signJWT(user);
             user.password = "";
             return {
                 message: `Auth successful for ${username}`,

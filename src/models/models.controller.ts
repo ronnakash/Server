@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Next, Param, Post, Put, Req, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Next, Param, Post, Put, Query, Req, Res } from '@nestjs/common';
 import { NextFunction, Request, Response} from 'express';
 import { NoteDto } from '../interfaces/notes';
 import mongoose, { Model } from 'mongoose';
@@ -14,8 +14,8 @@ export abstract class ModelsController<T extends mongoose.Document> {
     }
 
     @Get()
-    async getAll(@Req() req : Request) {
-        let params = urlParser(req.url);
+    async getAll(@Query() params : any) {
+        // let params = urlParser(req.url);
         let docs = await this.service
             .getAll({find: params})
         return {
@@ -37,8 +37,8 @@ export abstract class ModelsController<T extends mongoose.Document> {
 
 
     @Get('/my')
-    async getMyModels(@Req() req : Request) {
-        let params = urlParser(req.url);
+    async getMyModels(@Query() params : any) {
+        // let params = urlParser(req.url);
         const models = await this.service
             .getMany(params)
         return {

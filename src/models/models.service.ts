@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import mongoose, { Document, Model, MongooseQueryOptions } from 'mongoose';
 import { QueryFeaturesParams, UpdateByIdQueryParams, UpdateQueryParams } from '../interfaces/queries';
-import AppError from '../utils/appError';
-import QueryFeatures from '../utils/queryFeatures';
+import AppError from '../utils/AppError';
 import { ModelsRepository } from './models.repository';
 
 

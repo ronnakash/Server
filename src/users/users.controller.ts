@@ -3,7 +3,7 @@ import { NextFunction, Request, Response} from 'express';
 import validator from 'validator';
 import {UserChangePasswordProps, UserDocument} from '../interfaces/user';
 import { ModelsController } from '../models/models.controller';
-import AppError from '../utils/appError';
+import AppError from '../utils/AppError';
 import { UsersService } from './users.service';
 import bcryptjs from 'bcryptjs';
 

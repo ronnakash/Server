@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
 import getGoogleTokens from '../functions/googleCodeExchange';
-import JWT from '../functions/signJWT';
 import { IUserProps, UserDocument } from '../interfaces/user';
 import { UsersService } from '../users/users.service';
 import jwt from 'jsonwebtoken';
+import config from '../config/config';
 
 
 
@@ -49,9 +49,25 @@ export class AuthService {
 
 
     async safeLogin(user : UserDocument) {
-        return JWT.signJWT(user);
+        return this.signJWT(user);
     };
 
+    signJWT(user: UserDocument) {
+        return jwt.sign(
+            {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                permissions: user.permissions
+            },
+            config.server.token.secret,
+            {
+                issuer: config.server.token.issuer,
+                algorithm: 'HS256',
+                expiresIn: "30 days"
+            }
+        )
+    }
     
 
 }

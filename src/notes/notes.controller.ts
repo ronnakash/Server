@@ -9,7 +9,7 @@ import {NoteModel as Note} from '../schemas/notes';
 import { NotesService } from './notes.service';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import AppError from '../utils/appError';
+import AppError from '../utils/AppError';
 
 
 @Controller('notes')
