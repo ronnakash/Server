@@ -8,7 +8,6 @@ import { IUserProps, UserChangePasswordProps, UserLoginProps, UserRegisterProps 
 import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { AuthService } from './auth.service';
-import getGoogleTokens from '../functions/googleCodeExchange';
 
 
 @Controller('auth')

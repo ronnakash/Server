@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
-import getGoogleTokens from '../functions/googleCodeExchange';
 import { IUserProps, UserDocument } from '../interfaces/user';
 import { UsersService } from '../users/users.service';
 import jwt from 'jsonwebtoken';
 import config from '../config/config';
+import axios from 'axios'
+import {googleTokenUri, googleLoginConfig} from '../config/secret';
 
 
 
@@ -14,7 +15,7 @@ export class AuthService {
     constructor(private usersService : UsersService){}
 
     async googleCodeExchage(code : string) {
-        const googleResponse = await getGoogleTokens(code);
+        const googleResponse = await this.getGoogleTokens(code);
         //if exchange successful
         let {access_token, id_token} = googleResponse;
         const decodedIdToken : any = jwt.decode(id_token);
@@ -68,6 +69,25 @@ export class AuthService {
             }
         )
     }
-    
+
+    async getGoogleTokens(code : any) : Promise<{access_token: any; id_token: any;}> {
+        const config = googleLoginConfig;
+        const googleCodeExchangeRequest = axios.create({
+            method: 'POST',
+            baseURL: googleTokenUri,
+            transformResponse: [(res : any) => {
+                let response = JSON.parse(res);
+                let {access_token, id_token} = response;
+                return {access_token, id_token};
+            }],
+            timeout: 5000
+        });
+        const googleResponse = await googleCodeExchangeRequest
+            .post('', {
+                code,
+                ...config
+            }).catch(err => {console.log(err)});
+        return googleResponse? googleResponse.data : {};
+    }
 
 }

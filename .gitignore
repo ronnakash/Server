@@ -7,4 +7,3 @@ push.sh
 .env
 build/
 *vercel*
-ssl/

@@ -5,10 +5,7 @@ import { AppModule } from './AppModule';
 
 dotenv.config({path:`${__dirname}/.env`});
 
-
 require('dotenv').config();
-
-const NAMESPACE = 'Server';
 
 const bootstrap = async () => {
     const app = await NestFactory.create(AppModule);
