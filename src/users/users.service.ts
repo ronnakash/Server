@@ -21,12 +21,15 @@ export class UsersService extends ModelsService<UserDocument>{
     }
 
     async updateModel(model: UserDocument): Promise<UserDocument> {
-        let {id, username ,picture} = model;
+        let {id, username, picture, password} = model;
         const user = await this.repository
             .getOneById(id);
-        if (picture) user.picture = picture;
-        if (username) user.username = username;
-        await this.repository.updateDoc(user);
+        if (picture) 
+            user.picture = picture;
+        if (username) 
+            user.username = username;
+        // await this.repository.updateDoc(user);
+        await user.save();
         return user;
     }
 

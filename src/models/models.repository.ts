@@ -41,7 +41,7 @@ export abstract class ModelsRepository<T extends Document> {
     }
 
 
-    async updateDoc( doc : T): Promise<T> {
+    async updateDoc(doc : T): Promise<T> {
         return await doc.save().catch(error => {throw new AppError(error.message,500)});
     }
 
