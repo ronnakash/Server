@@ -32,11 +32,13 @@ export class AuthController {
         //check token user permission
         else if (permissions === 'Admin' && (!token || (token && !(token.permissions === 'Admin'))))
             throw new AppError(`You are not authorised to create Admin users!`,400);
+        //hash password
+        const hashPassword = await bcryptjs.hash(password, 10);
         //create user
         const userProps : IUserProps = {
             username,
             email,
-            password,
+            password: hashPassword,
             permissions
             };
         const user = await this.usersService.newUser(userProps)
