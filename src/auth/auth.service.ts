@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { NextFunction, Request, Response } from 'express';
 import { IUserProps, UserDocument } from '../interfaces/user';
 import { UsersService } from '../users/users.service';
 import jwt from 'jsonwebtoken';
 import config from '../config/config';
 import axios from 'axios'
 import {googleTokenUri, googleLoginConfig} from '../config/secret';
-
 
 
 @Injectable()
@@ -72,14 +70,15 @@ export class AuthService {
 
     async getGoogleTokens(code : any) : Promise<{access_token: any; id_token: any;}> {
         const config = googleLoginConfig;
+        const transformer = (res : any) => {
+            let response = JSON.parse(res);
+            let {access_token, id_token} = response;
+            return {access_token, id_token};
+        };
         const googleCodeExchangeRequest = axios.create({
             method: 'POST',
             baseURL: googleTokenUri,
-            transformResponse: [(res : any) => {
-                let response = JSON.parse(res);
-                let {access_token, id_token} = response;
-                return {access_token, id_token};
-            }],
+            transformResponse: [transformer],
             timeout: 5000
         });
         const googleResponse = await googleCodeExchangeRequest

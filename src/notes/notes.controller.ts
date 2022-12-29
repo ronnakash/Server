@@ -20,6 +20,15 @@ export class NotesController extends ModelsController<NoteDocument>{
         super(notesService)
     }
 
+    @Put("")
+    async createModel(@Body() reqBody : NoteDocument) {
+        let newNote = await this.notesService.createModel(reqBody);
+        return {
+            message: `Created new note for ${newNote.author}`, 
+            newNote
+        }
+    };
+
     // @Put()
     // async updateModel(@Body() reqBody : NoteDocument) {
     //     let doc = await this.notesService.updateModel(reqBody);
@@ -49,15 +58,5 @@ export class NotesController extends ModelsController<NoteDocument>{
     //     }
     //     next();
     // }
-
-    @Put("")
-    async createModel(@Body() reqBody : NoteDocument) {
-        let newNote = await this.notesService.createModel(reqBody);
-        return {
-            message: `Created new note for ${newNote.author}`, 
-            newNote
-        }
-    };
-
-
+    
 }

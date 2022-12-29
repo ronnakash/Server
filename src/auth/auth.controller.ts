@@ -30,22 +30,22 @@ export class AuthController {
         else if (!validator.isStrongPassword(password || ""))
         throw new AppError(`Provided password for user ${username} is too weak`, 400);
         //check token user permission
-        else if (permissions === 'Admin' && token && !(token.permissions === 'Admin'))
+        else if (permissions === 'Admin' && (!token || (token && !(token.permissions === 'Admin'))))
             throw new AppError(`You are not authorised to create Admin users!`,400);
-        else {
-            const userProps : IUserProps = {
-                username,
-                email,
-                password,
-                permissions
-                };
-            const user = await this.usersService.newUser(userProps)
-                // .catch( error => next(error));
-            return {
-                message: `Created new user ${username} sucsessfuly`,
-                user: user
-            }
+        //create user
+        const userProps : IUserProps = {
+            username,
+            email,
+            password,
+            permissions
+            };
+        const user = await this.usersService.newUser(userProps)
+            // .catch( error => next(error));
+        return {
+            message: `Created new user ${username} sucsessfuly`,
+            user: user
         }
+    
     }
 
     @Post('/login')
@@ -62,8 +62,8 @@ export class AuthController {
             user.password = "";
             return {
                 message: `Auth successful for ${username}`,
-                token: token,
-                user: user
+                token,
+                user
             };
         }
         return { message: "Error!!!!"};
