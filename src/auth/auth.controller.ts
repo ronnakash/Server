@@ -46,6 +46,8 @@ export class AuthController {
         //make jwt
         const newToken = await this.authService.safeLogin(user);
             // .catch( error => next(error));
+        //hide password
+        user.password = "";
         return {
             message: `Created new user ${username} sucsessfuly`,
             user: user,
