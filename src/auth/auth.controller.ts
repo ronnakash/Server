@@ -40,13 +40,17 @@ export class AuthController {
             email,
             password: hashPassword,
             permissions
-            };
-        const user = await this.usersService.newUser(userProps)
+        };
+        //save user
+        const user = await this.usersService.newUser(userProps);
+        //make jwt
+        const newToken = await this.authService.safeLogin(user);
             // .catch( error => next(error));
         return {
             message: `Created new user ${username} sucsessfuly`,
-            user: user
-        }
+            user: user,
+            token: newToken
+        };
     
     }
 
