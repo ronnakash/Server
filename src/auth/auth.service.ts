@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IUserProps, UserDocument } from '../interfaces/user';
+import { UserProps, UserDocument } from '../interfaces/user';
 import { UsersService } from '../users/users.service';
 import jwt from 'jsonwebtoken';
 import config from '../config/config';
@@ -36,7 +36,7 @@ export class AuthService {
             }
             return user;
         }
-        const userProps : IUserProps = {
+        const userProps : UserProps = {
             username: name,
             email,
             permissions: 'user',

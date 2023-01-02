@@ -9,8 +9,9 @@ export interface UserLoginProps {
     password?: string;
 }
 
-export interface UserChangePasswordProps extends UserLoginProps {
-    oldPassword: string;
+export interface UserChangePasswordProps  {
+    // oldPassword: string;
+    user: UserDocument
     newPassword: string;
 }
 
@@ -20,7 +21,7 @@ export interface UserRegisterProps extends UserLoginProps {
     token?: JwtPayload;
 }
 
-export interface IUserProps extends UserLoginProps{
+export interface UserProps extends UserLoginProps{
     username: string;
     email : string;
     password?: string;
@@ -30,7 +31,7 @@ export interface IUserProps extends UserLoginProps{
     googleAccessToken?: string;
 }
 
-export interface IUser extends IUserProps{
+export interface User extends UserProps{
     password: string;
     permissions: string;
     passwordChangedAt: number;
@@ -39,7 +40,7 @@ export interface IUser extends IUserProps{
 }
 
 //interface that contains all UserDocument fields
-export interface UserBaseDocument extends IUser, Document {
+export interface UserBaseDocument extends User, Document {
     _id: mongoose.ObjectId;
     createdAt: mongoose.Date;
     updatedAt: mongoose.Date;

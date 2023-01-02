@@ -1,12 +1,9 @@
 import { UsersService } from '../users/users.service';
 import { Body, Controller, Delete, Get, Next, Param, Patch, Post, Put, Req, Res } from '@nestjs/common';
-import urlParser from '../utils/urlParser';
-import { NextFunction, Request, Response} from 'express';
 import AppError from '../utils/AppError';
 import validator from 'validator';
-import { IUserProps, UserChangePasswordProps, UserLoginProps, UserRegisterProps } from '../interfaces/user';
+import { UserProps, UserLoginProps, UserRegisterProps } from '../interfaces/user';
 import bcryptjs from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { AuthService } from './auth.service';
 
 
@@ -35,7 +32,7 @@ export class AuthController {
         //hash password
         const hashPassword = await bcryptjs.hash(password, 10);
         //create user
-        const userProps : IUserProps = {
+        const userProps : UserProps = {
             username,
             email,
             password: hashPassword,
