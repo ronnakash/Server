@@ -41,7 +41,6 @@ export class UsersService extends ModelsService<UserDocument>{
         //compare passwords
         // if (!(await bcryptjs.compare(newPassword, user.password))) 
         //     throw new AppError(`Password mismatch for ${username}`,400);
-        await bcryptjs.compare(newPassword, user.password)
         if (await bcryptjs.compare(newPassword, user.password))
             throw new AppError(`Can't change password to the current one`,400);
         // validate new password strength
