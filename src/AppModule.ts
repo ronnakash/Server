@@ -22,23 +22,23 @@ import { ExistsJWTMiddleware, GetJWTMiddleware } from './middleware/authJWT';
 
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
-        // //notes
-        // const nri1 : RouteInfo = {
-        //     path: "notes/my",
-        //     method: RequestMethod.ALL
-        // };
-        // //users
+        //notes
+        const nri1 : RouteInfo = {
+            path: "notes/my",
+            method: RequestMethod.ALL
+        };
+        //users
 
-        // //auth
-        // const ri1 : RouteInfo = {
-        //     path: "*",
-        //     method: RequestMethod.ALL
-        // };
-        // const ri2 : RouteInfo = {
-        //     path: "*",
-        //     method: RequestMethod.ALL
-        // };
-        // consumer.apply(GetJWTMiddleware, ExistsJWTMiddleware).forRoutes(nri1);
+        //auth
+        const ri1 : RouteInfo = {
+            path: "*",
+            method: RequestMethod.ALL
+        };
+        const ri2 : RouteInfo = {
+            path: "*",
+            method: RequestMethod.ALL
+        };
+        consumer.apply(GetJWTMiddleware, ExistsJWTMiddleware).forRoutes(nri1);
     }
 }
 
