@@ -6,9 +6,9 @@ import AppError from "./AppError";
 class Query<T extends Document> {
     params: any;
     schema: Model<T, any, any>;
-    find: any;
-    select: any;
-    sort: any;
+    find: any;      //fields to find docs by
+    select: any;    //fields to show in result
+    sort: any;      //sort order of results
     docs: T[] = [];
 
     constructor(schema : Model<T, any, any>, params : any) {
