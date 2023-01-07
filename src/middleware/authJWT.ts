@@ -20,12 +20,13 @@ const NAMESPACE = 'Auth';
 
 export class ExistsJWTMiddleware implements NestMiddleware {
     use(req: Request, res: Response, next: NextFunction) {
+        // console.log('ExistsJWTMiddleware');
         let token = req.body.jwt;
         //TODO: make sure next with error works
         if (token) 
             next();
         else 
-            next(new AppError(`no token provided`,400));
+        throw new AppError(`no token provided`,400);
     }
 };
 
@@ -41,22 +42,23 @@ export class ExistsJWTMiddleware implements NestMiddleware {
 
 export class GetJWTMiddleware implements NestMiddleware {
     use(req: Request, res: Response, next: NextFunction) {
+        console.log('GetJWTMiddleware');
         //ensure that the request body doesn't contain a jwt field
         if (req.body.jwt)
-            new AppError('No token provided',400)
+            throw new AppError('No token provided',400)
         //extract token and add it to the request body
         let token = req.headers.authorization?.split(' ')[1];
         if (token) {
             jwt.verify(token, config.server.token.secret,
                 (error: VerifyErrors | null, decoded: JwtPayload | undefined) => {
                     if (error) {
-                        next(error);
+                        throw error;
                     } else {
                         req.body.jwt = decoded;
+                        next();
                     }
             });
         }
-        next();
         // else next(new AppError('No token provided', 400));
     }    
 };
@@ -76,11 +78,12 @@ export class GetJWTMiddleware implements NestMiddleware {
 
 export class ValidateAdminTokenMiddleware implements NestMiddleware{
     use(req: Request, res: Response, next: NextFunction) {
+        console.log('ValidateAdminTokenMiddleware');
         let token = req.body.jwt;
         let {username, permissions} = token;
         if (permissions !== 'Admin')
-            next(new AppError(`User ${username} does not have admin permissions`,400));           
-        next();
+            throw new AppError(`User ${username} does not have admin permissions`,400);           
+        else next();
     }
 };
 
@@ -96,19 +99,16 @@ export class ValidateAdminTokenMiddleware implements NestMiddleware{
 
 export class ValidateUserOrAdminMiddleware implements NestMiddleware{
     use(req: Request, res: Response, next: NextFunction) {
+        console.log('ValidateUserOrAdminMiddleware');
         let token : JWTParams = req.body.jwt;
         let { permissions, username } = token;
         if (permissions == 'Admin')
             next();
-        else if (permissions == 'user') {
-            //check if author/username match the username of token
-            const requestUser = req.body.author || req.body.username;
-            if (requestUser == username)
-                next();
-            next(`Users without admin permissions can't make actions regarding other users`)
-        }
-        else
-            next(new AppError('No token provided',400)); 
+        //check if author/username match the username of token
+        const requestUser = req.body.author || req.body.username;
+        if (requestUser == username)
+            next();
+        else throw new AppError(`Users without admin permissions can't make actions regarding other users`,400); 
     }
 };
 

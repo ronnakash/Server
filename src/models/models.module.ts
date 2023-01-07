@@ -8,16 +8,10 @@ import { ExistsJWTMiddleware, GetJWTMiddleware, ValidateUserOrAdminMiddleware } 
 
 @Module({})
 export abstract class ModelsModule implements NestModule{
-    route : RouteInfo;
 
     constructor(path : string){
-        this.route = {
-            path: path+"*",
-            method: RequestMethod.ALL
-        }
     }
 
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(GetJWTMiddleware, ExistsJWTMiddleware, ValidateUserOrAdminMiddleware).forRoutes(this.route);
     }
 }

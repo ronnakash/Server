@@ -6,7 +6,7 @@ import { NoteDocument } from '../interfaces/notes';
 import {NoteSchema} from '../schemas/notes';
 import { NotesRepository } from './notes.repository';
 import { RouteInfo } from '@nestjs/common/interfaces';
-import { ExistsJWTMiddleware, GetJWTMiddleware, ValidateUserOrAdminMiddleware } from '../middleware/authJWT';
+// import { ExistsJWTMiddleware, GetJWTMiddleware, ValidateUserOrAdminMiddleware } from '../middleware/authJWT';
 import { ModelsModule } from '../models/models.module';
 
 @Module({

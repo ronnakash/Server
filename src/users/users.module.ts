@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { RouteInfo } from '@nestjs/common/interfaces';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ExistsJWTMiddleware, GetJWTMiddleware, ValidateUserOrAdminMiddleware } from '../middleware/authJWT';
+// import { ExistsJWTMiddleware, GetJWTMiddleware, ValidateUserOrAdminMiddleware } from '../middleware/authJWT';
 import { ModelsModule } from '../models/models.module';
 import {UserSchema} from '../schemas/user';
 import { UsersController } from './users.controller';
