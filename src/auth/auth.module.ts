@@ -6,6 +6,9 @@ import { UsersRepository } from '../users/users.repository';
 import { UsersService } from '../users/users.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { ExistsJWTMiddleware, GetJWTMiddleware, ValidateUserOrAdminMiddleware } from '../middleware/authJWT';
+import { routeInfos } from '../interfaces/middleware';
+
 
 @Module({
   imports: [MongooseModule.forFeature([
@@ -21,5 +24,6 @@ import { AuthService } from './auth.service';
 
 export class AuthModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
+      consumer.apply(ExistsJWTMiddleware, ValidateUserOrAdminMiddleware).forRoutes(routeInfos.authPutRoutes);
   }
 }

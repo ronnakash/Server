@@ -55,6 +55,11 @@ const authPostRoutes : RouteInfo = {
     method: RequestMethod.POST
 }
 
+const authPutRoutes : RouteInfo = {
+    path: '/auth*', 
+    method: RequestMethod.PUT
+}
+
 const userRoutes : RouteInfo = {
     path: '/user*', 
     method: RequestMethod.ALL
@@ -69,5 +74,6 @@ export const routeInfos = {
     allPutRoutes,
     notesRoutes,
     authPostRoutes,
+    authPutRoutes,
     userRoutes,
 }

@@ -22,7 +22,7 @@ exports: [UsersService]
 })
 export class UsersModule extends ModelsModule<UserProps, UserDocument> {
   configure(consumer: MiddlewareConsumer): void {
-    throw new Error('Method not implemented.');
+      super.configure(consumer);
   }
 
   constructor(){

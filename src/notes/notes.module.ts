@@ -22,11 +22,11 @@ import { ModelsModule } from '../models/models.module';
 })
 export class NotesModule extends ModelsModule<Note, NoteDocument>{
     configure(consumer: MiddlewareConsumer): void {
-        throw new Error('Method not implemented.');
+        super.configure(consumer);
     }
 
     constructor(){
-        super("Note");
+        super("note");
     }
     
 

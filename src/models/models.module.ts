@@ -11,10 +11,36 @@ import { Document } from 'mongoose';
 
 @Module({})
 export abstract class ModelsModule<M extends ModelBase, S extends Document> implements NestModule{
+    path: string;
 
     constructor(path : string){
+        this.path = path;
     }
 
 
-    abstract configure(consumer: MiddlewareConsumer) : void;
+    configure(consumer: MiddlewareConsumer){
+        // const fullPath = `/${this.path}*`;
+        // const getRouteInfo : RouteInfo = {
+        //     path: fullPath,
+        //     method: RequestMethod.GET
+        // };
+        // const postRouteInfo : RouteInfo = {
+        //     path: fullPath,
+        //     method: RequestMethod.POST
+        // };
+        // const PutRouteInfo : RouteInfo = {
+        //     path: fullPath,
+        //     method: RequestMethod.PUT
+        // };
+        // const deleteRouteInfo : RouteInfo = {
+        //     path: fullPath,
+        //     method: RequestMethod.DELETE
+        // };
+        const routeInfo : RouteInfo = {
+            path: `/${this.path}*`,
+            method: RequestMethod.ALL
+        };
+        consumer.apply(ExistsJWTMiddleware, ValidateUserOrAdminMiddleware).forRoutes(routeInfo);
+
+    };
 }
