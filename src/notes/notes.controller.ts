@@ -7,8 +7,8 @@ import { Note, NoteDocument} from '../interfaces/notes';
 // import {NoteModel as NoteModel} from '../schemas/notes';
 // import Query from '../utils/query';
 import { NotesService } from './notes.service';
-import { ParamsDictionary } from 'express-serve-static-core';
-import { ParsedQs } from 'qs';
+// import { ParamsDictionary } from 'express-serve-static-core';
+// import { ParsedQs } from 'qs';
 import AppError from '../utils/AppError';
 import { JWTBody } from '../interfaces/middleware';
 
@@ -39,7 +39,7 @@ export class NotesController extends ModelsController<NoteDocument>{
         let newNote = await this.notesService.createModel(reqBody);
         return {
             message: `Created new note for ${newNote.author}`, 
-            newNote
+            model: newNote
         }
     };
 

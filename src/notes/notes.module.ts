@@ -8,6 +8,7 @@ import { NotesRepository } from './notes.repository';
 import { RouteInfo } from '@nestjs/common/interfaces';
 // import { ExistsJWTMiddleware, GetJWTMiddleware, ValidateUserOrAdminMiddleware } from '../middleware/authJWT';
 import { ModelsModule } from '../models/models.module';
+import { ExistsJWTMiddleware, ValidateUserOrAdminMiddleware } from '../middleware/authJWT';
 
 @Module({
     imports: [MongooseModule.forFeature([
@@ -22,7 +23,26 @@ import { ModelsModule } from '../models/models.module';
 })
 export class NotesModule extends ModelsModule<Note, NoteDocument>{
     configure(consumer: MiddlewareConsumer): void {
-        super.configure(consumer);
+        // const fullPath = `/${this.path}*`;
+        // super.configure(consumer);
+        // const allRouteInfo : RouteInfo = {
+        //     path: `/${this.path}*`,
+        //     method: RequestMethod.ALL
+        // };
+        const postRouteInfo : RouteInfo = {
+            path: this.path,
+            method: RequestMethod.POST
+        };
+        const PutRouteInfo : RouteInfo = {
+            path: this.path,
+            method: RequestMethod.PUT
+        };
+        const deleteRouteInfo : RouteInfo = {
+            path: this.path,
+            method: RequestMethod.DELETE
+        };
+        consumer.apply(ExistsJWTMiddleware, ValidateUserOrAdminMiddleware)
+            .forRoutes(postRouteInfo, PutRouteInfo, deleteRouteInfo);
     }
 
     constructor(){

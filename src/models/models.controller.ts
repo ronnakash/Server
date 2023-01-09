@@ -84,7 +84,12 @@ export abstract class ModelsController<T extends Document> {
         };
     }
 
-    // @Put()
-
-
+    @Put()
+    async createModel(@Body() reqBody : T) : Promise<{message: string, model: T }>{
+        let newModel = await this.service.createModel(reqBody);
+        return {
+            message: `Created new model`, 
+            model: newModel
+        };
+    }
 }

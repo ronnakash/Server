@@ -24,6 +24,6 @@ import { routeInfos } from '../interfaces/middleware';
 
 export class AuthModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
-      consumer.apply(ExistsJWTMiddleware, ValidateUserOrAdminMiddleware).forRoutes(routeInfos.authPutRoutes);
+      // consumer.apply(ExistsJWTMiddleware, ValidateUserOrAdminMiddleware).forRoutes(routeInfos.authPutRoutes);
   }
 }

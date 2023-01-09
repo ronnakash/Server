@@ -12,17 +12,19 @@ import { JWTBody } from '../interfaces/middleware';
 @Controller('users')
 export class UsersController extends ModelsController<UserDocument>{
     
-    
-    getMyModels(body: JWTBody): Promise<{ message: string; models: UserDocument[]; }> {
-        throw new Error('Method not implemented.');
-    }
-
     constructor( //@InjectModel("Note") private noteModel : Model<NoteDocument>,
             private usersService : UsersService) {
         super(usersService)
     }   
 
+    createModel(reqBody: UserDocument): Promise<{ message: string; model: UserDocument; }> {
+        throw new Error('Method not implemented.');
+    }
     
+    getMyModels(body: JWTBody): Promise<{ message: string; models: UserDocument[]; }> {
+        throw new Error('Method not implemented.');
+    }
+
     @Delete()
     async deleteByUsername(@Body() body: UserDocument) {
         let { username } = body;

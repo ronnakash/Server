@@ -14,12 +14,13 @@ export abstract class ModelsModule<M extends ModelBase, S extends Document> impl
     path: string;
 
     constructor(path : string){
-        this.path = path;
+        this.path = `/${path}*`;
     }
 
+    // abstract configure(consumer: MiddlewareConsumer) : void;
 
+    
     configure(consumer: MiddlewareConsumer){
-        // const fullPath = `/${this.path}*`;
         // const getRouteInfo : RouteInfo = {
         //     path: fullPath,
         //     method: RequestMethod.GET
@@ -36,11 +37,12 @@ export abstract class ModelsModule<M extends ModelBase, S extends Document> impl
         //     path: fullPath,
         //     method: RequestMethod.DELETE
         // };
-        const routeInfo : RouteInfo = {
-            path: `/${this.path}*`,
+        const allRouteInfo : RouteInfo = {
+            path: this.path,
             method: RequestMethod.ALL
         };
-        consumer.apply(ExistsJWTMiddleware, ValidateUserOrAdminMiddleware).forRoutes(routeInfo);
-
+        consumer.apply(ExistsJWTMiddleware, ValidateUserOrAdminMiddleware)
+            .forRoutes(allRouteInfo);
     };
+
 }

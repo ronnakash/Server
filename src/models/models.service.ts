@@ -11,7 +11,6 @@ export abstract class ModelsService<T extends mongoose.Document> {
 
     protected constructor(){}
 
-
     async getAll(params : any) : Promise<T[]> {
         return await this.repository
             .getMany({find: params});
@@ -47,6 +46,10 @@ export abstract class ModelsService<T extends mongoose.Document> {
         if (deletedModel == null)
             throw new AppError('Document not found', 500);
         return deletedModel;
+    }
+
+    async createModel(model : T) : Promise<T>{
+        return this.repository.createOne(model);
     }
 
 }

@@ -7,3 +7,4 @@ push.sh
 .env
 build/
 *vercel*
+Dockerfile

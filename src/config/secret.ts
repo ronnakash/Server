@@ -8,7 +8,7 @@ export const SERVER_HOSTNAME = process.env.SERVER_HOSTNAME;
 export const SERVER_PORT = process.env.SERVER_PORT;
 export const SERVER_TOKEN_EXPIRETIME = process.env.SERVER_TOKEN_EXPIRETIME;
 export const SERVER_TOKEN_ISSUER = process.env.SERVER_TOKEN_ISSUER;
-export const SERVER_TOKEN_SECRET = process.env.SERVER_TOKEN_SECRET || 'superencryptedsecret';
+export const SERVER_TOKEN_SECRET = process.env.SERVER_TOKEN_SECRET;
 // export const SERVER_TOKEN_ALGORITHM = process.env.SERVER_TOKEN_ALGORITHM || 'HS256'
 
 // mongoose options

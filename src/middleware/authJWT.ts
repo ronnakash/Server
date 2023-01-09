@@ -44,8 +44,8 @@ export class GetJWTMiddleware implements NestMiddleware {
         //extract token and add it to the request body
         let token = req.headers.authorization?.split(' ')[1];
         if (token) {
-            jwt.verify(token, config.server.token.secret,
-                (error, decoded) => {
+            jwt.verify(token, config.server.token.secret || "",
+                (error: any, decoded: any) => {
                     if (error) {
                         console.log(error);
                         throw error;
@@ -91,13 +91,14 @@ export class ValidateAdminTokenMiddleware implements NestMiddleware{
 export class ValidateUserOrAdminMiddleware implements NestMiddleware{
     use(req: Request, res: Response, next: NextFunction) {
         // console.log('ValidateUserOrAdminMiddleware');
-        let token : JWTParams = req.body.jwt;
-        let { permissions, username } = token;
+        let body = req.body;
+        let token : JWTParams = body.jwt;
+        let { permissions, email } = token;
         if (permissions == 'Admin')
             next();
         //check if author/username match the username of token
-        const requestUser = req.body.author || req.body.username;
-        if (requestUser == username)
+        const requestUser = body.author || body.email;
+        if (requestUser == email)
             next();
         else throw new AppError(`Users without admin permissions can't make actions regarding other users`,400); 
     }

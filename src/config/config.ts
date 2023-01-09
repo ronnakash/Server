@@ -15,7 +15,7 @@ const config = {
         token: {
             expireTime: SERVER_TOKEN_EXPIRETIME,
             issuer: SERVER_TOKEN_ISSUER,
-            secret: SERVER_TOKEN_SECRET,
+            secret: SERVER_TOKEN_SECRET || "",
         }
     }
 }
