@@ -21,10 +21,5 @@ import { AuthService } from './auth.service';
 
 export class AuthModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
-    // const nri1 : RouteInfo = {
-    //   path: "auth/register",
-    //   method: RequestMethod.PUT
-    // };
-    // consumer.apply(GetJWTMiddleware).forRoutes(nri1);
   }
 }

@@ -3,17 +3,31 @@ import { InjectModel } from '@nestjs/mongoose';
 import { NextFunction, Request, Response} from 'express';
 import { Model } from 'mongoose';
 import { ModelsController } from '../models/models.controller';
-import { INote, NoteDocument} from '../interfaces/notes';
-import {NoteModel as Note} from '../schemas/notes';
+import { Note, NoteDocument} from '../interfaces/notes';
+// import {NoteModel as NoteModel} from '../schemas/notes';
 // import Query from '../utils/query';
 import { NotesService } from './notes.service';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
 import AppError from '../utils/AppError';
+import { JWTBody } from '../interfaces/middleware';
 
 
 @Controller('notes')
 export class NotesController extends ModelsController<NoteDocument>{
+    
+    @Get('/my')
+    async getMyModels(@Body() body : JWTBody) {
+        // let params = urlParser(req.url);
+        let {email} = body.jwt;
+        const models = await this.service
+            .getMany({find: {author: email}})
+        return {
+            message: models ? `Got ${models.length} results` : `Got no results`,
+            models
+        };
+    }
+
 
     constructor(//@InjectModel("Note") private noteModel : Model<NoteDocument>,
             private notesService : NotesService) {

@@ -2,7 +2,7 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/c
 import { NotesController } from './notes.controller';
 import { NotesService } from './notes.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { NoteDocument } from '../interfaces/notes';
+import { Note, NoteDocument } from '../interfaces/notes';
 import {NoteSchema} from '../schemas/notes';
 import { NotesRepository } from './notes.repository';
 import { RouteInfo } from '@nestjs/common/interfaces';
@@ -20,11 +20,15 @@ import { ModelsModule } from '../models/models.module';
     providers: [NotesService, NotesRepository],
     // exports: [NotesController]
 })
-export class NotesModule extends ModelsModule{
+export class NotesModule extends ModelsModule<Note, NoteDocument>{
+    configure(consumer: MiddlewareConsumer): void {
+        throw new Error('Method not implemented.');
+    }
 
     constructor(){
-        super("notes");
+        super("Note");
     }
+    
 
 }
 

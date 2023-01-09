@@ -1,10 +1,10 @@
 import { Body, Controller, Delete, Get, Next, Param, Post, Put, Query, Req, Res } from '@nestjs/common';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import { ModelsService } from './models.service';
 import { JWTBody } from '../interfaces/middleware';
 
 @Controller()
-export abstract class ModelsController<T extends mongoose.Document> {
+export abstract class ModelsController<T extends Document> {
     service : ModelsService<T>;
 
     protected constructor(modelsService : ModelsService<T>){
@@ -34,17 +34,20 @@ export abstract class ModelsController<T extends mongoose.Document> {
     }
 
 
-    @Get('/my')
-    async getMyModels(@Body() body : JWTBody) {
-        // let params = urlParser(req.url);
-        let {email} = body.jwt;
-        const models = await this.service
-            .getMany({find: {author: email}})
-        return {
-            message: models ? `Got ${models.length} results` : `Got no results`,
-            models
-        };
-    }
+    // @Get('/my')
+    // async getMyModels(@Body() body : JWTBody) {
+    //     // let params = urlParser(req.url);
+    //     let {email} = body.jwt;
+    //     const models = await this.service
+    //         .getMany({find: {author: email}})
+    //     return {
+    //         message: models ? `Got ${models.length} results` : `Got no results`,
+    //         models
+    //     };
+    // }
+
+    abstract getMyModels(body : JWTBody) : Promise<{ message: string; models: T[]; }>;
+
 
 
     // @Get('/my')

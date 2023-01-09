@@ -6,10 +6,16 @@ import { ModelsController } from '../models/models.controller';
 import AppError from '../utils/AppError';
 import { UsersService } from './users.service';
 import bcryptjs from 'bcryptjs';
+import { JWTBody } from '../interfaces/middleware';
 
 
 @Controller('users')
 export class UsersController extends ModelsController<UserDocument>{
+    
+    
+    getMyModels(body: JWTBody): Promise<{ message: string; models: UserDocument[]; }> {
+        throw new Error('Method not implemented.');
+    }
 
     constructor( //@InjectModel("Note") private noteModel : Model<NoteDocument>,
             private usersService : UsersService) {

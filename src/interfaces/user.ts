@@ -1,9 +1,10 @@
 import { JwtPayload } from 'jsonwebtoken';
 import mongoose, { Document } from 'mongoose';
+import { ModelBase } from './models';
 
 //interface to pass params to User constructor
 
-export interface UserLoginProps {
+export interface UserLoginProps extends ModelBase{
     username: string;
     email : string;
     password?: string;

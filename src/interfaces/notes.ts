@@ -1,7 +1,8 @@
 import mongoose, { Document } from 'mongoose';
 import {UserDocument} from './user';
+import { ModelBase } from './models';
 
-export interface INote {
+export interface Note extends ModelBase {
     title: string;
     author: string;
     body: string;
@@ -9,7 +10,7 @@ export interface INote {
 }
 
 
-export interface NoteDto extends INote {
+export interface NoteDto extends Note {
     _id: mongoose.ObjectId;
     createdAt: mongoose.Date;
     updatedAt: mongoose.Date;

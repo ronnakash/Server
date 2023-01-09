@@ -20,13 +20,12 @@ const NAMESPACE = 'Auth';
 
 export class ExistsJWTMiddleware implements NestMiddleware {
     use(req: Request, res: Response, next: NextFunction) {
-        // console.log('ExistsJWTMiddleware');
+        console.log('ExistsJWTMiddleware');
         let token = req.body.jwt;
         //TODO: make sure next with error works
         if (token) 
             next();
-        else 
-        throw new AppError(`no token provided`,400);
+        else throw new AppError(`no token provided`,400);
     }
 };
 
@@ -45,21 +44,22 @@ export class GetJWTMiddleware implements NestMiddleware {
         console.log('GetJWTMiddleware');
         //ensure that the request body doesn't contain a jwt field
         if (req.body.jwt)
-            throw new AppError('No token provided',400)
+            throw new AppError(`Can't provide JWT in request body`,400)
         //extract token and add it to the request body
         let token = req.headers.authorization?.split(' ')[1];
         if (token) {
             jwt.verify(token, config.server.token.secret,
-                (error: VerifyErrors | null, decoded: JwtPayload | undefined) => {
+                (error, decoded) => {
                     if (error) {
+                        console.log(error);
                         throw error;
                     } else {
                         req.body.jwt = decoded;
-                        next();
                     }
             });
         }
-        // else next(new AppError('No token provided', 400));
+        next();
+        // throw new AppError('No token provided', 400);
     }    
 };
 
